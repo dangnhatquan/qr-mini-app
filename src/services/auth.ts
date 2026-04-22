@@ -1,0 +1,40 @@
+import { authZaloLogin } from "@/resources";
+import { LoginResponse } from "@/types/auth";
+import request from "@/utils/axios";
+
+import { getAccessToken } from "zmp-sdk";
+
+async function loginWithZaloToken(
+  zaloAccessToken: string,
+): Promise<LoginResponse> {
+  try {
+    const data = await request.post<LoginResponse, { accessToken: string }>(
+      authZaloLogin,
+      { accessToken: zaloAccessToken }
+    );
+
+    return data;
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.message ||
+      "Login failed";
+
+    throw new Error(message);
+  }
+}
+
+async function getZaloAccessToken(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    getAccessToken({
+      success: (accessToken: string) => resolve(accessToken),
+      fail: (err: unknown) => reject(err),
+    });
+  });
+}
+
+export async function loginWithZalo(): Promise<LoginResponse> {
+  const zaloAccessToken = await getZaloAccessToken();
+  const loginResponse = await loginWithZaloToken(zaloAccessToken);
+  return loginResponse;
+}

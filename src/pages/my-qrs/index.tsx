@@ -56,7 +56,7 @@ const MyQRsPage: React.FC = () => {
   return (
     <Page className="bg-gray-50">
       <Header title="Danh sách QR" showBackIcon={false} />
-      <div className="mt-[64px] pb-24">
+      <div className="content">
         {loading ? (
           <Box flex justifyContent="center" alignItems="center" p={10}>
             <Spinner />
@@ -93,7 +93,7 @@ const MyQRsPage: React.FC = () => {
         )}
       </div>
 
-      <Box p={4} className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+      <Box p={4} className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-8">
         <Button
           fullWidth
           size="large"

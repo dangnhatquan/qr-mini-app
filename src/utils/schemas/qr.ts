@@ -10,7 +10,7 @@ export const wifiSchema = z.object({
 export const bankingSchema = z.object({
   bankId: z.string().min(1, "Vui lòng chọn ngân hàng"),
   accountNo: z.string().min(1, "Vui lòng nhập số tài khoản"),
-  accountName: z.string().min(1, "Vui lòng nhập tên chủ tài khoản"),
+  accountName: z.string().optional(),
   amount: z.string().optional(),
   description: z.string().optional(),
 });

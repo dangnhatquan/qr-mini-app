@@ -34,7 +34,6 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
         control={control}
         label="Tên chủ tài khoản"
         placeholder="Nhập tên chủ tài khoản (không dấu)"
-        required
       />
       <InputFormField
         name="bankingData.amount"

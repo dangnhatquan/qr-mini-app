@@ -133,7 +133,10 @@ const CreatePage: React.FC = () => {
             )}
           </Box>
 
-          <Box p={4}>
+          <Box
+            p={4}
+            className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-8"
+          >
             <Button
               fullWidth
               size="large"

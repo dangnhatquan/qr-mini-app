@@ -5,6 +5,7 @@ import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import globals from "globals";
 
 export default [
   {
@@ -18,13 +19,8 @@ export default [
       ecmaVersion: "latest",
       sourceType: "module",
       globals: {
-        window: "readonly",
-        document: "readonly",
-        navigator: "readonly",
-        console: "readonly",
-        module: "readonly",
-        process: "readonly",
-        require: "readonly",
+        ...globals.browser,
+        ...globals.node
       },
     },
     plugins: {

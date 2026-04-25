@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Page, Header, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
+import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";
 import { createRoute } from "@/utils/routes";
@@ -35,6 +36,39 @@ const MyQRsPage: React.FC = () => {
         console.error("Load modal image error:", err);
       }
     }
+  };
+
+  const handleDownload = async () => {
+    if (!modalImgSrc) return;
+    try {
+      await saveImageToGallery({
+        imageBase64Data: modalImgSrc,
+      });
+      showToast({ message: "Lưu ảnh thành công" });
+    } catch (error) {
+      console.error("Save image error:", error);
+      showToast({ message: "Lưu ảnh thất bại hoặc bị từ chối quyền" });
+    }
+  };
+
+  const handleShare = async () => {
+    if (!selectedQR?.previewImage?.path) return;
+    try {
+      await openShareSheet({
+        type: "image",
+        data: {
+          imageUrls: [selectedQR.previewImage.path],
+        },
+      });
+    } catch (error) {
+      console.error("Share error:", error);
+      showToast({ message: "Không thể chia sẻ, vui lòng thử lại" });
+    }
+  };
+
+  const handleEdit = () => {
+    if (!selectedQR) return;
+    showToast({ message: "Tính năng đang phát triển" });
   };
 
   useEffect(() => {
@@ -127,7 +161,55 @@ const MyQRsPage: React.FC = () => {
           <Text className="mt-6 text-center text-gray-500 text-sm px-4 font-medium">
             Người dùng có thể quét mã này trực tiếp từ màn hình của bạn
           </Text>
-          <Button className="mt-6" fullWidth onClick={() => setModalVisible(false)}>
+
+          <Box flex flexDirection="row" justifyContent="space-around" className="w-full mt-6 px-4">
+            <Box
+              flex
+              flexDirection="column"
+              alignItems="center"
+              onClick={handleDownload}
+              className="cursor-pointer"
+            >
+              <div className="bg-gray-100 p-3 rounded-full mb-2">
+                <Icon icon="zi-download" className="text-gray-800" />
+              </div>
+              <Text size="xxSmall" className="text-gray-600 font-medium">
+                Tải xuống
+              </Text>
+            </Box>
+
+            <Box
+              flex
+              flexDirection="column"
+              alignItems="center"
+              onClick={handleEdit}
+              className="cursor-pointer"
+            >
+              <div className="bg-gray-100 p-3 rounded-full mb-2">
+                <Icon icon="zi-edit-text" className="text-gray-800" />
+              </div>
+              <Text size="xxSmall" className="text-gray-600 font-medium">
+                Tuỳ chỉnh
+              </Text>
+            </Box>
+
+            <Box
+              flex
+              flexDirection="column"
+              alignItems="center"
+              onClick={handleShare}
+              className="cursor-pointer"
+            >
+              <div className="bg-gray-100 p-3 rounded-full mb-2">
+                <Icon icon="zi-share-external-1" className="text-gray-800" />
+              </div>
+              <Text size="xxSmall" className="text-gray-600 font-medium">
+                Chia sẻ
+              </Text>
+            </Box>
+          </Box>
+
+          <Button className="mt-6" fullWidth onClick={() => setModalVisible(false)} type="neutral">
             Đóng
           </Button>
         </Box>

@@ -7,8 +7,7 @@ import { createRoute } from "@/utils/routes";
 import { getCategoryLabel } from "./utils/functions";
 import { QRCard } from "./components/qr-card";
 import { QrCode } from "@/types/qr";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import "./styles.scss";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,39 +19,124 @@ const MyQRsPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const container = useRef<HTMLDivElement>(null);
 
-  // Swipe to delete states
   const [swipeState, setSwipeState] = useState<{ [id: string]: number }>({});
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const touchStart = useRef<{ x: number; y: number; val: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QrCode | null>(null);
 
-  const hasAnimatedIn = useRef(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const ptrStart = useRef<{ y: number; val: number; isPulling: boolean } | null>(null);
 
-  useGSAP(() => {
-    if (qrs.length > 0 && !hasAnimatedIn.current) {
-      hasAnimatedIn.current = true;
-      gsap.fromTo(
-        ".qr-card-wrapper",
-        { y: 100, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          stagger: 0.1,
-          duration: 0.6,
-          ease: "power3.out",
-          clearProps: "y,opacity",
-        },
-      );
+  const [isInitialRender, setIsInitialRender] = useState(true);
+
+  const fetchQRs = async (isBackground = false) => {
+    try {
+      if (!isBackground) setLoading(true);
+      const data = await qrService.getMyQRs();
+      setQrs(data || []);
+    } catch (error) {
+      console.error("Failed to fetch QRs:", error);
+    } finally {
+      if (!isBackground) setLoading(false);
     }
-  }, [qrs]);
+  };
+
+  useEffect(() => {
+    if (qrs.length > 0 && isInitialRender) {
+      const timer = setTimeout(() => setIsInitialRender(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [qrs, isInitialRender]);
+
+  useEffect(() => {
+    // Tránh lỗi linter gọi setState đồng bộ trong effect
+    setTimeout(() => {
+      fetchQRs();
+    }, 0);
+  }, []);
+
+  const handlePtrStart = (e: React.TouchEvent) => {
+    const pageContent = document.querySelector(".zaui-page-content") || document.documentElement;
+    if (pageContent.scrollTop <= 0) {
+      ptrStart.current = { y: e.touches[0].clientY, val: 0, isPulling: false };
+    }
+  };
+
+  const handlePtrMove = (e: React.TouchEvent) => {
+    if (!ptrStart.current || isRefreshing) return;
+    const currentY = e.touches[0].clientY;
+    const diffY = currentY - ptrStart.current.y;
+
+    if (diffY > 0) {
+      ptrStart.current.isPulling = true;
+      let val = diffY * 0.4;
+      if (val > 80) val = 80;
+      ptrStart.current.val = val;
+
+      const ptrEl = document.getElementById("ptr-wrapper");
+      if (ptrEl) ptrEl.style.transform = `translate3d(0, ${val}px, 0)`;
+
+      const spinnerEl = document.getElementById("ptr-spinner");
+      if (spinnerEl) {
+        spinnerEl.style.transform = `translate3d(0, ${val - 40}px, 0) rotate(${val * 5}deg)`;
+        spinnerEl.style.opacity = `${val / 80}`;
+      }
+    }
+  };
+
+  const handlePtrEnd = async () => {
+    if (!ptrStart.current || !ptrStart.current.isPulling || isRefreshing) {
+      ptrStart.current = null;
+      return;
+    }
+    const val = ptrStart.current.val;
+    const ptrEl = document.getElementById("ptr-wrapper");
+    const spinnerEl = document.getElementById("ptr-spinner");
+
+    if (val >= 60) {
+      setIsRefreshing(true);
+      if (ptrEl) {
+        ptrEl.style.transition = "transform 0.3s ease-out";
+        ptrEl.style.transform = `translate3d(0, 60px, 0)`;
+      }
+      if (spinnerEl) {
+        spinnerEl.style.transition = "all 0.3s ease-out";
+        spinnerEl.style.transform = `translate3d(0, 20px, 0) rotate(360deg)`;
+        spinnerEl.style.opacity = `1`;
+        spinnerEl.classList.add("animate-spin");
+      }
+
+      await fetchQRs(true);
+      setIsRefreshing(false);
+      showToast({ message: "Đã làm mới danh sách" });
+    }
+
+    // Snap back
+    if (ptrEl) {
+      ptrEl.style.transition = "transform 0.3s ease-out";
+      ptrEl.style.transform = `translate3d(0, 0, 0)`;
+    }
+    if (spinnerEl) {
+      spinnerEl.style.transition = "all 0.3s ease-out";
+      spinnerEl.style.transform = `translate3d(0, -40px, 0)`;
+      spinnerEl.style.opacity = `0`;
+      spinnerEl.classList.remove("animate-spin");
+    }
+
+    setTimeout(() => {
+      if (ptrEl) ptrEl.style.transition = "";
+      if (spinnerEl) spinnerEl.style.transition = "";
+    }, 300);
+
+    ptrStart.current = null;
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, val: 0 };
     setIsDragging(true);
   };
 
   const handleTouchMove = (e: React.TouchEvent, id: string, index: number) => {
-    // Chỉ cho phép vuốt thẻ đang mở rộng hoặc thẻ cuối cùng
     if (expandedId !== id && index !== qrs.length - 1) return;
 
     if (!touchStart.current) return;
@@ -62,11 +146,12 @@ const MyQRsPage: React.FC = () => {
     const diffY = currentY - touchStart.current.y;
 
     if (Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX < 0) {
-        // Ghi đè toàn bộ state để đảm bảo chỉ có 1 thẻ được vuốt ra tại 1 thời điểm
-        setSwipeState({ [id]: Math.max(diffX, -90) });
-      } else {
-        setSwipeState({ [id]: Math.min(diffX, 0) });
+      const val = diffX < 0 ? Math.max(diffX, -90) : Math.min(diffX, 0);
+      touchStart.current.val = val;
+
+      const el = document.getElementById(`swipe-content-${id}`);
+      if (el) {
+        el.style.transform = `translate3d(${val}px, 0, 0)`;
       }
     }
   };
@@ -76,7 +161,11 @@ const MyQRsPage: React.FC = () => {
     if (expandedId !== id && index !== qrs.length - 1) return;
 
     if (!touchStart.current) return;
-    const diffX = swipeState[id] || 0;
+    const diffX = touchStart.current.val || 0;
+
+    const el = document.getElementById(`swipe-content-${id}`);
+    if (el) el.style.transform = "";
+
     if (diffX < -50) {
       setSwipeState({ [id]: -90 });
     } else {
@@ -88,7 +177,6 @@ const MyQRsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteConfirmQR) return;
     try {
-      // Bỏ setLoading(true) để không unmount cả danh sách gây mất mượt
       await qrService.deleteQR(deleteConfirmQR.id);
 
       const cardId = deleteConfirmQR.id;
@@ -96,24 +184,14 @@ const MyQRsPage: React.FC = () => {
       setSwipeState({});
       if (expandedId === cardId) setExpandedId(null);
 
-      // Hiệu ứng GSAP rút thẻ ra khỏi danh sách
       const cardElement = document.getElementById(`qr-card-wrapper-${cardId}`);
       if (cardElement) {
-        gsap.to(cardElement, {
-          x: -window.innerWidth,
-          opacity: 0,
-          height: 0,
-          marginTop: 0,
-          marginBottom: 0,
-          paddingTop: 0,
-          paddingBottom: 0,
-          duration: 0.5,
-          ease: "power3.inOut",
-          onComplete: () => {
-            setQrs((prev) => prev.filter((q) => q.id !== cardId));
-            showToast({ message: "Xoá mã QR thành công" });
-          },
-        });
+        cardElement.classList.add("card-delete");
+
+        setTimeout(() => {
+          setQrs((prev) => prev.filter((q) => q.id !== cardId));
+          showToast({ message: "Xoá mã QR thành công" });
+        }, 500);
       } else {
         setQrs((prev) => prev.filter((q) => q.id !== cardId));
         showToast({ message: "Xoá mã QR thành công" });
@@ -186,28 +264,29 @@ const MyQRsPage: React.FC = () => {
     navigate(`/edit-ui/${selectedQR.id}`);
   };
 
-  useEffect(() => {
-    const fetchQRs = async () => {
-      try {
-        setLoading(true);
-        const data = await qrService.getMyQRs();
-        setQrs(data || []);
-      } catch (error) {
-        console.error("Failed to fetch QRs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQRs();
-  }, []);
-
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
 
   return (
     <Page className="bg-gray-50">
       <Header title="Danh sách QR" showBackIcon={false} />
-      <div className="content relative">
+      <div
+        className="content relative"
+        id="ptr-wrapper"
+        onTouchStart={handlePtrStart}
+        onTouchMove={handlePtrMove}
+        onTouchEnd={handlePtrEnd}
+      >
+        <div
+          className="absolute top-0 left-0 right-0 h-16 flex items-center justify-center -translate-y-full pointer-events-none"
+          style={{ zIndex: 100 }}
+        >
+          <Icon
+            id="ptr-spinner"
+            icon="zi-auto-solid"
+            className="text-gray-400 text-2xl"
+            style={{ opacity: 0 }}
+          />
+        </div>
         {loading ? (
           <Box flex justifyContent="center" alignItems="center" p={10}>
             <Spinner />
@@ -218,15 +297,15 @@ const MyQRsPage: React.FC = () => {
               <div
                 key={qr.id}
                 id={`qr-card-wrapper-${qr.id}`}
-                className="qr-card-wrapper transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden"
+                className={`qr-card-base qr-card-wrapper transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden ${isInitialRender ? "card-enter" : ""}`}
                 style={{
                   marginTop: index === 0 ? "0px" : "-85px",
-                  position: "relative",
                   zIndex: index,
+                  animationDelay: isInitialRender ? `${index * 0.1}s` : "0s",
                   transform:
                     expandedIndex !== -1 && index > expandedIndex
-                      ? "translateY(105px)"
-                      : "translateY(0px)",
+                      ? "translate3d(0, 105px, 0)"
+                      : "translate3d(0, 0, 0)",
                 }}
               >
                 <div
@@ -237,10 +316,12 @@ const MyQRsPage: React.FC = () => {
                   <Icon icon="zi-delete" className="text-2xl" />
                 </div>
                 <div
+                  id={`swipe-content-${qr.id}`}
                   className="relative z-10 w-full h-full rounded-2xl"
                   style={{
-                    transform: `translateX(${swipeState[qr.id] || 0}px)`,
+                    transform: `translate3d(${swipeState[qr.id] || 0}px, 0, 0)`,
                     transition: isDragging ? "none" : "transform 0.3s ease-out",
+                    willChange: "transform",
                   }}
                   onTouchStart={(e) => handleTouchStart(e)}
                   onTouchMove={(e) => handleTouchMove(e, qr.id, index)}

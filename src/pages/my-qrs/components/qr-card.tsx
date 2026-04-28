@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Text, Icon } from "zmp-ui";
 import { getCategoryLabel } from "../utils/functions";
-import QRCodeStyling from "qr-code-styling";
-import { IQRBackendPayload } from "@/types/qr";
-import { generateQRPayload } from "@/utils/helpers/qr";
 
 interface QRCardProps {
   id: string;
@@ -58,10 +55,9 @@ export const QRCard: React.FC<QRCardProps> = ({
           ? "bg-gradient-to-br from-blue-500 to-blue-700"
           : "bg-gradient-to-br from-indigo-500 to-purple-700"
       }`}
-      style={{ minHeight: "180px" }}
+      style={{ minHeight: "200px" }}
       onClick={onClick}
     >
-      {/* Decorative Background Elements */}
       <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white opacity-10 blur-xl" />
       <div className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full bg-white opacity-10 blur-xl" />
 

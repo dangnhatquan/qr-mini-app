@@ -20,8 +20,17 @@ const MyQRsPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const container = useRef<HTMLDivElement>(null);
 
+  // Swipe to delete states
+  const [swipeState, setSwipeState] = useState<{ [id: string]: number }>({});
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [deleteConfirmQR, setDeleteConfirmQR] = useState<QrCode | null>(null);
+
+  const hasAnimatedIn = useRef(false);
+
   useGSAP(() => {
-    if (qrs.length > 0) {
+    if (qrs.length > 0 && !hasAnimatedIn.current) {
+      hasAnimatedIn.current = true;
       gsap.fromTo(
         ".qr-card-wrapper",
         { y: 100, opacity: 0 },
@@ -36,6 +45,84 @@ const MyQRsPage: React.FC = () => {
       );
     }
   }, [qrs]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent, id: string, index: number) => {
+    // Chỉ cho phép vuốt thẻ đang mở rộng hoặc thẻ cuối cùng
+    if (expandedId !== id && index !== qrs.length - 1) return;
+
+    if (!touchStart.current) return;
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const diffX = currentX - touchStart.current.x;
+    const diffY = currentY - touchStart.current.y;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX < 0) {
+        // Ghi đè toàn bộ state để đảm bảo chỉ có 1 thẻ được vuốt ra tại 1 thời điểm
+        setSwipeState({ [id]: Math.max(diffX, -90) });
+      } else {
+        setSwipeState({ [id]: Math.min(diffX, 0) });
+      }
+    }
+  };
+
+  const handleTouchEnd = (id: string, index: number) => {
+    setIsDragging(false);
+    if (expandedId !== id && index !== qrs.length - 1) return;
+
+    if (!touchStart.current) return;
+    const diffX = swipeState[id] || 0;
+    if (diffX < -50) {
+      setSwipeState({ [id]: -90 });
+    } else {
+      setSwipeState({});
+    }
+    touchStart.current = null;
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmQR) return;
+    try {
+      // Bỏ setLoading(true) để không unmount cả danh sách gây mất mượt
+      await qrService.deleteQR(deleteConfirmQR.id);
+
+      const cardId = deleteConfirmQR.id;
+      setDeleteConfirmQR(null);
+      setSwipeState({});
+      if (expandedId === cardId) setExpandedId(null);
+
+      // Hiệu ứng GSAP rút thẻ ra khỏi danh sách
+      const cardElement = document.getElementById(`qr-card-wrapper-${cardId}`);
+      if (cardElement) {
+        gsap.to(cardElement, {
+          x: -window.innerWidth,
+          opacity: 0,
+          height: 0,
+          marginTop: 0,
+          marginBottom: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          duration: 0.5,
+          ease: "power3.inOut",
+          onComplete: () => {
+            setQrs((prev) => prev.filter((q) => q.id !== cardId));
+            showToast({ message: "Xoá mã QR thành công" });
+          },
+        });
+      } else {
+        setQrs((prev) => prev.filter((q) => q.id !== cardId));
+        showToast({ message: "Xoá mã QR thành công" });
+      }
+    } catch (error) {
+      console.error(error);
+      showToast({ message: "Lỗi khi xoá mã QR" });
+    }
+  };
 
   const handleCardClick = async (qr: QrCode, index: number) => {
     if (expandedId !== qr.id && index !== qrs.length - 1) {
@@ -130,7 +217,8 @@ const MyQRsPage: React.FC = () => {
             {qrs.map((qr, index) => (
               <div
                 key={qr.id}
-                className="qr-card-wrapper transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                id={`qr-card-wrapper-${qr.id}`}
+                className="qr-card-wrapper transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] overflow-hidden"
                 style={{
                   marginTop: index === 0 ? "0px" : "-85px",
                   position: "relative",
@@ -141,14 +229,38 @@ const MyQRsPage: React.FC = () => {
                       : "translateY(0px)",
                 }}
               >
-                <QRCard
-                  id={qr.id}
-                  type={qr.type}
-                  category={qr.category}
-                  previewUrl={qr.previewImage?.path}
-                  createdAt={qr.createdAt}
-                  onClick={() => handleCardClick(qr, index)}
-                />
+                <div
+                  className="absolute inset-0 bg-red-500 rounded-2xl flex items-center justify-end pr-6 text-white"
+                  style={{ zIndex: 0 }}
+                  onClick={() => setDeleteConfirmQR(qr)}
+                >
+                  <Icon icon="zi-delete" className="text-2xl" />
+                </div>
+                <div
+                  className="relative z-10 w-full h-full rounded-2xl"
+                  style={{
+                    transform: `translateX(${swipeState[qr.id] || 0}px)`,
+                    transition: isDragging ? "none" : "transform 0.3s ease-out",
+                  }}
+                  onTouchStart={(e) => handleTouchStart(e)}
+                  onTouchMove={(e) => handleTouchMove(e, qr.id, index)}
+                  onTouchEnd={() => handleTouchEnd(qr.id, index)}
+                >
+                  <QRCard
+                    id={qr.id}
+                    type={qr.type}
+                    category={qr.category}
+                    previewUrl={qr.previewImage?.path}
+                    createdAt={qr.createdAt}
+                    onClick={() => {
+                      if (swipeState[qr.id] === -90) {
+                        setSwipeState((prev) => ({ ...prev, [qr.id]: 0 }));
+                      } else {
+                        handleCardClick(qr, index);
+                      }
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </Box>
@@ -170,7 +282,10 @@ const MyQRsPage: React.FC = () => {
         )}
       </div>
 
-      <Box p={4} className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-8">
+      <Box
+        p={4}
+        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-8 z-50"
+      >
         <Button
           fullWidth
           size="large"
@@ -257,6 +372,17 @@ const MyQRsPage: React.FC = () => {
           </Button>
         </Box>
       </Modal>
+
+      <Modal
+        visible={!!deleteConfirmQR}
+        title="Xác nhận xoá"
+        description="Bạn có chắc chắn muốn xoá mã QR này không? Thao tác này không thể hoàn tác."
+        onClose={() => setDeleteConfirmQR(null)}
+        actions={[
+          { text: "Huỷ", close: true, onClick: () => setDeleteConfirmQR(null) },
+          { text: "Xoá", danger: true, onClick: handleDeleteConfirm },
+        ]}
+      />
     </Page>
   );
 };

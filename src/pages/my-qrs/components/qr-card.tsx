@@ -53,7 +53,7 @@ export const QRCard: React.FC<QRCardProps> = ({
 
   return (
     <Box
-      className={`rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden transition-transform duration-300 active:scale-95 cursor-pointer text-white ${
+      className={`rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden cursor-pointer text-white ${
         type === "static"
           ? "bg-gradient-to-br from-blue-500 to-blue-700"
           : "bg-gradient-to-br from-indigo-500 to-purple-700"

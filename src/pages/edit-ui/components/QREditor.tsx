@@ -106,7 +106,32 @@ export const QREditor: React.FC = () => {
         if (qr) {
           setOriginalQR(qr);
           const textData = generateQRPayload(qr);
-          setQrOptions((prev) => ({ ...prev, data: textData }));
+
+          let savedStage = qr.editorStage as any;
+          if (typeof savedStage === "string") {
+            try {
+              savedStage = JSON.parse(savedStage);
+            } catch (e) {
+              savedStage = null;
+            }
+          }
+
+          if (savedStage && savedStage.qrOptions) {
+            const newOptions = { ...savedStage.qrOptions, data: textData };
+            setQrOptions(newOptions);
+            setInitialOptions(newOptions);
+
+            if (savedStage.elements) {
+              setElements(savedStage.elements);
+              setInitialElements(savedStage.elements);
+            }
+            if (savedStage.canvasBg) {
+              setCanvasBg(savedStage.canvasBg);
+              setInitialCanvasBg(savedStage.canvasBg);
+            }
+          } else {
+            setQrOptions((prev) => ({ ...prev, data: textData }));
+          }
         }
       } catch (error) {
         console.error(error);

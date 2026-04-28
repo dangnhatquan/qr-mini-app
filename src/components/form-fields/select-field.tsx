@@ -47,6 +47,7 @@ export const SelectFormField = <T extends FieldValues>({
               status={fieldError ? "error" : undefined}
               onChange={(value) => field.onChange(value)}
               value={field.value || defaultValue}
+              closeOnSelect={true}
             >
               {options.map((opt) => (
                 <Option key={opt.value} value={opt.value} title={opt.label} />

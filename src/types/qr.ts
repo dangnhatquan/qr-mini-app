@@ -17,7 +17,7 @@ export enum EWifiSecurity {
 }
 
 export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
-export const DEFAULT_BANK_ID = "vcb";
+export const DEFAULT_BANK_ID = "970422";
 export const DEFAULT_MAX_ATTEMPTS = 5;
 
 export interface IQRBackendPayload {

@@ -21,21 +21,21 @@ function crc16(data: string): string {
 }
 
 export function generateVietQRPayload({
-  bankBin,
+  bankId,
   accountNumber,
   amount,
   merchantName = "N/A",
   merchantCity = "VIETNAM",
   description = "",
 }: {
-  bankBin: string;
+  bankId: string;
   accountNumber: string;
   amount?: string;
   merchantName?: string;
   merchantCity?: string;
   description?: string;
 }) {
-  if (!bankBin) throw new Error("Bank BIN không được để trống");
+  if (!bankId) throw new Error("Bank BIN không được để trống");
   if (!accountNumber) throw new Error("Số tài khoản không được để trống");
 
   const tlv = (id: string, value: string) => {
@@ -44,7 +44,7 @@ export function generateVietQRPayload({
     return `${id}${len}${v}`;
   };
 
-  const consumerInfo = tlv("00", bankBin) + tlv("01", accountNumber);
+  const consumerInfo = tlv("00", bankId) + tlv("01", accountNumber);
   const napasProvider = tlv("00", "A000000727") + tlv("01", consumerInfo) + tlv("02", "QRIBFTTC");
 
   let payload = "";
@@ -111,12 +111,10 @@ export const generateQRPayload = (qr: QrCode) => {
   switch (qr.category) {
     case EQRCategory.BANKING: {
       const { accountNo, amount, bankId } = qr.payload?.bankingData as BankingQRData;
-      return generateVietQRPayload({ accountNumber: accountNo, amount, bankBin: bankId });
+      return generateVietQRPayload({ accountNumber: accountNo, amount, bankId });
     }
     case EQRCategory.WIFI: {
       const { ssid, password, security } = qr.payload?.wifiData as WifiQRData;
-
-      console.log(ssid, password, security);
       return generateWifiPayload(ssid, password, security);
     }
     case EQRCategory.VCARD: {

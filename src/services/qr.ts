@@ -18,7 +18,7 @@ export const getQRPayload = (data: IQRFormValues): string => {
     case EQRCategory.BANKING: {
       const { bankId, accountNo } = data.bankingData!;
       return generateVietQRPayload({
-        bankBin: bankId,
+        bankId,
         accountNumber: accountNo,
       });
     }

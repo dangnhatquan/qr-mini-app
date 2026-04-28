@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useRef, useState } from "react";
 import { Options } from "qr-code-styling";
-import { COLOR, DEFAULT_OPTIONS, STYLE_SECTION } from "../utils/constants";
+import { COLOR, STYLE_SECTION } from "../utils/constants";
 import Konva from "konva";
+import { DEFAULT_QR_STYLE } from "@/utils/constants/qr";
 
 export interface CanvasElement {
   id: string;
@@ -68,7 +69,7 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const stageRef = useRef<Konva.Stage | null>(null);
   const mainGroupRef = useRef<Konva.Group | null>(null);
 
-  const [qrOptions, setQrOptions] = useState<Options>(DEFAULT_OPTIONS);
+  const [qrOptions, setQrOptions] = useState<Options>(DEFAULT_QR_STYLE);
 
   const [qrImageSrc, setQrImageSrc] = useState<string>("");
   const [isRendering, setIsRendering] = useState(false);

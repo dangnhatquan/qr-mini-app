@@ -3,7 +3,7 @@ import { Page, Header, Box, Icon } from "zmp-ui";
 import { useParams, useNavigate } from "react-router-dom";
 import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
-import { saveImageToGallery, showToast } from "zmp-sdk/apis";
+import { showToast } from "zmp-sdk/apis";
 import { Stage, Layer, Rect, Group } from "react-konva";
 import { FocusIcon } from "@/components/icons/Focus";
 import { URLImage } from "./QRImage";
@@ -15,6 +15,7 @@ import { KonvaEventObject } from "konva/lib/Node";
 import { generateQRPayload } from "@/utils/helpers/qr";
 import { EQRCategory, EQRType, QrCode } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
+import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 
 export const QREditor: React.FC = () => {
   const { id } = useParams();
@@ -130,7 +131,13 @@ export const QREditor: React.FC = () => {
               setInitialCanvasBg(savedStage.canvasBg);
             }
           } else {
-            setQrOptions((prev) => ({ ...prev, data: textData }));
+            const newOptions = { ...DEFAULT_EDITOR_STAGE.qrOptions, data: textData };
+            setQrOptions(newOptions);
+            setInitialOptions(newOptions);
+            setElements(DEFAULT_EDITOR_STAGE.elements);
+            setInitialElements(DEFAULT_EDITOR_STAGE.elements);
+            setCanvasBg(DEFAULT_EDITOR_STAGE.canvasBg);
+            setInitialCanvasBg(DEFAULT_EDITOR_STAGE.canvasBg);
           }
         }
       } catch (error) {

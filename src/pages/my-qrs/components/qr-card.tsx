@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Text, Icon } from "zmp-ui";
 import { getCategoryLabel } from "../utils/functions";
+import QRCodeStyling from "qr-code-styling";
+import { IQRBackendPayload } from "@/types/qr";
+import { generateQRPayload } from "@/utils/helpers/qr";
 
 interface QRCardProps {
   id: string;
@@ -8,6 +11,7 @@ interface QRCardProps {
   category: string;
   previewUrl: string;
   createdAt: string;
+  payload: IQRBackendPayload;
   onClick: () => void;
 }
 
@@ -16,6 +20,7 @@ export const QRCard: React.FC<QRCardProps> = ({
   category,
   previewUrl,
   createdAt,
+  payload,
   onClick,
 }) => {
   const [imgSrc, setImgSrc] = useState<string>("");

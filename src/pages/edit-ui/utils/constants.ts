@@ -48,17 +48,6 @@ export const CORNER_DOT_TYPES = [STYLES.SQUARE, STYLES.DOT];
 export const SHEET_HEIGHT = window.innerHeight * 0.5;
 export const COLLAPSED_Y = SHEET_HEIGHT - 60;
 
-export const DEFAULT_OPTIONS: Partial<Options> = {
-  width: 512,
-  height: 512,
-  margin: 10,
-  dotsOptions: { color: "#000000", type: "rounded" },
-  backgroundOptions: { color: "#ffffff" },
-  cornersSquareOptions: { color: "#000000", type: "extra-rounded" },
-  cornersDotOptions: { color: "#000000", type: "dot" },
-  imageOptions: { crossOrigin: "anonymous", margin: 10 },
-};
-
 export const COLOR = {
   WHITE: {
     name: "White",

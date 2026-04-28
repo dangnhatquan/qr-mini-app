@@ -147,9 +147,9 @@ const MyQRsPage: React.FC = () => {
         verticalActions
       >
         <Box flex flexDirection="column" alignItems="center" justifyContent="center">
-          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 min-h-[256px] min-w-[256px] flex items-center justify-center">
+          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 w-full h-auto flex items-center justify-center">
             {modalImgSrc ? (
-              <img src={modalImgSrc} alt="QR Code" className="w-64 h-64 object-contain" />
+              <img src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
             ) : (
               <Box flex flexDirection="column" alignItems="center">
                 <Spinner />
@@ -160,7 +160,7 @@ const MyQRsPage: React.FC = () => {
             )}
           </div>
           <Text className="mt-6 text-center text-gray-500 text-sm px-4 font-medium">
-            Người dùng có thể quét mã này trực tiếp từ màn hình của bạn
+            Bạn có thể quét mã này trực tiếp bằng Zalo
           </Text>
 
           <Box flex flexDirection="row" justifyContent="space-around" className="w-full mt-6 px-4">

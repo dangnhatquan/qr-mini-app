@@ -8,6 +8,7 @@ import {
 } from "@/types/qr";
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
+import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
 
 function crc16(data: string): string {
   let crc = 0xffff;
@@ -104,6 +105,7 @@ export const buildQRCreatePayload = (data: IQRFormValues, file: { id: string }) 
     bankingData: data.category === "banking" ? data.bankingData : undefined,
     vcardData: data.category === "vcard" ? data.vcardData : undefined,
     greetingData: data.category === "greeting" ? data.greetingData : undefined,
+    editorStage: DEFAULT_EDITOR_STAGE,
   };
 };
 

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Page, Button, Box, useSnackbar } from "zmp-ui";
-import { Header } from "@/components/Header";
+import { Page, Button, Box, useSnackbar, Header } from "zmp-ui";
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IQRFormValues, qrFormSchema } from "@/utils/schemas/qr";

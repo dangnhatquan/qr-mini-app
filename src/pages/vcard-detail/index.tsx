@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Page, Box, Text, Icon, Button, Spinner } from "zmp-ui";
-import { Header } from "@/components/Header";
+import { Page, Box, Text, Icon, Button, Spinner, Header } from "zmp-ui";
 import { qrService } from "@/services/qr";
 import { QrCode, VCardQRData } from "@/types/qr";
 import { openPhone, openWebview } from "zmp-sdk/apis";

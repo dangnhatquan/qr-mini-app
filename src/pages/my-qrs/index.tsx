@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Page, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
-import { Header } from "@/components/Header";
+import { Page, Box, Button, Text, Icon, Spinner, Modal, Header } from "zmp-ui";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";

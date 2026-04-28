@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useMemo, useState } from "react";
-import { Page, Box, Icon } from "zmp-ui";
-import { Header } from "@/components/Header";
+import { Page, Box, Icon, Header } from "zmp-ui";
 import { useParams, useNavigate } from "react-router-dom";
 import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
@@ -375,7 +374,7 @@ export const QREditor: React.FC = () => {
     <Page className="bg-gray-50 flex flex-col h-screen overflow-hidden">
       <div>
         <Header title="Tuỳ chỉnh giao diện" />
-        <div className="w-full px-4 flex justify-between z-40 absolute top-28">
+        <div className="w-full px-4 flex justify-between z-40 absolute top-24">
           <div
             onClick={handleDiscard}
             id="reset-button"

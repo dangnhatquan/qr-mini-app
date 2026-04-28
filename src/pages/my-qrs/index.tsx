@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Page, Header, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
+import { Page, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
+import { Header } from "@/components/Header";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";
@@ -264,6 +265,12 @@ const MyQRsPage: React.FC = () => {
     navigate(`/edit-ui/${selectedQR.id}`);
   };
 
+  const handleView = () => {
+    if (!selectedQR) return;
+    setModalVisible(false);
+    navigate(`/vcards/${selectedQR.id}`);
+  };
+
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
 
   return (
@@ -446,6 +453,23 @@ const MyQRsPage: React.FC = () => {
                 Chia sẻ
               </Text>
             </Box>
+
+            {selectedQR?.type === "dynamic" && (
+              <Box
+                flex
+                flexDirection="column"
+                alignItems="center"
+                onClick={handleView}
+                className="cursor-pointer"
+              >
+                <div className="bg-blue-100 p-3 rounded-full mb-2">
+                  <Icon icon="zi-user" className="text-blue-600" />
+                </div>
+                <Text size="xxSmall" className="text-blue-600 font-medium">
+                  Xem chi tiết
+                </Text>
+              </Box>
+            )}
           </Box>
 
           <Button className="mt-6" fullWidth onClick={() => setModalVisible(false)} type="neutral">

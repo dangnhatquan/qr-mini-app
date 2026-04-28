@@ -1,8 +1,8 @@
 import { getPresignedUrl, qrRecordResource } from "@/resources";
-import { EQRCategory, QrCode } from "@/types/qr";
+import { EQRCategory, EQRType, QrCode } from "@/types/qr";
 import request from "@/utils/axios";
 import { ZALO_APP_LINK } from "@/utils/constants/common";
-import { DEFAULT_EDITOR_STAGE, DEFAULT_QR_STYLE } from "@/utils/constants/qr";
+import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import Konva from "konva";
 import {
   buildQRCreatePayload,
@@ -13,6 +13,7 @@ import {
 } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import QRCodeStyling from "qr-code-styling";
+import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 
 export const getQRPayload = (data: IQRFormValues): string => {
   switch (data.category) {
@@ -129,6 +130,50 @@ export const qrService = {
   },
 
   async createQR(data: IQRFormValues) {
+    if (data.qrType === EQRType.DYNAMIC) {
+      const createPayload = {
+        qrType: data.qrType,
+        category: data.category,
+        wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
+        bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
+        vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
+        greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
+      };
+
+      const qrResponse = await request.post<{
+        id: string;
+        slug: string;
+        shortUrl: string;
+      }>(qrRecordResource, createPayload);
+
+      const { id, shortUrl } = qrResponse;
+
+      const finalUrl =
+        shortUrl ||
+        `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${ZALO_APP_DEV_VERSION}&page=vcards/${id}`;
+
+      const blob = await generateQRBlob(finalUrl);
+
+      const uploadInfo = await request.get<{
+        file: { id: string; path: string };
+        uploadSignedUrl: string;
+      }>(getPresignedUrl);
+
+      const { uploadSignedUrl, file } = uploadInfo;
+
+      await request.put(uploadSignedUrl, blob, {
+        headers: { "Content-Type": "image/webp" },
+      });
+
+      const updatePayload = {
+        editorStage: DEFAULT_EDITOR_STAGE,
+        previewImageId: file.id,
+      };
+
+      return await request.patch(`${qrRecordResource}/${id}`, updatePayload);
+    }
+
+    // Static QR Flow
     const payloadString = getQRPayload(data);
     const blob = await generateQRBlob(payloadString);
 

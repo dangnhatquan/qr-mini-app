@@ -22,7 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setString("access_token", res.token);
         setString("refresh_token", res.refreshToken);
 
-        navigate(myQrsRoute, { replace: true });
+        // Handle Deep Link from 'page' query parameter
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get("page");
+
+        if (page) {
+          const targetPath = page.startsWith("/") ? page : `/${page}`;
+          navigate(targetPath, { replace: true });
+        } else {
+          navigate(myQrsRoute, { replace: true });
+        }
       })
       .catch(console.error);
   }, []);

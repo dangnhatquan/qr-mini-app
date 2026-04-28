@@ -6,7 +6,9 @@ import HomePage from "@/pages/index";
 import CreatePage from "@/pages/create";
 import MyQRsPage from "@/pages/my-qrs";
 import EditUIPage from "@/pages/edit-ui";
+import VCardDetailPage from "@/pages/vcard-detail";
 import { AuthProvider } from "@/contexts";
+import { createRoute, defaultRoute, editRoute, myQrsRoute, vcardDetailRoute } from "@/utils/routes";
 
 const Layout = () => {
   return (
@@ -15,10 +17,11 @@ const Layout = () => {
         <ZMPRouter>
           <AuthProvider>
             <AnimationRoutes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/create" element={<CreatePage />} />
-              <Route path="/my-qrs" element={<MyQRsPage />} />
-              <Route path="/edit-ui/:id" element={<EditUIPage />} />
+              <Route path={defaultRoute} element={<HomePage />} />
+              <Route path={createRoute} element={<CreatePage />} />
+              <Route path={myQrsRoute} element={<MyQRsPage />} />
+              <Route path={editRoute} element={<EditUIPage />} />
+              <Route path={vcardDetailRoute} element={<VCardDetailPage />} />
             </AnimationRoutes>
           </AuthProvider>
         </ZMPRouter>

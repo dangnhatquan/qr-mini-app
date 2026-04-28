@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useMemo, useState } from "react";
-import { Page, Header, Box, Icon } from "zmp-ui";
+import { Page, Box, Icon } from "zmp-ui";
+import { Header } from "@/components/Header";
 import { useParams, useNavigate } from "react-router-dom";
 import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
@@ -61,7 +62,6 @@ export const QREditor: React.FC = () => {
   const dragStartY = useRef(0);
   const currentTranslateY = useRef(0);
 
-  // Update QR Image Src whenever options change
   useEffect(() => {
     qrCode.update(qrOptions);
     qrCode.getRawData("png").then((blob) => {
@@ -153,7 +153,6 @@ export const QREditor: React.FC = () => {
     const deltaY = y - dragStartY.current;
     let nextY = currentTranslateY.current + deltaY;
 
-    // Constraints
     if (nextY < 0) nextY = nextY * 0.2;
     if (nextY > COLLAPSED_Y) nextY = COLLAPSED_Y + (nextY - COLLAPSED_Y) * 0.2;
 
@@ -163,7 +162,6 @@ export const QREditor: React.FC = () => {
   const handleEnd = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    // Snap points
     if (translateY < COLLAPSED_Y / 2) {
       setTranslateY(0);
       setIsCollapsed(false);
@@ -173,7 +171,6 @@ export const QREditor: React.FC = () => {
     }
   };
 
-  // Bind global events when dragging to prevent "losing" the handle
   useEffect(() => {
     if (isDragging) {
       const onMouseMove = (e: MouseEvent) => handleMove(e.clientY);
@@ -233,7 +230,6 @@ export const QREditor: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCollapsed, stageSize.height]);
 
-  // --- Stage Interaction (Zoom & Pan) ---
   const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault();
     const scaleBy = 1.1;
@@ -377,9 +373,9 @@ export const QREditor: React.FC = () => {
 
   return (
     <Page className="bg-gray-50 flex flex-col h-screen overflow-hidden">
-      <div className="">
+      <div>
         <Header title="Tuỳ chỉnh giao diện" />
-        <div className="w-full px-4 flex justify-between absolute top-20 z-40">
+        <div className="w-full px-4 flex justify-between z-40 absolute top-28">
           <div
             onClick={handleDiscard}
             id="reset-button"

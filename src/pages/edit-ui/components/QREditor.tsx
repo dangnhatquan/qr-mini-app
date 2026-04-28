@@ -402,7 +402,7 @@ export const QREditor: React.FC = () => {
           </div>
 
           <div className="flex gap-3 pointer-events-auto">
-            {selectedId && (
+            {selectedId && selectedId !== "qr-main" && (
               <div
                 className="bg-red-500 flex items-center justify-center w-10 h-10 !rounded-full cursor-pointer"
                 onClick={() => {

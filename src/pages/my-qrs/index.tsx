@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Page, Header, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import { createRoute } from "@/utils/routes";
 import { getCategoryLabel } from "./utils/functions";
 import { QRCard } from "./components/qr-card";
 import { QrCode } from "@/types/qr";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +17,19 @@ const MyQRsPage: React.FC = () => {
   const [selectedQR, setSelectedQR] = useState<QrCode | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImgSrc, setModalImgSrc] = useState<string>("");
+  const container = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (qrs.length > 0) {
+      gsap.from(".qr-card-wrapper", {
+        y: 100,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: "power3.out",
+      });
+    }
+  }, [qrs]);
 
   const handleCardClick = async (qr: QrCode) => {
     setSelectedQR(qr);
@@ -91,23 +106,33 @@ const MyQRsPage: React.FC = () => {
   return (
     <Page className="bg-gray-50">
       <Header title="Danh sách QR" showBackIcon={false} />
-      <div className="content">
+      <div className="content relative">
         {loading ? (
           <Box flex justifyContent="center" alignItems="center" p={10}>
             <Spinner />
           </Box>
         ) : qrs.length > 0 ? (
-          <Box p={4}>
-            {qrs.map((qr) => (
-              <QRCard
+          <Box p={4} className="pb-32" ref={container}>
+            {qrs.map((qr, index) => (
+              <div
                 key={qr.id}
-                id={qr.id}
-                type={qr.type}
-                category={qr.category}
-                previewUrl={qr.previewImage?.path}
-                createdAt={qr.createdAt}
-                onClick={() => handleCardClick(qr)}
-              />
+                className="qr-card-wrapper"
+                style={{
+                  marginTop: index === 0 ? "0px" : "-90px",
+                  position: "relative",
+                  zIndex: index,
+                }}
+              >
+                <QRCard
+                  id={qr.id}
+                  type={qr.type}
+                  category={qr.category}
+                  previewUrl={qr.previewImage?.path}
+                  createdAt={qr.createdAt}
+                  payload={qr.payload}
+                  onClick={() => handleCardClick(qr)}
+                />
+              </div>
             ))}
           </Box>
         ) : (

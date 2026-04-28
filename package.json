@@ -33,6 +33,7 @@
     ]
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
     "axios": "^1.15.2",
     "globals": "^17.5.0",

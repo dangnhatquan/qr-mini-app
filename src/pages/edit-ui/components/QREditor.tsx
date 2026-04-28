@@ -425,39 +425,46 @@ export const QREditor: React.FC = () => {
                 shadowOpacity={0.3}
                 cornerRadius={8}
               />
-              {elements.map((el, i) => {
-                if (el.type === "image") {
-                  return (
-                    <URLImage
-                      key={el.id}
-                      imageProps={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => setSelectedId(el.id)}
-                      onChange={(newProps: CanvasElement) => {
-                        const newEls = [...elements];
-                        newEls[i] = newProps;
-                        setElements(newEls);
-                      }}
-                    />
-                  );
-                }
-                if (el.type === "text") {
-                  return (
-                    <TextElement
-                      key={el.id}
-                      textProps={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => setSelectedId(el.id)}
-                      onChange={(newProps: CanvasElement) => {
-                        const newEls = [...elements];
-                        newEls[i] = newProps;
-                        setElements(newEls);
-                      }}
-                    />
-                  );
-                }
-                return null;
-              })}
+              {elements
+                .map((el, originalIndex) => ({ el, originalIndex }))
+                .sort((a, b) => {
+                  if (a.el.id === "qr-main") return 1;
+                  if (b.el.id === "qr-main") return -1;
+                  return a.originalIndex - b.originalIndex;
+                })
+                .map(({ el, originalIndex: i }) => {
+                  if (el.type === "image") {
+                    return (
+                      <URLImage
+                        key={el.id}
+                        imageProps={el}
+                        isSelected={el.id === selectedId}
+                        onSelect={() => setSelectedId(el.id)}
+                        onChange={(newProps: CanvasElement) => {
+                          const newEls = [...elements];
+                          newEls[i] = newProps;
+                          setElements(newEls);
+                        }}
+                      />
+                    );
+                  }
+                  if (el.type === "text") {
+                    return (
+                      <TextElement
+                        key={el.id}
+                        textProps={el}
+                        isSelected={el.id === selectedId}
+                        onSelect={() => setSelectedId(el.id)}
+                        onChange={(newProps: CanvasElement) => {
+                          const newEls = [...elements];
+                          newEls[i] = newProps;
+                          setElements(newEls);
+                        }}
+                      />
+                    );
+                  }
+                  return null;
+                })}
             </Group>
           </Layer>
         </Stage>

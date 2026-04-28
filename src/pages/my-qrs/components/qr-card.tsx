@@ -11,7 +11,6 @@ interface QRCardProps {
   category: string;
   previewUrl: string;
   createdAt: string;
-  payload: IQRBackendPayload;
   onClick: () => void;
 }
 
@@ -20,7 +19,6 @@ export const QRCard: React.FC<QRCardProps> = ({
   category,
   previewUrl,
   createdAt,
-  payload,
   onClick,
 }) => {
   const [imgSrc, setImgSrc] = useState<string>("");
@@ -55,41 +53,33 @@ export const QRCard: React.FC<QRCardProps> = ({
 
   return (
     <Box
-      className="rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-5 w-full flex flex-col justify-between relative overflow-hidden transition-transform duration-300 active:scale-95 border border-gray-100 bg-white cursor-pointer"
+      className={`rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden transition-transform duration-300 active:scale-95 cursor-pointer text-white ${
+        type === "static"
+          ? "bg-gradient-to-br from-blue-500 to-blue-700"
+          : "bg-gradient-to-br from-indigo-500 to-purple-700"
+      }`}
       style={{ minHeight: "180px" }}
       onClick={onClick}
     >
-      {/* Decorative Background Element */}
-      <div
-        className={`absolute -right-10 -top-10 w-40 h-40 rounded-full opacity-10 blur-2xl ${
-          type === "static" ? "bg-blue-500" : "bg-purple-500"
-        }`}
-      />
-      <div
-        className={`absolute -left-10 -bottom-10 w-32 h-32 rounded-full opacity-10 blur-2xl ${
-          type === "static" ? "bg-blue-400" : "bg-purple-400"
-        }`}
-      />
+      {/* Decorative Background Elements */}
+      <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white opacity-10 blur-xl" />
+      <div className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full bg-white opacity-10 blur-xl" />
 
       <div className="flex justify-between items-start relative z-10">
         <Box>
-          <Text className="font-bold text-xl text-gray-800 line-clamp-1 mb-1">
+          <Text className="font-bold text-xl text-white line-clamp-1 mb-2 shadow-sm">
             {getCategoryLabel(category)}
           </Text>
-          <span
-            className={`text-[10px] px-2 py-1 rounded-full uppercase font-bold tracking-wider ${
-              type === "static" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"
-            }`}
-          >
-            {type === "static" ? "Tĩnh" : "Động"}
+          <span className="text-[10px] px-2.5 py-1 rounded-full uppercase font-bold tracking-wider bg-white/20 backdrop-blur-sm text-white border border-white/30">
+            {type === "static" ? "QR Tĩnh" : "QR Động"}
           </span>
         </Box>
 
-        <div className="w-14 h-14 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0 p-1">
+        <div className="w-14 h-14 bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 p-1 border border-white/50">
           {imgSrc ? (
             <img src={imgSrc} alt="QR Thumbnail" className="w-full h-full object-contain" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-200">
+            <div className="w-full h-full flex items-center justify-center text-gray-300">
               <Icon icon="zi-more-grid" />
             </div>
           )}
@@ -98,10 +88,10 @@ export const QRCard: React.FC<QRCardProps> = ({
 
       <div className="flex justify-between items-end relative z-10 mt-6">
         <div>
-          <Text className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-0.5">
+          <Text className="text-white/70 text-xs font-medium uppercase tracking-wider mb-0.5">
             Ngày tạo
           </Text>
-          <Text className="font-semibold text-gray-700 text-sm">
+          <Text className="font-semibold text-white text-sm">
             {new Date(createdAt).toLocaleDateString("vi-VN", {
               day: "2-digit",
               month: "2-digit",
@@ -111,10 +101,9 @@ export const QRCard: React.FC<QRCardProps> = ({
         </div>
 
         <div className="flex space-x-1">
-          {/* Placeholder for dots if we want to show it's a card */}
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
         </div>
       </div>
     </Box>

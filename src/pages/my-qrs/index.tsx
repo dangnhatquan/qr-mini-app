@@ -17,21 +17,33 @@ const MyQRsPage: React.FC = () => {
   const [selectedQR, setSelectedQR] = useState<QrCode | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImgSrc, setModalImgSrc] = useState<string>("");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const container = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     if (qrs.length > 0) {
-      gsap.from(".qr-card-wrapper", {
-        y: 100,
-        opacity: 0,
-        stagger: 0.1,
-        duration: 0.6,
-        ease: "power3.out",
-      });
+      gsap.fromTo(
+        ".qr-card-wrapper",
+        { y: 100, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.1,
+          duration: 0.6,
+          ease: "power3.out",
+          clearProps: "y,opacity",
+        },
+      );
     }
   }, [qrs]);
 
-  const handleCardClick = async (qr: QrCode) => {
+  const handleCardClick = async (qr: QrCode, index: number) => {
+    if (expandedId !== qr.id && index !== qrs.length - 1) {
+      setExpandedId(qr.id);
+      return;
+    }
+
+    setExpandedId(qr.id);
     setSelectedQR(qr);
     setModalVisible(true);
     setModalImgSrc("");
@@ -103,6 +115,8 @@ const MyQRsPage: React.FC = () => {
     fetchQRs();
   }, []);
 
+  const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
+
   return (
     <Page className="bg-gray-50">
       <Header title="Danh sách QR" showBackIcon={false} />
@@ -112,15 +126,19 @@ const MyQRsPage: React.FC = () => {
             <Spinner />
           </Box>
         ) : qrs.length > 0 ? (
-          <Box p={4} className="pb-32" ref={container}>
+          <Box p={4} className="pb-40" ref={container}>
             {qrs.map((qr, index) => (
               <div
                 key={qr.id}
-                className="qr-card-wrapper"
+                className="qr-card-wrapper transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
                 style={{
-                  marginTop: index === 0 ? "0px" : "-90px",
+                  marginTop: index === 0 ? "0px" : "-85px",
                   position: "relative",
                   zIndex: index,
+                  transform:
+                    expandedIndex !== -1 && index > expandedIndex
+                      ? "translateY(105px)"
+                      : "translateY(0px)",
                 }}
               >
                 <QRCard
@@ -129,8 +147,7 @@ const MyQRsPage: React.FC = () => {
                   category={qr.category}
                   previewUrl={qr.previewImage?.path}
                   createdAt={qr.createdAt}
-                  payload={qr.payload}
-                  onClick={() => handleCardClick(qr)}
+                  onClick={() => handleCardClick(qr, index)}
                 />
               </div>
             ))}

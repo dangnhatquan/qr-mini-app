@@ -5,6 +5,7 @@ import { AppProps } from "zmp-ui/app";
 import HomePage from "@/pages/index";
 import CreatePage from "@/pages/create";
 import MyQRsPage from "@/pages/my-qrs";
+import EditUIPage from "@/pages/edit-ui";
 import { AuthProvider } from "@/contexts";
 
 const Layout = () => {
@@ -17,6 +18,7 @@ const Layout = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<CreatePage />} />
               <Route path="/my-qrs" element={<MyQRsPage />} />
+              <Route path="/edit-ui/:id" element={<EditUIPage />} />
             </AnimationRoutes>
           </AuthProvider>
         </ZMPRouter>

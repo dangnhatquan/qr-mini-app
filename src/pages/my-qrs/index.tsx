@@ -68,7 +68,8 @@ const MyQRsPage: React.FC = () => {
 
   const handleEdit = () => {
     if (!selectedQR) return;
-    showToast({ message: "Tính năng đang phát triển" });
+    setModalVisible(false);
+    navigate(`/edit-ui/${selectedQR.id}`);
   };
 
   useEffect(() => {

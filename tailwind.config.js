@@ -1,3 +1,4 @@
+/* eslint-env node */
 module.exports = {
   darkMode: ["selector", '[zaui-theme="dark"]'],
   purge: {

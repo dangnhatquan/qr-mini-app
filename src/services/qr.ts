@@ -60,7 +60,7 @@ export const generateQRBlob = async (text: string): Promise<Blob> => {
   if (raw instanceof Blob) {
     return raw;
   }
-  return new Blob([raw as any], { type: "image/webp" });
+  return new Blob([raw as BlobPart], { type: "image/webp" });
 };
 
 export const qrService = {

@@ -12,6 +12,7 @@ import { useKonvaEditor, CanvasElement } from "../context/KonvaEditorContext";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { BottomSheet } from "./BottomSheet";
 import { KonvaEventObject } from "konva/lib/Node";
+import { generateQRPayload } from "@/utils/helpers/qr";
 
 export const QREditor: React.FC = () => {
   const { id } = useParams();
@@ -97,10 +98,9 @@ export const QREditor: React.FC = () => {
     const fetchQR = async () => {
       if (!id) return;
       try {
-        const qrs = await qrService.getMyQRs();
-        const qr = qrs.find((q) => q.id === id);
+        const qr = await qrService.getQRDetail(id);
         if (qr) {
-          const textData = "https://zalo.me";
+          const textData = generateQRPayload(qr);
           setQrOptions((prev) => ({ ...prev, data: textData }));
         }
       } catch (error) {

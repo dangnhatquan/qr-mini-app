@@ -1,4 +1,13 @@
+import {
+  BankingQRData,
+  EQRCategory,
+  GreetingQRData,
+  QrCode,
+  VCardQRData,
+  WifiQRData,
+} from "@/types/qr";
 import { IQRFormValues } from "../schemas/qr";
+import { ZALO_APP_LINK } from "../constants/common";
 
 function crc16(data: string): string {
   let crc = 0xffff;
@@ -96,4 +105,30 @@ export const buildQRCreatePayload = (data: IQRFormValues, file: { id: string }) 
     vcardData: data.category === "vcard" ? data.vcardData : undefined,
     greetingData: data.category === "greeting" ? data.greetingData : undefined,
   };
+};
+
+export const generateQRPayload = (qr: QrCode) => {
+  switch (qr.category) {
+    case EQRCategory.BANKING: {
+      const { accountNo, amount, bankId } = qr.payload?.bankingData as BankingQRData;
+      return generateVietQRPayload({ accountNumber: accountNo, amount, bankBin: bankId });
+    }
+    case EQRCategory.WIFI: {
+      const { ssid, password, security } = qr.payload?.wifiData as WifiQRData;
+
+      console.log(ssid, password, security);
+      return generateWifiPayload(ssid, password, security);
+    }
+    case EQRCategory.VCARD: {
+      const { fullName, phone, email, company, position, website } = qr.payload
+        ?.vcardData as VCardQRData;
+      return generateVCardPayload(fullName, phone, email, company, position, website);
+    }
+    case EQRCategory.GREETING: {
+      const { eventName, wishes } = qr.payload?.greetingData as GreetingQRData;
+      return generateGreetingPayload(eventName, wishes);
+    }
+    default:
+      return ZALO_APP_LINK;
+  }
 };

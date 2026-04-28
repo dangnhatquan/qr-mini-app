@@ -89,4 +89,34 @@ export const qrService = {
 
     return response;
   },
+
+  async getQRDetail(id: string) {
+    return await request.get<QrCode>(`${qrRecordResource}/${id}`);
+  },
+
+  async updateQR(id: string, data: IQRFormValues) {
+    const payloadString = getQRPayload(data);
+    const blob = await generateQRBlob(payloadString);
+
+    const uploadInfo = await request.get<{
+      file: { id: string; path: string };
+      uploadSignedUrl: string;
+    }>(getPresignedUrl);
+
+    const { uploadSignedUrl, file } = uploadInfo;
+
+    await request.put(uploadSignedUrl, blob, {
+      headers: { "Content-Type": "image/webp" },
+    });
+
+    const payload = buildQRCreatePayload(data, file);
+
+    const response = await request.put(`${qrRecordResource}/${id}`, payload);
+
+    return response;
+  },
+
+  async deleteQR(id: string) {
+    return await request.delete(`${qrRecordResource}/${id}`);
+  },
 };

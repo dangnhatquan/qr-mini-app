@@ -20,6 +20,40 @@ export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
 export const DEFAULT_BANK_ID = "vcb";
 export const DEFAULT_MAX_ATTEMPTS = 5;
 
+export interface IQRBackendPayload {
+  wifiData?: WifiQRData;
+  bankingData?: BankingQRData;
+  vcardData?: VCardQRData;
+  greetingData?: GreetingQRData;
+}
+
+export interface WifiQRData {
+  security: string;
+  ssid: string;
+  password: string;
+}
+
+export interface BankingQRData {
+  bankId: string;
+  accountNo: string;
+  amount?: string;
+  accountName?: string;
+}
+
+export interface VCardQRData {
+  fullName: string;
+  phone: string;
+  email?: string;
+  company?: string;
+  position?: string;
+  website?: string;
+}
+
+export interface GreetingQRData {
+  eventName: string;
+  wishes: string;
+}
+
 export interface QrCode {
   id: string;
   userId: number;
@@ -28,7 +62,7 @@ export interface QrCode {
   slug: string | null;
   passwordHash: string | null;
   previewImage: PreviewImage;
-  payload: unknown | null;
+  payload: IQRBackendPayload | null;
   editorStage: EditorStage;
   isDeleted: boolean;
   createdAt: string;

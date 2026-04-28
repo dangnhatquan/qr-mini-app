@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import { Page, Header, Box, Icon } from "zmp-ui";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
@@ -13,9 +13,13 @@ import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { BottomSheet } from "./BottomSheet";
 import { KonvaEventObject } from "konva/lib/Node";
 import { generateQRPayload } from "@/utils/helpers/qr";
+import { EQRCategory, EQRType, QrCode } from "@/types/qr";
+import { IQRFormValues } from "@/utils/schemas/qr";
 
 export const QREditor: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [originalQR, setOriginalQR] = useState<QrCode | null>(null);
 
   const {
     stageRef,
@@ -100,6 +104,7 @@ export const QREditor: React.FC = () => {
       try {
         const qr = await qrService.getQRDetail(id);
         if (qr) {
+          setOriginalQR(qr);
           const textData = generateQRPayload(qr);
           setQrOptions((prev) => ({ ...prev, data: textData }));
         }
@@ -275,12 +280,97 @@ export const QREditor: React.FC = () => {
     }
   };
 
+  const handleSave = async () => {
+    if (!originalQR || !id) return;
+
+    setSelectedId(null);
+    setIsRendering(true);
+
+    setTimeout(async () => {
+      const stage = stageRef.current;
+      if (mainGroupRef.current && stage) {
+        const oldScale = stage.scaleX();
+        const oldPos = stage.position();
+
+        stage.scale({ x: 1, y: 1 });
+        stage.position({ x: oldPos.x, y: oldPos.y });
+        stage.batchDraw();
+
+        try {
+          if (stage) {
+            const box = mainGroupRef.current.getClientRect({
+              relativeTo: stage.getLayer() ?? undefined,
+            });
+
+            const uri = stage.toDataURL({
+              x: box.x,
+              y: box.y,
+              width: box.width,
+              height: box.height,
+              pixelRatio: 3,
+            });
+
+            stage.scale({ x: oldScale, y: oldScale });
+            stage.position(oldPos);
+            stage.batchDraw();
+
+            const response = await fetch(uri);
+            const blob = await response.blob();
+
+            const data: IQRFormValues = {
+              qrType: originalQR.type as EQRType,
+              category: originalQR.category as EQRCategory,
+              ...originalQR.payload,
+            };
+
+            const editorStage = {
+              qrOptions,
+              elements,
+              canvasBg,
+            };
+
+            await qrService.updateQR(id, data, blob, editorStage);
+          }
+
+          showToast({ message: "Đã lưu thay đổi!" });
+          navigate(-1);
+        } catch (err) {
+          showToast({ message: "Lỗi khi lưu!" });
+        } finally {
+          setIsRendering(false);
+        }
+      }
+    }, 100);
+  };
+
   return (
     <Page className="bg-gray-50 flex flex-col h-screen overflow-hidden">
-      <Header title="Tuỳ chỉnh giao diện" />
+      <div className="">
+        <Header title="Tuỳ chỉnh giao diện" />
+        <div className="w-full px-4 flex justify-between absolute top-20 z-40">
+          <div
+            onClick={handleDiscard}
+            id="reset-button"
+            className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-10 h-10 flex items-center justify-center p-0"
+          >
+            <Icon icon="zi-retry" className="text-black font-bold" size={20} />
+          </div>
+
+          {/* Save button */}
+          <div
+            onClick={handleSave}
+            id="save-button"
+            className="cursor-pointer bg-blue-500 text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
+          >
+            <Icon icon="zi-check" className="font-bold" size={20} />
+          </div>
+        </div>
+      </div>
 
       {/* Stage */}
       <Box className="flex-1 flex flex-col items-center justify-center bg-[#d1d5db] overflow-hidden relative">
+        {/* Reset button (top left) */}
+
         <Stage
           ref={stageRef}
           width={window.innerWidth}
@@ -385,14 +475,6 @@ export const QREditor: React.FC = () => {
           }}
         >
           <div className="flex gap-3 pointer-events-auto">
-            {!selectedId && (
-              <div
-                onClick={handleDiscard}
-                className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-12 h-12 flex items-center justify-center p-0"
-              >
-                <Icon icon="zi-retry" className="text-black font-bold" size={20} />
-              </div>
-            )}
             <div
               onClick={handleResetView}
               className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-12 h-12 flex items-center justify-center p-0"

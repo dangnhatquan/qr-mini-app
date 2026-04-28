@@ -55,6 +55,15 @@ const request = {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
     return instance.delete<T>(url, config).then((response) => response.data);
   },
+
+  async patch<T = unknown, D = unknown>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
+    const instance = isAbsoluteURL(url) ? axios : axiosInstance;
+    return instance.patch<T>(url, data, config).then((response) => response.data);
+  },
 };
 
 export default request;

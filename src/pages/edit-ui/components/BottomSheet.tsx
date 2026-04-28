@@ -3,7 +3,6 @@ import { Box, Tabs } from "zmp-ui";
 import { StickerTab } from "./StickerTab";
 import { LayoutTab } from "./LayoutTab";
 import { StylingTab } from "./StylingTab";
-import { DownloadButton } from "./DownloadButton";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 
@@ -82,13 +81,6 @@ export const BottomSheet = ({
             <StickerTab />
           </Tabs.Tab>
         </Tabs>
-      </Box>
-
-      <Box
-        px={4}
-        className={`absolute bottom-6 left-0 right-0 bg-white pt-2 transition-all duration-300 ${translateY > COLLAPSED_Y - 100 ? "opacity-0 translate-y-10 pointer-events-none" : "opacity-100 translate-y-0"}`}
-      >
-        <DownloadButton />
       </Box>
     </Box>
   );

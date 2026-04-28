@@ -94,9 +94,9 @@ export const qrService = {
     return await request.get<QrCode>(`${qrRecordResource}/${id}`);
   },
 
-  async updateQR(id: string, data: IQRFormValues) {
+  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: any) {
     const payloadString = getQRPayload(data);
-    const blob = await generateQRBlob(payloadString);
+    const blob = customBlob || (await generateQRBlob(payloadString));
 
     const uploadInfo = await request.get<{
       file: { id: string; path: string };
@@ -110,8 +110,11 @@ export const qrService = {
     });
 
     const payload = buildQRCreatePayload(data, file);
+    if (editorStage) {
+      (payload as any).editorStage = editorStage;
+    }
 
-    const response = await request.put(`${qrRecordResource}/${id}`, payload);
+    const response = await request.patch(`${qrRecordResource}/${id}`, payload);
 
     return response;
   },

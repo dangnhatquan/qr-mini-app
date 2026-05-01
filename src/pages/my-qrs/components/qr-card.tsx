@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Text, Icon } from "zmp-ui";
 import { getCategoryLabel } from "../utils/functions";
+import { Image } from "@/components/image";
 
 interface QRCardProps {
   id: string;
@@ -18,36 +19,6 @@ export const QRCard: React.FC<QRCardProps> = ({
   createdAt,
   onClick,
 }) => {
-  const [imgSrc, setImgSrc] = useState<string>("");
-
-  useEffect(() => {
-    if (!previewUrl) return;
-
-    const loadImage = async () => {
-      try {
-        const res = await fetch(previewUrl, {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
-        });
-
-        const blob = await res.blob();
-
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          setImgSrc(reader.result as string);
-        };
-
-        reader.readAsDataURL(blob);
-      } catch (err) {
-        console.error("Load image error:", err);
-      }
-    };
-
-    loadImage();
-  }, [previewUrl]);
-
   return (
     <Box
       className={`rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden cursor-pointer text-white ${
@@ -72,8 +43,8 @@ export const QRCard: React.FC<QRCardProps> = ({
         </Box>
 
         <div className="w-14 h-14 bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 p-1 border border-white/50">
-          {imgSrc ? (
-            <img src={imgSrc} alt="QR Thumbnail" className="w-full h-full object-contain" />
+          {previewUrl ? (
+            <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300">
               <Icon icon="zi-more-grid" />

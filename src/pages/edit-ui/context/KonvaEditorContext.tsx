@@ -61,6 +61,10 @@ interface KonvaEditorContextType {
   setInitialElements: React.Dispatch<React.SetStateAction<CanvasElement[] | null>>;
   initialCanvasBg: string;
   setInitialCanvasBg: React.Dispatch<React.SetStateAction<string>>;
+
+  // Asset Cache for bypass CORS/ngrok
+  assetCache: Record<string, string>;
+  setAssetCache: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const KonvaEditorContext = createContext<KonvaEditorContextType | undefined>(undefined);
@@ -91,6 +95,8 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [initialOptions, setInitialOptions] = useState<Options | null>(null);
   const [initialElements, setInitialElements] = useState<CanvasElement[] | null>(null);
   const [initialCanvasBg, setInitialCanvasBg] = useState("");
+
+  const [assetCache, setAssetCache] = useState<Record<string, string>>({});
 
   const value = {
     stageRef,
@@ -126,6 +132,8 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setInitialElements,
     initialCanvasBg,
     setInitialCanvasBg,
+    assetCache,
+    setAssetCache,
   };
 
   return <KonvaEditorContext.Provider value={value}>{children}</KonvaEditorContext.Provider>;

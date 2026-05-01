@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Page, Box, Button, Text, Icon, Spinner, Modal, Header } from "zmp-ui";
+import { Page, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";
@@ -8,6 +8,7 @@ import { getCategoryLabel } from "./utils/functions";
 import { QRCard } from "./components/qr-card";
 import { QrCode } from "@/types/qr";
 import "./styles.scss";
+import { Image } from "@/components/image";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const MyQRsPage: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImgSrc, setModalImgSrc] = useState<string>("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const container = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLDivElement>(null!);
 
   const [swipeState, setSwipeState] = useState<{ [id: string]: number }>({});
   const touchStart = useRef<{ x: number; y: number; val: number } | null>(null);
@@ -49,7 +50,6 @@ const MyQRsPage: React.FC = () => {
   }, [qrs, isInitialRender]);
 
   useEffect(() => {
-    // Tránh lỗi linter gọi setState đồng bộ trong effect
     setTimeout(() => {
       fetchQRs();
     }, 0);
@@ -111,7 +111,6 @@ const MyQRsPage: React.FC = () => {
       showToast({ message: "Đã làm mới danh sách" });
     }
 
-    // Snap back
     if (ptrEl) {
       ptrEl.style.transition = "transform 0.3s ease-out";
       ptrEl.style.transform = `translate3d(0, 0, 0)`;
@@ -214,19 +213,7 @@ const MyQRsPage: React.FC = () => {
     setModalImgSrc("");
 
     if (qr.previewImage?.path) {
-      try {
-        const res = await fetch(qr.previewImage.path, {
-          headers: { "ngrok-skip-browser-warning": "true" },
-        });
-        const blob = await res.blob();
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setModalImgSrc(reader.result as string);
-        };
-        reader.readAsDataURL(blob);
-      } catch (err) {
-        console.error("Load modal image error:", err);
-      }
+      setModalImgSrc(qr.previewImage?.path);
     }
   };
 
@@ -274,7 +261,7 @@ const MyQRsPage: React.FC = () => {
 
   return (
     <Page className="bg-gray-50">
-      <Header title="Danh sách QR" showBackIcon={false} />
+      {/* <Header title="Danh sách QR" showBackIcon={false} className="max-w-[100px]"/> */}
       <div
         className="content relative"
         id="ptr-wrapper"
@@ -391,18 +378,17 @@ const MyQRsPage: React.FC = () => {
         verticalActions
       >
         <Box flex flexDirection="column" alignItems="center" justifyContent="center">
-          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 w-full h-auto flex items-center justify-center">
+          <div className="w-full max-w-[280px] aspect-[3/4] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
             {modalImgSrc ? (
-              <img src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
+              <Image src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
             ) : (
-              <Box flex flexDirection="column" alignItems="center">
-                <Spinner />
-                <Text size="xxSmall" className="mt-2 text-gray-400">
-                  Đang tải mã QR...
-                </Text>
-              </Box>
+              <div className="w-full h-full animate-pulse flex flex-col items-center justify-center gap-4">
+                <Icon icon="zi-more-grid" size={48} className="text-gray-200" />
+                <div className="w-1/3 h-2 bg-gray-200 rounded-full opacity-50" />
+              </div>
             )}
           </div>
+
           <Text className="mt-6 text-center text-gray-500 text-sm px-4 font-medium">
             Bạn có thể quét mã này trực tiếp bằng Zalo
           </Text>

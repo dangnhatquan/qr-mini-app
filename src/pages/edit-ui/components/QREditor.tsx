@@ -9,6 +9,7 @@ import { FocusIcon } from "@/components/icons/Focus";
 import { URLImage } from "./QRImage";
 import { TextElement } from "./TextElement";
 import { useKonvaEditor, CanvasElement } from "../context/KonvaEditorContext";
+import { preloadImage } from "@/utils/helpers/image";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { BottomSheet } from "./BottomSheet";
 import { KonvaEventObject } from "konva/lib/Node";
@@ -53,6 +54,8 @@ export const QREditor: React.FC = () => {
     setInitialElements,
     initialCanvasBg,
     setInitialCanvasBg,
+    assetCache,
+    setAssetCache,
   } = useKonvaEditor();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,21 +65,67 @@ export const QREditor: React.FC = () => {
   const currentTranslateY = useRef(0);
 
   useEffect(() => {
-    qrCode.update(qrOptions);
-    qrCode.getRawData("png").then((blob) => {
-      if (blob) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const src = reader.result as string;
-          setQrImageSrc(src);
-          setElements((prev) => prev.map((el) => (el.id === "qr-main" ? { ...el, src } : el)));
-          setIsRendering(false);
-        };
-        reader.readAsDataURL(blob as Blob);
+    let isMounted = true;
+
+    const updateQRPreview = async () => {
+      // Use cached base64 for rendering if available to bypass CORS
+      const imageSrc = (qrOptions.image && assetCache[qrOptions.image]) || qrOptions.image;
+
+      const displayOptions = {
+        ...qrOptions,
+        image: imageSrc,
+      };
+
+      // Check if it's a remote URL (http, https, or protocol-relative)
+      const isRemoteImage = imageSrc && /^(https?:)?\/\//.test(imageSrc);
+
+      // If we have a remote image that is not yet in cache,
+      // we must wait for it to load to avoid flickering/missing logo in the preview
+      if (isRemoteImage && !assetCache[imageSrc!]) {
+        try {
+          await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = imageSrc!;
+            // Timeout after 3s to avoid hanging the UI
+            setTimeout(resolve, 3000);
+          });
+        } catch (e) {
+          console.warn("Failed to wait for logo load:", e);
+        }
       }
-    });
+
+      qrCode.update(displayOptions);
+
+      // Small delay to ensure qr-code-styling internal canvas has processed the update
+      await new Promise((r) => setTimeout(r, 150));
+
+      try {
+        const blob = await qrCode.getRawData("png");
+        if (blob && isMounted) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (!isMounted) return;
+            const src = reader.result as string;
+            setQrImageSrc(src);
+            setElements((prev) => prev.map((el) => (el.id === "qr-main" ? { ...el, src } : el)));
+          };
+          reader.readAsDataURL(blob as Blob);
+        }
+      } catch (err) {
+        console.error("Error generating QR image:", err);
+      }
+    };
+
+    updateQRPreview();
+
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qrOptions, qrCode]);
+  }, [qrOptions, qrCode, assetCache]);
 
   useEffect(() => {
     const initialEls = [
@@ -96,7 +145,7 @@ export const QREditor: React.FC = () => {
     setInitialOptions(qrOptions);
     setInitialCanvasBg(canvasBg);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchQR = async () => {
@@ -107,17 +156,62 @@ export const QREditor: React.FC = () => {
           setOriginalQR(qr);
           const textData = generateQRPayload(qr);
 
-          let savedStage = qr.editorStage as any;
+          let savedStage: any = qr.editorStage;
           if (typeof savedStage === "string") {
             try {
               savedStage = JSON.parse(savedStage);
-            } catch (e) {
-              savedStage = null;
+            } catch {
+              savedStage = {};
             }
           }
 
           if (savedStage && savedStage.qrOptions) {
             const newOptions = { ...savedStage.qrOptions, data: textData };
+
+            if (newOptions.image && newOptions.image.startsWith("http")) {
+              await new Promise((resolve) => {
+                preloadImage(
+                  newOptions.image,
+                  (base64: string) => {
+                    setAssetCache((prev) => ({ ...prev, [newOptions.image!]: base64 }));
+                    resolve(null);
+                  },
+                  () => {
+                    resolve(null);
+                  },
+                );
+              });
+            }
+
+            if (savedStage.elements) {
+              const imageElements = (savedStage.elements as any[]).filter(
+                (el: any) =>
+                  el.type === "image" &&
+                  el.src &&
+                  typeof el.src === "string" &&
+                  el.src.startsWith("http"),
+              );
+
+              await Promise.all(
+                imageElements.map(
+                  (el: any) =>
+                    new Promise((resolve) => {
+                      preloadImage(
+                        el.src,
+                        (base64: string) => {
+                          setAssetCache((prev) => ({ ...prev, [el.src]: base64 }));
+                          resolve(null);
+                        },
+                        () => {
+                          resolve(null);
+                        },
+                      );
+                    }),
+                ),
+              );
+            }
+
+            // 3. Now set options and elements - assetCache will already be populated
             setQrOptions(newOptions);
             setInitialOptions(newOptions);
 
@@ -361,7 +455,7 @@ export const QREditor: React.FC = () => {
 
           showToast({ message: "Đã lưu thay đổi!" });
           navigate(-1);
-        } catch (err) {
+        } catch {
           showToast({ message: "Lỗi khi lưu!" });
         } finally {
           setIsRendering(false);

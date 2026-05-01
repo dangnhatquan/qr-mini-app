@@ -33,7 +33,6 @@ export const DownloadButton = () => {
         stage.position(oldPos);
         stage.batchDraw();
 
-        // Trigger download on desktop for testing
         try {
           const isZalo =
             (window as unknown as { ZaloJavaScriptInterface?: unknown }).ZaloJavaScriptInterface ||
@@ -43,7 +42,6 @@ export const DownloadButton = () => {
             await saveImageToGallery({ imageBase64Data: uri });
             showToast({ message: "Lưu ảnh thành công!" });
           } else {
-            // Browser Fallback
             const link = document.createElement("a");
             link.download = `qr-code-${id || "design"}.png`;
             link.href = uri;
@@ -52,7 +50,7 @@ export const DownloadButton = () => {
             document.body.removeChild(link);
             showToast({ message: "Đã tải ảnh về máy!" });
           }
-        } catch (_err) {
+        } catch {
           const link = document.createElement("a");
           link.download = `qr-code-${id || "design"}.png`;
           link.href = uri;

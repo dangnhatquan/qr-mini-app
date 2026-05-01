@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
-import { CanvasElement } from "../context/KonvaEditorContext";
+import { useKonvaEditor, CanvasElement } from "../context/KonvaEditorContext";
 
 export const URLImage = ({
   imageProps,
@@ -15,7 +15,9 @@ export const URLImage = ({
   onSelect: () => void;
   onChange: (newProps: CanvasElement) => void;
 }) => {
-  const [img] = useImage(imageProps.src || "", "anonymous");
+  const { assetCache } = useKonvaEditor();
+  const displaySrc = (imageProps.src && assetCache[imageProps.src]) || imageProps.src;
+  const [img] = useImage(displaySrc || "", "anonymous");
   const shapeRef = useRef<Konva.Image | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
 
@@ -44,18 +46,20 @@ export const URLImage = ({
         }}
         onTransformEnd={() => {
           const node = shapeRef.current;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-          node.scaleX(1);
-          node.scaleY(1);
-          onChange({
-            ...imageProps,
-            x: node.x(),
-            y: node.y(),
-            rotation: node.rotation(),
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(5, node.height() * scaleY),
-          });
+          if (node) {
+            const scaleX = node.scaleX();
+            const scaleY = node.scaleY();
+            node.scaleX(1);
+            node.scaleY(1);
+            onChange({
+              ...imageProps,
+              x: node.x(),
+              y: node.y(),
+              rotation: node.rotation(),
+              width: Math.max(5, node.width() * scaleX),
+              height: Math.max(5, node.height() * scaleY),
+            });
+          }
         }}
       />
       {isSelected && (

@@ -1,16 +1,20 @@
 import { Box, Button, Icon } from "zmp-ui";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
-import { chooseImage } from "zmp-sdk";
+import { useState } from "react";
+import { chooseImage, showToast } from "zmp-sdk/apis";
+import { uploadFile } from "@/utils/helpers/image";
 
 export const StickerTab = () => {
   const { elements, setElements, setSelectedId } = useKonvaEditor();
+  const [uploading, setUploading] = useState(false);
 
   const handleAddSticker = (url: string) => {
-    const elId = "sticker-" + Date.now();
+    // eslint-disable-next-line react-hooks/purity
+    const id = `sticker-${Date.now().toString()}`;
     setElements([
       ...elements,
       {
-        id: elId,
+        id,
         type: "image",
         src: url,
         x: 100,
@@ -20,36 +24,36 @@ export const StickerTab = () => {
         rotation: 0,
       },
     ]);
-    setSelectedId(elId);
+    setSelectedId(id);
   };
 
   const handleUploadSticker = () => {
     chooseImage({
       count: 1,
-      success: (data) => {
-        if (data.filePaths.length > 0) {
-          handleAddSticker(data.filePaths[0]);
-        } else if (data.tempFiles.length > 0) {
-          handleAddSticker(data.tempFiles[0].path);
+      success: async (data) => {
+        const path = data.filePaths?.[0] || data.tempFiles?.[0]?.path;
+        if (path) {
+          try {
+            setUploading(true);
+            const response = await fetch(path);
+            const blob = await response.blob();
+            const file = await uploadFile(blob);
+            handleAddSticker(file.path);
+            showToast({ message: "Đã thêm Sticker" });
+          } catch (err) {
+            console.error("Upload sticker error:", err);
+            showToast({ message: "Lỗi tải Sticker" });
+          } finally {
+            setUploading(false);
+          }
         }
       },
-      fail: () => {
-        // do nothing
-      },
+      fail: () => setUploading(false),
     });
   };
 
   return (
     <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
-      <Button
-        variant="secondary"
-        onClick={handleUploadSticker}
-        prefixIcon={<Icon icon="zi-plus" />}
-        fullWidth
-        className="mb-4"
-      >
-        Tải nhãn dán từ máy
-      </Button>
       <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
         Kho nhãn dán
       </div>
@@ -66,10 +70,26 @@ export const StickerTab = () => {
           <img
             key={s}
             src={s}
-            className="w-full aspect-square object-contain border rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
+            className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
             onClick={() => handleAddSticker(s)}
           />
         ))}
+        <div className="w-full aspect-square flex justify-center items-center">
+          <Button
+            variant="secondary"
+            fullWidth
+            icon={
+              <Icon
+                icon={uploading ? "zi-backup-arrow-solid" : "zi-plus"}
+                className={`${uploading ? "animate-spin" : ""} rotate-90`}
+              />
+            }
+            onClick={handleUploadSticker}
+            disabled={uploading}
+          >
+            {uploading ? "Đang tải lên..." : "Tải Sticker lên"}
+          </Button>
+        </div>
       </div>
     </Box>
   );

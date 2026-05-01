@@ -13,7 +13,8 @@ import {
 } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import QRCodeStyling from "qr-code-styling";
-import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
+import { ZALO_APP_ID } from "@/api";
+import { getSystemInfo } from "zmp-sdk/apis";
 
 export const getQRPayload = (data: IQRFormValues): string => {
   switch (data.category) {
@@ -71,7 +72,6 @@ export const generateQRBlob = async (text: string): Promise<Blob> => {
 
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
-    // crossOrigin might not be needed for data URLs
     img.onload = () => resolve(img);
     img.onerror = reject;
     img.src = imgUrl;
@@ -148,9 +148,11 @@ export const qrService = {
 
       const { id, shortUrl } = qrResponse;
 
+      const { version } = getSystemInfo();
+
       const finalUrl =
         shortUrl ||
-        `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${ZALO_APP_DEV_VERSION}&page=vcards/${id}`;
+        `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=vcards/${id}`;
 
       const blob = await generateQRBlob(finalUrl);
 
@@ -173,7 +175,6 @@ export const qrService = {
       return await request.patch(`${qrRecordResource}/${id}`, updatePayload);
     }
 
-    // Static QR Flow
     const payloadString = getQRPayload(data);
     const blob = await generateQRBlob(payloadString);
 
@@ -199,7 +200,7 @@ export const qrService = {
     return await request.get<QrCode>(`${qrRecordResource}/${id}`);
   },
 
-  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: any) {
+  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: unknown) {
     const payloadString = getQRPayload(data);
     const blob = customBlob || (await generateQRBlob(payloadString));
 
@@ -214,9 +215,9 @@ export const qrService = {
       headers: { "Content-Type": "image/webp" },
     });
 
-    const payload = buildQRCreatePayload(data, file);
+    const payload = buildQRCreatePayload(data, file) as Record<string, unknown>;
     if (editorStage) {
-      (payload as any).editorStage = editorStage;
+      payload.editorStage = editorStage;
     }
 
     const response = await request.patch(`${qrRecordResource}/${id}`, payload);

@@ -4,9 +4,12 @@ import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { COLORS, CORNER_DOT_TYPES, CORNER_SQUARE_TYPES, DOT_TYPES } from "../utils/constants";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
 import { Options } from "qr-code-styling";
+import { uploadFile } from "@/utils/helpers/image";
+import { useState } from "react";
 
 export const StylingTab = () => {
   const { openSection, setOpenSection, qrOptions, setQrOptions } = useKonvaEditor();
+  const [uploading, setUploading] = useState(false);
 
   const updateQrOption = (category: keyof Options, key: string, value: string | number) => {
     setQrOptions((prev: Options) => ({
@@ -20,13 +23,29 @@ export const StylingTab = () => {
 
   const handleUseAvatar = async () => {
     try {
-      const { userInfo } = await getUserInfo({});
+      setUploading(true);
+      const { userInfo } = await getUserInfo({
+        autoRequestPermission: false,
+        avatarType: "normal",
+      });
       if (userInfo.avatar) {
-        setQrOptions((prev) => ({ ...prev, image: userInfo.avatar }));
+        let finalPath = userInfo.avatar;
+
+        const response = await fetch(finalPath);
+        const blob = await response.blob();
+        const file = await uploadFile(blob);
+
+        setQrOptions((prev) => ({
+          ...prev,
+          image: file.path,
+        }));
         showToast({ message: "Đã thêm Avatar" });
       }
     } catch (_err) {
+      console.error("Use avatar error:", _err);
       showToast({ message: "Lỗi lấy thông tin" });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -34,10 +53,23 @@ export const StylingTab = () => {
     try {
       const { filePaths } = await chooseImage({ count: 1 });
       if (filePaths && filePaths.length > 0) {
-        setQrOptions((prev) => ({ ...prev, image: filePaths[0] }));
+        setUploading(true);
+        const path = filePaths[0];
+        const response = await fetch(path);
+        const blob = await response.blob();
+        const file = await uploadFile(blob);
+
+        setQrOptions((prev) => ({
+          ...prev,
+          image: file.path,
+        }));
+        showToast({ message: "Đã thêm Logo" });
       }
     } catch (_err) {
+      console.error("Upload logo error:", _err);
       showToast({ message: "Lỗi tải ảnh" });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -188,9 +220,15 @@ export const StylingTab = () => {
             <Button
               variant="secondary"
               onClick={handleUploadLogo}
-              prefixIcon={<Icon icon="zi-plus" />}
+              disabled={uploading}
+              prefixIcon={
+                <Icon
+                  icon={uploading ? "zi-backup-arrow-solid" : "zi-plus"}
+                  className={`${uploading ? "animate-spin" : ""} rotate-90`}
+                />
+              }
             >
-              Tải Logo
+              {uploading ? "Đang tải lên..." : "Tải Logo"}
             </Button>
           </div>
           {qrOptions.image && (

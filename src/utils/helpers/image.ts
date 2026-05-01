@@ -1,0 +1,86 @@
+import request from "../axios";
+import { getPresignedUrl } from "@/resources";
+
+export const resizeImage = (
+  base64: string,
+  maxWidth: number,
+  maxHeight: number,
+): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = base64;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(base64);
+  });
+};
+
+export const preloadImage = async (
+  url: string,
+  onSuccess: (base64: string) => void,
+  onFail?: (error: unknown) => void,
+  options?: { maxWidth?: number; maxHeight?: number },
+) => {
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error(`Failed to fetch image: ${res.statusText}`);
+
+    const blob = await res.blob();
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+      let result = reader.result as string;
+      if (options?.maxWidth || options?.maxHeight) {
+        result = await resizeImage(result, options.maxWidth || 800, options.maxHeight || 800);
+      }
+      onSuccess(result);
+    };
+
+    reader.onerror = (e) => {
+      if (onFail) onFail(e);
+    };
+
+    reader.readAsDataURL(blob);
+  } catch (error) {
+    console.error("preloadImage error:", error);
+    if (onFail) onFail(error);
+  }
+};
+
+export const uploadFile = async (blob: Blob | File): Promise<{ id: string; path: string }> => {
+  const uploadInfo = await request.get<{
+    file: { id: string; path: string };
+    uploadSignedUrl: string;
+  }>(getPresignedUrl);
+
+  const { uploadSignedUrl, file } = uploadInfo;
+
+  await request.put(uploadSignedUrl, blob, {
+    headers: { "Content-Type": blob.type || "image/png" },
+  });
+
+  return file;
+};

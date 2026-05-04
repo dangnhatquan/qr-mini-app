@@ -4,6 +4,8 @@ import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
 import { uploadFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
+import { PUBLIC_API_URL } from "@/api";
+import { STICKERS } from "../utils/constants";
 
 export const StickerTab = () => {
   const { elements, setElements, setSelectedId } = useKonvaEditor();
@@ -59,15 +61,7 @@ export const StickerTab = () => {
         Kho nhãn dán
       </div>
       <div className="grid grid-cols-4 gap-4 pb-4">
-        {[
-          "https://img.icons8.com/color/96/ok--v1.png",
-          "https://img.icons8.com/color/96/like--v1.png",
-          "https://img.icons8.com/color/96/star--v1.png",
-          "https://img.icons8.com/color/96/checked-checkbox.png",
-          "https://img.icons8.com/color/96/sale.png",
-          "https://img.icons8.com/color/96/discount.png",
-          "https://img.icons8.com/color/96/shopping-cart.png",
-        ].map((s) => (
+        {STICKERS.map((s) => (
           <img
             key={s}
             src={getFullUrl(s)}

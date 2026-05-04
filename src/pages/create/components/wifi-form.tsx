@@ -26,7 +26,6 @@ export const WifiForm: React.FC<WifiFormProps> = ({ control }) => {
         label="Mật khẩu"
         placeholder="Nhập mật khẩu Wifi"
         type="password"
-        required
       />
       <SelectFormField
         name="wifiData.security"

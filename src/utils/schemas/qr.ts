@@ -3,7 +3,7 @@ import { EQRType, EQRCategory, EWifiSecurity } from "@/types/qr";
 
 export const wifiSchema = z.object({
   ssid: z.string().min(1, "Vui lòng nhập tên Wifi"),
-  password: z.string().min(1, "Vui lòng nhập mật khẩu"),
+  password: z.string().optional(),
   security: z.nativeEnum(EWifiSecurity),
 });
 

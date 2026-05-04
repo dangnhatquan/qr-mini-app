@@ -68,7 +68,6 @@ export const QREditor: React.FC = () => {
     let isMounted = true;
 
     const updateQRPreview = async () => {
-      // Use cached base64 for rendering if available to bypass CORS
       const imageSrc = (qrOptions.image && assetCache[qrOptions.image]) || qrOptions.image;
 
       const displayOptions = {
@@ -76,12 +75,9 @@ export const QREditor: React.FC = () => {
         image: imageSrc,
       };
 
-      // Check if it's a remote URL (http, https, or protocol-relative) or a proxied minio path
       const isRemoteImage =
         imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
 
-      // If we have a remote image that is not yet in cache,
-      // we must wait for it to load to avoid flickering/missing logo in the preview
       if (isRemoteImage && !assetCache[imageSrc!]) {
         try {
           await new Promise((resolve, reject) => {
@@ -90,7 +86,6 @@ export const QREditor: React.FC = () => {
             img.onload = resolve;
             img.onerror = reject;
             img.src = imageSrc!;
-            // Timeout after 3s to avoid hanging the UI
             setTimeout(resolve, 3000);
           });
         } catch (e) {
@@ -100,7 +95,6 @@ export const QREditor: React.FC = () => {
 
       qrCode.update(displayOptions);
 
-      // Small delay to ensure qr-code-styling internal canvas has processed the update
       await new Promise((r) => setTimeout(r, 150));
 
       try {
@@ -215,7 +209,6 @@ export const QREditor: React.FC = () => {
               );
             }
 
-            // 3. Now set options and elements - assetCache will already be populated
             setQrOptions(newOptions);
             setInitialOptions(newOptions);
 
@@ -309,7 +302,6 @@ export const QREditor: React.FC = () => {
       targetScale = (availableHeight - 40) / stageSize.height;
     }
 
-    // Animate using Konva's internal tween for smoothness
     stageRef.current.to({
       scaleX: targetScale,
       scaleY: targetScale,
@@ -317,7 +309,6 @@ export const QREditor: React.FC = () => {
       y: targetY + stagePos.y,
       duration: 0.5,
       easing: (t: number, b: number, c: number, d: number) => {
-        // Custom cubic-bezier approximation
         return c * ((t = t / d - 1) * t * t + 1) + b;
       },
       onFinish: () => {
@@ -413,7 +404,9 @@ export const QREditor: React.FC = () => {
 
     setTimeout(async () => {
       const stage = stageRef.current;
-      if (mainGroupRef.current && stage) {
+      const frame = mainGroupRef.current;
+
+      if (frame && stage) {
         const oldScale = stage.scaleX();
         const oldPos = stage.position();
 
@@ -422,40 +415,35 @@ export const QREditor: React.FC = () => {
         stage.batchDraw();
 
         try {
-          if (stage) {
-            const box = mainGroupRef.current.getClientRect({
-              relativeTo: stage.getLayer() ?? undefined,
-            });
+          const frameAbsPos = frame.getAbsolutePosition();
 
-            const uri = stage.toDataURL({
-              x: box.x,
-              y: box.y,
-              width: box.width,
-              height: box.height,
-              pixelRatio: 3,
-            });
+          const CAPTURE_WIDTH = 350;
+          const CAPTURE_HEIGHT = 450;
 
-            stage.scale({ x: oldScale, y: oldScale });
-            stage.position(oldPos);
-            stage.batchDraw();
+          const uri = stage.toDataURL({
+            x: frameAbsPos.x,
+            y: frameAbsPos.y,
+            width: CAPTURE_WIDTH,
+            height: CAPTURE_HEIGHT,
+            pixelRatio: 1,
+          });
 
-            const response = await fetch(uri);
-            const blob = await response.blob();
+          stage.scale({ x: oldScale, y: oldScale });
+          stage.position(oldPos);
+          stage.batchDraw();
 
-            const data: IQRFormValues = {
-              qrType: originalQR.type as EQRType,
-              category: originalQR.category as EQRCategory,
-              ...originalQR.payload,
-            };
+          const response = await fetch(uri);
+          const blob = await response.blob();
 
-            const editorStage = {
-              qrOptions,
-              elements,
-              canvasBg,
-            };
+          const data: IQRFormValues = {
+            qrType: originalQR.type as EQRType,
+            category: originalQR.category as EQRCategory,
+            ...originalQR.payload,
+          };
 
-            await qrService.updateQR(id, data, blob, editorStage);
-          }
+          const editorStage = { qrOptions, elements, canvasBg };
+
+          await qrService.updateQR(id, data, blob, editorStage);
 
           showToast({ message: "Đã lưu thay đổi!" });
           navigate(-1);

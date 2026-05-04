@@ -40,7 +40,7 @@ export const QRCard: React.FC<QRCardProps> = ({
               {type === "static" ? "QR Tĩnh" : "QR Động"}
             </span>
           </Box>
-          <div className="w-16 h-16 bg-white rounded-lg shadow-2xl overflow-hidden flex-shrink-0 p-1.5">
+          <div className="w-14 aspect-[350/450] bg-white rounded-lg shadow-2xl overflow-hidden flex-shrink-0">
             {previewUrl ? (
               <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
             ) : (
@@ -84,7 +84,7 @@ export const QRCard: React.FC<QRCardProps> = ({
           </span>
         </Box>
 
-        <div className="w-14 h-14 bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 p-1 border border-white/50">
+        <div className="w-14 aspect-[350/450] bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 border border-white/50">
           {previewUrl ? (
             <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
           ) : (

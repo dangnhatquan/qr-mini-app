@@ -379,7 +379,7 @@ const MyQRsPage: React.FC = () => {
         verticalActions
       >
         <Box flex flexDirection="column" alignItems="center" justifyContent="center">
-          <div className="w-full max-w-[280px] aspect-[3/4] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
+          <div className="w-full max-w-[280px] aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
             {modalImgSrc ? (
               <Image src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
             ) : (

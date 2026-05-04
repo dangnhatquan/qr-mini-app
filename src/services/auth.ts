@@ -1,24 +1,21 @@
-import { authZaloLogin } from "@/resources";
+import { authZaloLoginResource } from "@/resources";
 import { LoginResponse } from "@/types/auth";
 import request from "@/utils/axios";
+import { BYPASS_ZALO_ACCESS_TOKEN } from "@/utils/constants/common";
+import { isEmpty } from "radash";
 
 import { getAccessToken } from "zmp-sdk";
 
-async function loginWithZaloToken(
-  zaloAccessToken: string,
-): Promise<LoginResponse> {
+async function loginWithZaloToken(zaloAccessToken: string): Promise<LoginResponse> {
   try {
-    const data = await request.post<LoginResponse, { accessToken: string }>(
-      authZaloLogin,
-      { accessToken: zaloAccessToken }
-    );
+    const data = await request.post<LoginResponse, { accessToken: string }>(authZaloLoginResource, {
+      accessToken: isEmpty(zaloAccessToken) ? BYPASS_ZALO_ACCESS_TOKEN : zaloAccessToken,
+    });
 
     return data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Login failed";
+    const message = error?.response?.data?.message || error?.message || "Login failed";
 
     throw new Error(message);
   }

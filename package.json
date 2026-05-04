@@ -20,6 +20,7 @@
     "deploy": "zmp deploy"
   },
   "dependencies": {
+    "axios": "^1.15.2",
     "jotai": "^2.12.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -27,6 +28,7 @@
     "zmp-ui": "latest"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

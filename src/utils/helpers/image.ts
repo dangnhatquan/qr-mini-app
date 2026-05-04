@@ -1,4 +1,4 @@
-import request from "../axios";
+import request, { getFullUrl } from "../axios";
 import { getPresignedUrl } from "@/resources";
 
 export const resizeImage = (
@@ -44,7 +44,8 @@ export const preloadImage = async (
   options?: { maxWidth?: number; maxHeight?: number },
 ) => {
   try {
-    const res = await fetch(url);
+    const fullUrl = getFullUrl(url);
+    const res = await fetch(fullUrl);
 
     if (!res.ok) throw new Error(`Failed to fetch image: ${res.statusText}`);
 

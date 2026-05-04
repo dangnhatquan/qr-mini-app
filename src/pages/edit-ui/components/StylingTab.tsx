@@ -6,6 +6,7 @@ import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
 import { Options } from "qr-code-styling";
 import { uploadFile } from "@/utils/helpers/image";
 import { useState } from "react";
+import { getFullUrl } from "@/utils/axios";
 
 export const StylingTab = () => {
   const { openSection, setOpenSection, qrOptions, setQrOptions } = useKonvaEditor();
@@ -37,7 +38,7 @@ export const StylingTab = () => {
 
         setQrOptions((prev) => ({
           ...prev,
-          image: file.path,
+          image: getFullUrl(file.path),
         }));
         showToast({ message: "Đã thêm Avatar" });
       }
@@ -61,7 +62,7 @@ export const StylingTab = () => {
 
         setQrOptions((prev) => ({
           ...prev,
-          image: file.path,
+          image: getFullUrl(file.path),
         }));
         showToast({ message: "Đã thêm Logo" });
       }

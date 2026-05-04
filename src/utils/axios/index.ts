@@ -9,7 +9,6 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    "ngrok-skip-browser-warning": "true",
   },
   withCredentials: false,
 });
@@ -64,6 +63,12 @@ const request = {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
     return instance.patch<T>(url, data, config).then((response) => response.data);
   },
+};
+
+export const getFullUrl = (path: string) => {
+  if (!path) return path;
+  if (path.startsWith("http")) return path;
+  return `${PUBLIC_API_URL}${path}`;
 };
 
 export default request;

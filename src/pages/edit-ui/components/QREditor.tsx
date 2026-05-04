@@ -76,8 +76,9 @@ export const QREditor: React.FC = () => {
         image: imageSrc,
       };
 
-      // Check if it's a remote URL (http, https, or protocol-relative)
-      const isRemoteImage = imageSrc && /^(https?:)?\/\//.test(imageSrc);
+      // Check if it's a remote URL (http, https, or protocol-relative) or a proxied minio path
+      const isRemoteImage =
+        imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
 
       // If we have a remote image that is not yet in cache,
       // we must wait for it to load to avoid flickering/missing logo in the preview
@@ -168,7 +169,10 @@ export const QREditor: React.FC = () => {
           if (savedStage && savedStage.qrOptions) {
             const newOptions = { ...savedStage.qrOptions, data: textData };
 
-            if (newOptions.image && newOptions.image.startsWith("http")) {
+            if (
+              newOptions.image &&
+              (newOptions.image.startsWith("http") || newOptions.image.startsWith("/minio-proxy/"))
+            ) {
               await new Promise((resolve) => {
                 preloadImage(
                   newOptions.image,
@@ -189,7 +193,7 @@ export const QREditor: React.FC = () => {
                   el.type === "image" &&
                   el.src &&
                   typeof el.src === "string" &&
-                  el.src.startsWith("http"),
+                  (el.src.startsWith("http") || el.src.startsWith("/minio-proxy/")),
               );
 
               await Promise.all(

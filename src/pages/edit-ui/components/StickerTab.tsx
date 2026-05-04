@@ -3,6 +3,7 @@ import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
 import { uploadFile } from "@/utils/helpers/image";
+import { getFullUrl } from "@/utils/axios";
 
 export const StickerTab = () => {
   const { elements, setElements, setSelectedId } = useKonvaEditor();
@@ -38,7 +39,7 @@ export const StickerTab = () => {
             const response = await fetch(path);
             const blob = await response.blob();
             const file = await uploadFile(blob);
-            handleAddSticker(file.path);
+            handleAddSticker(getFullUrl(file.path));
             showToast({ message: "Đã thêm Sticker" });
           } catch (err) {
             console.error("Upload sticker error:", err);
@@ -69,7 +70,7 @@ export const StickerTab = () => {
         ].map((s) => (
           <img
             key={s}
-            src={s}
+            src={getFullUrl(s)}
             className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
             onClick={() => handleAddSticker(s)}
           />

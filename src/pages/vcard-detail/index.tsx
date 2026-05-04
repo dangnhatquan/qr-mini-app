@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Page, Box, Text, Icon, Button, Spinner, Header } from "zmp-ui";
+import { Page, Box, Text, Icon, Button, Spinner, Header, Avatar, useNavigate } from "zmp-ui";
 import { qrService } from "@/services/qr";
 import { QrCode, VCardQRData } from "@/types/qr";
 import { openPhone, openWebview } from "zmp-sdk/apis";
+import { getFullUrl } from "@/utils/axios";
+import { myQrsRoute } from "@/utils/routes";
 
 const VCardDetailPage: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [qr, setQr] = useState<QrCode | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,97 +69,122 @@ const VCardDetailPage: React.FC = () => {
   };
 
   return (
-    <Page className="bg-gray-50 pb-10">
-      <Header title={"Danh thiếp điện tử"} />
+    <Page className="bg-white pb-10">
+      <Header
+        title="Danh thiếp điện tử"
+        onBackClick={() => navigate(myQrsRoute, { direction: "backward" })}
+      />
+      <div className="relative w-full h-48 bg-gray-50 overflow-hidden">
+        <svg
+          className="absolute inset-0 w-full h-full opacity-5"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <pattern
+              id="hexagons"
+              width="10"
+              height="17.32"
+              patternUnits="userSpaceOnUse"
+              patternTransform="scale(1)"
+            >
+              <polygon
+                points="5,0 10,2.88 10,8.66 5,11.54 0,8.66 0,2.88"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="0.2"
+              />
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#hexagons)" />
+        </svg>
+      </div>
 
-      {vcardData && (
-        <>
-          <Box className="content bg-white p-6 flex flex-col items-center shadow-sm border-b">
-            <Box className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mb-4 overflow-hidden border-2 border-blue-500 shadow-md">
-              {vcardData.fullName ? (
-                <Text className="text-3xl font-bold text-blue-600">
-                  {vcardData.fullName.charAt(0).toUpperCase()}
+      <Box className="relative px-6 -mt-16 z-10">
+        <Box flex alignItems="center" justifyContent="center" className="mb-6 relative">
+          <div className="relative">
+            {vcardData.avatar ? (
+              <div className="p-1 bg-white rounded-full shadow-xl">
+                <Avatar
+                  src={getFullUrl(vcardData.avatar)}
+                  size={120}
+                  className="border-4 border-blue-500"
+                  backgroundColor="BLUE-BLUELIGHT"
+                />
+              </div>
+            ) : (
+              <Box className="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-xl overflow-hidden">
+                <Text className="text-4xl font-bold text-blue-600">
+                  {vcardData.fullName?.charAt(0).toUpperCase() || "U"}
                 </Text>
-              ) : (
-                <Icon icon="zi-user" className="text-blue-500" size={48} />
-              )}
-            </Box>
-            <Text size="xLarge" className="font-bold text-gray-900 text-center">
-              {vcardData.fullName || "N/A"}
+              </Box>
+            )}
+            <div className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-white"></div>
+          </div>
+        </Box>
+
+        <Box className="mb-8">
+          <Text size="xLarge" className="font-bold text-blue-500 text-2xl mb-1">
+            {vcardData.fullName || "N/A"}
+          </Text>
+          <Text className="text-gray-500 font-medium text-base">
+            {vcardData.position || "Professional"}
+            {vcardData.company ? ` tại ${vcardData.company}` : ""}
+          </Text>
+        </Box>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Box
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
+            onClick={handleEmail}
+          >
+            <Icon icon="zi-notif" className="text-blue-300 mb-2" size={20} />
+            <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
+              E-mail
             </Text>
-            {vcardData.position && (
-              <Text className="text-blue-600 font-medium mt-1">{vcardData.position}</Text>
-            )}
-            {vcardData.company && (
-              <Text className="text-gray-500 text-sm mt-1">{vcardData.company}</Text>
-            )}
+            <Text className="text-white text-xs font-medium truncate">
+              {vcardData.email || "N/A"}
+            </Text>
           </Box>
 
-          <Box flex className="px-4 py-6 gap-4 bg-white mb-2 shadow-sm">
-            <Button
-              fullWidth
-              icon={<Icon icon="zi-call" />}
-              onClick={handleCall}
-              className="bg-green-500"
-            >
-              Gọi
-            </Button>
-            {vcardData.email && (
-              <Button fullWidth variant="secondary" onClick={handleEmail}>
-                Email
-              </Button>
-            )}
+          <Box
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
+            onClick={handleCall}
+          >
+            <Icon icon="zi-call" className="text-green-300 mb-2" size={20} />
+            <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
+              Số điện thoại
+            </Text>
+            <Text className="text-white text-xs font-medium">{vcardData.phone || "N/A"}</Text>
           </Box>
 
-          <Box className="mt-2 bg-white shadow-sm overflow-hidden">
-            <Box
-              p={4}
-              className="border-b flex items-center gap-4 active:bg-gray-50"
-              onClick={handleCall}
-            >
-              <Box className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <Icon icon="zi-call" className="text-green-600" size={20} />
-              </Box>
-              <Box className="flex-1">
-                <Text className="text-gray-400 text-xs uppercase font-semibold">Số điện thoại</Text>
-                <Text className="text-gray-800 font-medium">{vcardData.phone || "N/A"}</Text>
-              </Box>
-            </Box>
-
-            {vcardData.email && (
-              <Box
-                p={4}
-                className="border-b flex items-center gap-4 active:bg-gray-50"
-                onClick={handleEmail}
-              >
-                <Box className="flex-1">
-                  <Text className="text-gray-400 text-xs uppercase font-semibold">Email</Text>
-                  <Text className="text-gray-800 font-medium">{vcardData.email}</Text>
-                </Box>
-              </Box>
-            )}
-
-            {vcardData.website && (
-              <Box
-                p={4}
-                className="border-b flex items-center gap-4 active:bg-gray-50"
-                onClick={handleWebsite}
-              >
-                <Box className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Icon icon="zi-link" className="text-purple-600" size={20} />
-                </Box>
-                <Box className="flex-1">
-                  <Text className="text-gray-400 text-xs uppercase font-semibold">Website</Text>
-                  <Text className="text-blue-600 font-medium">{vcardData.website}</Text>
-                </Box>
-              </Box>
-            )}
+          <Box
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
+            onClick={handleWebsite}
+          >
+            <Icon icon="zi-link" className="text-purple-300 mb-2" size={20} />
+            <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
+              Website
+            </Text>
+            <Text className="text-white text-xs font-medium truncate">
+              {vcardData.website || "N/A"}
+            </Text>
           </Box>
-        </>
-      )}
 
-      <Box p={8} className="flex flex-col items-center">
-        <Text className="text-gray-300 text-xs italic">Tạo bởi Zalo Mini App QR</Text>
+          <Box className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity">
+            <Icon icon="zi-user-circle-solid" className="text-red-300 mb-2" size={20} />
+            <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
+              Mạng xã hội
+            </Text>
+            <Text className="text-white text-xs font-medium">
+              {vcardData.socialLinks || "Global"}
+            </Text>
+          </Box>
+        </div>
+
+        <Box className="flex flex-col items-center mt-6">
+          <Text className="text-gray-300 text-[10px] italic">Powered by QR Mini App</Text>
+        </Box>
       </Box>
     </Page>
   );

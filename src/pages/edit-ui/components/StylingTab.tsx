@@ -220,16 +220,12 @@ export const StylingTab = () => {
             </Button>
             <Button
               variant="secondary"
+              fullWidth
+              prefixIcon={<Icon icon={"zi-plus"} />}
               onClick={handleUploadLogo}
-              disabled={uploading}
-              prefixIcon={
-                <Icon
-                  icon={uploading ? "zi-backup-arrow-solid" : "zi-plus"}
-                  className={`${uploading ? "animate-spin" : ""} rotate-90`}
-                />
-              }
+              loading={uploading}
             >
-              {uploading ? "Đang tải lên..." : "Tải Logo"}
+              Tải Logo lên
             </Button>
           </div>
           {qrOptions.image && (

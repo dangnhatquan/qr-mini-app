@@ -73,16 +73,11 @@ export const StickerTab = () => {
           <Button
             variant="secondary"
             fullWidth
-            icon={
-              <Icon
-                icon={uploading ? "zi-backup-arrow-solid" : "zi-plus"}
-                className={`${uploading ? "animate-spin" : ""} rotate-90`}
-              />
-            }
+            icon={<Icon icon={"zi-plus"} />}
             onClick={handleUploadSticker}
-            disabled={uploading}
+            loading={uploading}
           >
-            {uploading ? "Đang tải lên..." : "Tải Sticker lên"}
+            Tải Sticker lên
           </Button>
         </div>
       </div>

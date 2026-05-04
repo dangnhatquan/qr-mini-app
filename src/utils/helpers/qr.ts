@@ -9,6 +9,7 @@ import {
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
+import { ZALO_APP_ID } from "@/api";
 
 function crc16(data: string): string {
   let crc = 0xffff;
@@ -131,4 +132,11 @@ export const generateQRPayload = (qr: QrCode) => {
     default:
       return ZALO_APP_LINK;
   }
+};
+
+export const generateVCardLink = (version: string, id: string, shortUrl?: string) => {
+  return (
+    shortUrl ||
+    `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=vcards/${id}`
+  );
 };

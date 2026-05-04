@@ -325,6 +325,7 @@ const MyQRsPage: React.FC = () => {
                     type={qr.type}
                     category={qr.category}
                     previewUrl={qr.previewImage?.path}
+                    vcardData={qr.payload?.vcardData}
                     createdAt={qr.createdAt}
                     onClick={() => {
                       if (swipeState[qr.id] === -90) {

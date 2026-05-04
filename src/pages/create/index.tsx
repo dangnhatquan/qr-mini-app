@@ -126,7 +126,7 @@ const CreatePage: React.FC = () => {
               <BankingForm control={control} />
             )}
             {qrType === EQRType.DYNAMIC && category === EQRCategory.VCARD && (
-              <VCardForm control={control} />
+              <VCardForm control={control} setValue={setValue} />
             )}
             {qrType === EQRType.DYNAMIC && category === EQRCategory.GREETING && (
               <GreetingForm control={control} />

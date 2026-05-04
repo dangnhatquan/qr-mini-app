@@ -7,13 +7,14 @@ import Konva from "konva";
 import {
   buildQRCreatePayload,
   generateGreetingPayload,
+  generateVCardLink,
   generateVCardPayload,
   generateVietQRPayload,
   generateWifiPayload,
 } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import QRCodeStyling from "qr-code-styling";
-import { ZALO_APP_ID } from "@/api";
+import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
 
 export const getQRPayload = (data: IQRFormValues): string => {
@@ -150,9 +151,9 @@ export const qrService = {
 
       const { version } = getSystemInfo();
 
-      const finalUrl =
-        shortUrl ||
-        `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=vcards/${id}`;
+      const finalVersion = version || ZALO_APP_DEV_VERSION;
+
+      const finalUrl = generateVCardLink(finalVersion, id, shortUrl);
 
       const blob = await generateQRBlob(finalUrl);
 

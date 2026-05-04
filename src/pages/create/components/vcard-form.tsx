@@ -1,15 +1,25 @@
 import React from "react";
-import { Control } from "react-hook-form";
+import { Control, UseFormSetValue } from "react-hook-form";
 import { InputFormField } from "@/components/form-fields/input-field";
 import { IQRFormValues } from "@/utils/schemas/qr";
+import { UploadFormField } from "@/components/form-fields/upload-form-field";
 
 interface VCardFormProps {
   control: Control<IQRFormValues>;
+  setValue: UseFormSetValue<IQRFormValues>;
 }
 
-export const VCardForm: React.FC<VCardFormProps> = ({ control }) => {
+export const VCardForm: React.FC<VCardFormProps> = ({ control, setValue }) => {
   return (
     <>
+      <UploadFormField
+        setValue={setValue}
+        name="vcardData.avatar"
+        control={control}
+        label="Hình đại diện"
+        placeholder="Tải lên hình đại diện"
+        required
+      />
       <InputFormField
         name="vcardData.fullName"
         control={control}

@@ -9,6 +9,10 @@ interface QRCardProps {
   category: string;
   previewUrl: string;
   createdAt: string;
+  vcardData?: {
+    fullName?: string;
+    avatar?: string;
+  };
   onClick: () => void;
 }
 
@@ -17,8 +21,46 @@ export const QRCard: React.FC<QRCardProps> = ({
   category,
   previewUrl,
   createdAt,
+  vcardData,
   onClick,
 }) => {
+  if (category === "vcard") {
+    return (
+      <Box
+        className="rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden cursor-pointer text-white bg-[#D32F2F]"
+        style={{ minHeight: "200px" }}
+        onClick={onClick}
+      >
+        <div className="flex justify-between items-start relative z-10">
+          <Box>
+            <Text className="font-bold text-xl text-white line-clamp-1 mb-2 shadow-sm">
+              {getCategoryLabel(category)}
+            </Text>
+            <span className="text-[10px] px-2.5 py-1 rounded-full uppercase font-bold tracking-wider bg-white/20 backdrop-blur-sm text-white border border-white/30">
+              {type === "static" ? "QR Tĩnh" : "QR Động"}
+            </span>
+          </Box>
+          <div className="w-16 h-16 bg-white rounded-lg shadow-2xl overflow-hidden flex-shrink-0 p-1.5">
+            {previewUrl ? (
+              <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-300">
+                <Icon icon="zi-more-grid" />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-between items-end relative z-10">
+          <div className="flex flex-col">
+            <Text className="font-bold text-lg uppercase tracking-tight text-white/90">
+              {vcardData?.fullName || "Chưa đặt tên"}
+            </Text>
+          </div>
+        </div>
+      </Box>
+    );
+  }
+
   return (
     <Box
       className={`rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden cursor-pointer text-white ${

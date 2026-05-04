@@ -47,6 +47,8 @@ export interface VCardQRData {
   company?: string;
   position?: string;
   website?: string;
+  avatar?: string;
+  socialLinks?: string;
 }
 
 export interface GreetingQRData {

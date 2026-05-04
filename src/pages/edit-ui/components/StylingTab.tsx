@@ -1,0 +1,259 @@
+import { Accordion } from "@/components/accordion";
+import { Box, Button, Icon, Input } from "zmp-ui";
+import { useKonvaEditor } from "../context/KonvaEditorContext";
+import { COLORS, CORNER_DOT_TYPES, CORNER_SQUARE_TYPES, DOT_TYPES } from "../utils/constants";
+import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
+import { Options } from "qr-code-styling";
+import { uploadFile } from "@/utils/helpers/image";
+import { useState } from "react";
+
+export const StylingTab = () => {
+  const { openSection, setOpenSection, qrOptions, setQrOptions } = useKonvaEditor();
+  const [uploading, setUploading] = useState(false);
+
+  const updateQrOption = (category: keyof Options, key: string, value: string | number) => {
+    setQrOptions((prev: Options) => ({
+      ...prev,
+      [category]: {
+        ...(prev[category] as Record<string, unknown>),
+        [key]: value,
+      },
+    }));
+  };
+
+  const handleUseAvatar = async () => {
+    try {
+      setUploading(true);
+      const { userInfo } = await getUserInfo({
+        autoRequestPermission: false,
+        avatarType: "normal",
+      });
+      if (userInfo.avatar) {
+        let finalPath = userInfo.avatar;
+
+        const response = await fetch(finalPath);
+        const blob = await response.blob();
+        const file = await uploadFile(blob);
+
+        setQrOptions((prev) => ({
+          ...prev,
+          image: file.path,
+        }));
+        showToast({ message: "Đã thêm Avatar" });
+      }
+    } catch (_err) {
+      console.error("Use avatar error:", _err);
+      showToast({ message: "Lỗi lấy thông tin" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUploadLogo = async () => {
+    try {
+      const { filePaths } = await chooseImage({ count: 1 });
+      if (filePaths && filePaths.length > 0) {
+        setUploading(true);
+        const path = filePaths[0];
+        const response = await fetch(path);
+        const blob = await response.blob();
+        const file = await uploadFile(blob);
+
+        setQrOptions((prev) => ({
+          ...prev,
+          image: file.path,
+        }));
+        showToast({ message: "Đã thêm Logo" });
+      }
+    } catch (_err) {
+      console.error("Upload logo error:", _err);
+      showToast({ message: "Lỗi tải ảnh" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <Box className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+      <Accordion
+        title="Tùy chỉnh điểm ảnh"
+        isOpen={openSection === "dots"}
+        onClick={() => setOpenSection(openSection === "dots" ? null : "dots")}
+      >
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Màu sắc</div>
+        <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          {COLORS.map((c) => (
+            <div
+              key={c}
+              onClick={() => updateQrOption("dotsOptions", "color", c)}
+              className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border"
+              style={{
+                backgroundColor: c,
+                borderColor: qrOptions.dotsOptions?.color === c ? "#3b82f6" : "#e2e8f0",
+              }}
+            />
+          ))}
+        </div>
+        <div className="text-xs text-gray-500 mb-2 mt-3 uppercase tracking-wider">Kiểu chấm</div>
+        <div className="grid grid-cols-2 gap-2">
+          {DOT_TYPES.map((t) => (
+            <div
+              key={t}
+              onClick={() => updateQrOption("dotsOptions", "type", t)}
+              className={`px-3 py-2 rounded-lg border text-xs text-center cursor-pointer capitalize ${qrOptions.dotsOptions?.type === t ? "bg-blue-50 border-blue-500 text-blue-600 font-medium" : "bg-white border-gray-200 text-gray-600"}`}
+            >
+              {t.replace("-", " ")}
+            </div>
+          ))}
+        </div>
+      </Accordion>
+      <Accordion
+        title="Tùy chỉnh khung mắt QR"
+        isOpen={openSection === "cornersSquare"}
+        onClick={() => setOpenSection(openSection === "cornersSquare" ? null : "cornersSquare")}
+      >
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Màu sắc</div>
+        <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          {COLORS.map((c) => (
+            <div
+              key={c}
+              onClick={() => updateQrOption("cornersSquareOptions", "color", c)}
+              className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border"
+              style={{
+                backgroundColor: c,
+                borderColor: qrOptions.cornersSquareOptions?.color === c ? "#3b82f6" : "#e2e8f0",
+              }}
+            />
+          ))}
+        </div>
+        <div className="text-xs text-gray-500 mb-2 mt-3 uppercase tracking-wider">
+          Kiểu khung mắt
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {CORNER_SQUARE_TYPES.map((t) => (
+            <div
+              key={t}
+              onClick={() => updateQrOption("cornersSquareOptions", "type", t)}
+              className={`px-3 py-2 rounded-lg border text-xs text-center cursor-pointer capitalize ${qrOptions.cornersSquareOptions?.type === t ? "bg-blue-50 border-blue-500 text-blue-600 font-medium" : "bg-white border-gray-200 text-gray-600"}`}
+            >
+              {t.replace("-", " ")}
+            </div>
+          ))}
+        </div>
+      </Accordion>
+      <Accordion
+        title="Tùy chỉnh nhân mắt QR"
+        isOpen={openSection === "cornersDot"}
+        onClick={() => setOpenSection(openSection === "cornersDot" ? null : "cornersDot")}
+      >
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Màu sắc</div>
+        <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          {COLORS.map((c) => (
+            <div
+              key={c}
+              onClick={() => updateQrOption("cornersDotOptions", "color", c)}
+              className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border"
+              style={{
+                backgroundColor: c,
+                borderColor: qrOptions.cornersDotOptions?.color === c ? "#3b82f6" : "#e2e8f0",
+              }}
+            />
+          ))}
+        </div>
+        <div className="text-xs text-gray-500 mb-2 mt-3 uppercase tracking-wider">
+          Kiểu nhãn mắt
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {CORNER_DOT_TYPES.map((t) => (
+            <div
+              key={t}
+              onClick={() => updateQrOption("cornersDotOptions", "type", t)}
+              className={`px-3 py-2 rounded-lg border text-xs text-center cursor-pointer capitalize ${qrOptions.cornersDotOptions?.type === t ? "bg-blue-50 border-blue-500 text-blue-600 font-medium" : "bg-white border-gray-200 text-gray-600"}`}
+            >
+              {t}
+            </div>
+          ))}
+        </div>
+      </Accordion>
+      <Accordion
+        title="Màu nền mã QR"
+        isOpen={openSection === "bg"}
+        onClick={() => setOpenSection(openSection === "bg" ? null : "bg")}
+      >
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Màu nền mã QR</div>
+        <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+          <div
+            onClick={() => updateQrOption("backgroundOptions", "color", "transparent")}
+            className={`w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border flex items-center justify-center bg-white ${qrOptions.backgroundOptions?.color === "transparent" ? "border-blue-500" : "border-gray-200"}`}
+          >
+            <div className="w-full h-0.5 bg-red-500 rotate-45"></div>
+          </div>
+          {["#ffffff", "#f8fafc", "#fef3c7", "#dcfce7", "#e0e7ff", "#fce7f3", "#000000"].map(
+            (c) => (
+              <div
+                key={c}
+                onClick={() => updateQrOption("backgroundOptions", "color", c)}
+                className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border"
+                style={{
+                  backgroundColor: c,
+                  borderColor: qrOptions.backgroundOptions?.color === c ? "#3b82f6" : "#e2e8f0",
+                }}
+              />
+            ),
+          )}
+        </div>
+      </Accordion>
+      <Accordion
+        title="Tùy chỉnh Logo"
+        isOpen={openSection === "image"}
+        onClick={() => setOpenSection(openSection === "image" ? null : "image")}
+      >
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="secondary"
+              onClick={handleUseAvatar}
+              prefixIcon={<Icon icon="zi-user" />}
+            >
+              Dùng Avatar
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleUploadLogo}
+              disabled={uploading}
+              prefixIcon={
+                <Icon
+                  icon={uploading ? "zi-backup-arrow-solid" : "zi-plus"}
+                  className={`${uploading ? "animate-spin" : ""} rotate-90`}
+                />
+              }
+            >
+              {uploading ? "Đang tải lên..." : "Tải Logo"}
+            </Button>
+          </div>
+          {qrOptions.image && (
+            <Button
+              size="small"
+              type="danger"
+              variant="secondary"
+              onClick={() => setQrOptions((prev) => ({ ...prev, image: "" }))}
+            >
+              Xoá Logo
+            </Button>
+          )}
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-gray-500 uppercase tracking-wider">
+              Khoảng cách Logo (Margin)
+            </span>
+            <Input
+              type="number"
+              value={String(qrOptions.imageOptions?.margin || 0)}
+              onChange={(e) => updateQrOption("imageOptions", "margin", Number(e.target.value))}
+              className="h-8 text-sm"
+            />
+          </div>
+        </div>
+      </Accordion>
+    </Box>
+  );
+};

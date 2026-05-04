@@ -1,0 +1,86 @@
+export enum EQRType {
+  STATIC = "static",
+  DYNAMIC = "dynamic",
+}
+
+export enum EQRCategory {
+  WIFI = "wifi",
+  BANKING = "banking",
+  VCARD = "vcard",
+  GREETING = "greeting",
+}
+
+export enum EWifiSecurity {
+  WPA = "WPA/WPA2",
+  WEP = "WEP",
+  NONE = "None",
+}
+
+export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
+export const DEFAULT_BANK_ID = "970422";
+export const DEFAULT_MAX_ATTEMPTS = 5;
+
+export interface IQRBackendPayload {
+  wifiData?: WifiQRData;
+  bankingData?: BankingQRData;
+  vcardData?: VCardQRData;
+  greetingData?: GreetingQRData;
+}
+
+export interface WifiQRData {
+  security: string;
+  ssid: string;
+  password: string;
+}
+
+export interface BankingQRData {
+  bankId: string;
+  accountNo: string;
+  amount?: string;
+  accountName?: string;
+}
+
+export interface VCardQRData {
+  fullName: string;
+  phone: string;
+  email?: string;
+  company?: string;
+  position?: string;
+  website?: string;
+}
+
+export interface GreetingQRData {
+  eventName: string;
+  wishes: string;
+}
+
+export interface QrCode {
+  id: string;
+  userId: number;
+  type: string;
+  category: string;
+  slug: string | null;
+  passwordHash: string | null;
+  previewImage: PreviewImage;
+  payload: IQRBackendPayload | null;
+  editorStage: EditorStage;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface PreviewImage {
+  id: string;
+  path: string;
+  status: string;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface EditorStage {
+  dots: string;
+  color: string;
+}

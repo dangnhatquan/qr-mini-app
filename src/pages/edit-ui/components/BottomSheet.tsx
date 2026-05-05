@@ -5,6 +5,7 @@ import { LayoutTab } from "./LayoutTab";
 import { StylingTab } from "./StylingTab";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
+import { IconQrcode, IconSticker, IconTexture } from "@tabler/icons-react";
 
 export interface IBottomSheetProps {
   isDragging: boolean;
@@ -23,7 +24,6 @@ export const BottomSheet = ({
 }: IBottomSheetProps) => {
   const { setTranslateY, isCollapsed, setIsCollapsed } = useKonvaEditor();
 
-  // --- Drag Handlers ---
   const handleStart = (y: number) => {
     dragStartYRef.current = y;
     currentTranslateYRef.current = translateY;
@@ -31,7 +31,6 @@ export const BottomSheet = ({
   };
 
   const toggleSheet = (_e: React.MouseEvent | React.TouchEvent) => {
-    // Only toggle if not dragging (simple click)
     if (Math.abs(translateY - currentTranslateYRef.current) < 5) {
       if (isCollapsed) {
         setTranslateY(0);
@@ -69,15 +68,39 @@ export const BottomSheet = ({
         className={`flex-1 flex flex-col transition-opacity duration-300 ${translateY > COLLAPSED_Y - 100 ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
         <Tabs id="editor-tabs" className="flex-1 overflow-hidden">
-          <Tabs.Tab key="qr" label="Thiết kế QR">
+          <Tabs.Tab
+            key="qr"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconQrcode className="w-5 h-5" />
+                Thiết kế QR
+              </div>
+            }
+          >
             <StylingTab />
           </Tabs.Tab>
 
-          <Tabs.Tab key="layout" label="Bố cục">
+          <Tabs.Tab
+            key="layout"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconTexture className="w-5 h-5" />
+                Bố cục
+              </div>
+            }
+          >
             <LayoutTab />
           </Tabs.Tab>
 
-          <Tabs.Tab key="stickers" label="Nhãn dán">
+          <Tabs.Tab
+            key="stickers"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconSticker className="w-5 h-5" />
+                Stickers
+              </div>
+            }
+          >
             <StickerTab />
           </Tabs.Tab>
         </Tabs>

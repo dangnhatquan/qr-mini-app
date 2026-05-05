@@ -5,7 +5,6 @@ import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
 import { showToast } from "zmp-sdk/apis";
 import { Stage, Layer, Rect, Group } from "react-konva";
-import { FocusIcon } from "@/components/icons/Focus";
 import { URLImage } from "./QRImage";
 import { TextElement } from "./TextElement";
 import { useKonvaEditor, CanvasElement } from "../context/KonvaEditorContext";
@@ -13,10 +12,11 @@ import { preloadImage } from "@/utils/helpers/image";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { BottomSheet } from "./BottomSheet";
 import { KonvaEventObject } from "konva/lib/Node";
-import { generateQRPayload } from "@/utils/helpers/qr";
+import { generateQRPayload, isRemoteImage } from "@/utils/helpers/qr";
 import { EQRCategory, EQRType, QrCode } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
+import { IconFocusCentered } from "@tabler/icons-react";
 
 export const QREditor: React.FC = () => {
   const { id } = useParams();
@@ -75,10 +75,7 @@ export const QREditor: React.FC = () => {
         image: imageSrc,
       };
 
-      const isRemoteImage =
-        imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
-
-      if (isRemoteImage && !assetCache[imageSrc!]) {
+      if (isRemoteImage(imageSrc) && !assetCache[imageSrc!]) {
         try {
           await new Promise((resolve, reject) => {
             const img = new Image();
@@ -283,7 +280,6 @@ export const QREditor: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDragging, translateY]);
 
-  // Auto-zoom/pan based on sheet state
   useEffect(() => {
     if (!stageRef.current) return;
 
@@ -599,7 +595,7 @@ export const QREditor: React.FC = () => {
               onClick={handleResetView}
               className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-12 h-12 flex items-center justify-center p-0"
             >
-              <FocusIcon />
+              <IconFocusCentered />
             </div>
           </div>
 

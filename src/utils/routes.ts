@@ -4,3 +4,5 @@ export const myQrsRoute = "/my-qrs";
 export const homeRoute = "/";
 export const editRoute = "/edit-ui/:id";
 export const vcardDetailRoute = "/vcards/:id";
+export const greetingDetailRoute = "/greetings/:id";
+export const cardEditorRoute = "/card-editor";

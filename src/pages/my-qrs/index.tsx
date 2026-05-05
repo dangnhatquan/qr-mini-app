@@ -6,7 +6,7 @@ import { qrService } from "@/services/qr";
 import { createRoute } from "@/utils/routes";
 import { getCategoryLabel } from "./utils/functions";
 import { QRCard } from "./components/qr-card";
-import { QrCode } from "@/types/qr";
+import { EQRCategory, QrCode } from "@/types/qr";
 import "./styles.scss";
 import { Image } from "@/components/image";
 
@@ -30,6 +30,13 @@ const MyQRsPage: React.FC = () => {
 
   const [isInitialRender, setIsInitialRender] = useState(true);
 
+  useEffect(() => {
+    if (qrs.length > 0 && isInitialRender) {
+      const timer = setTimeout(() => setIsInitialRender(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [qrs, isInitialRender]);
+
   const fetchQRs = async (isBackground = false) => {
     try {
       if (!isBackground) setLoading(true);
@@ -43,16 +50,9 @@ const MyQRsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (qrs.length > 0 && isInitialRender) {
-      const timer = setTimeout(() => setIsInitialRender(false), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [qrs, isInitialRender]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      fetchQRs();
-    }, 0);
+    (async () => {
+      await fetchQRs();
+    })();
   }, []);
 
   const handlePtrStart = (e: React.TouchEvent) => {
@@ -254,7 +254,11 @@ const MyQRsPage: React.FC = () => {
   const handleView = () => {
     if (!selectedQR) return;
     setModalVisible(false);
-    navigate(`/vcards/${selectedQR.id}`);
+    if (selectedQR.category === EQRCategory.GREETING) {
+      navigate(`/greetings/${selectedQR.id}`);
+    } else {
+      navigate(`/vcards/${selectedQR.id}`);
+    }
   };
 
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
@@ -326,6 +330,7 @@ const MyQRsPage: React.FC = () => {
                     category={qr.category}
                     previewUrl={qr.previewImage?.path}
                     vcardData={qr.payload?.vcardData}
+                    greetingData={qr.payload?.greetingData}
                     createdAt={qr.createdAt}
                     onClick={() => {
                       if (swipeState[qr.id] === -90) {

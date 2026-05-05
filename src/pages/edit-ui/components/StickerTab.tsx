@@ -4,7 +4,6 @@ import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
 import { uploadFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
-import { PUBLIC_API_URL } from "@/api";
 import { STICKERS } from "../utils/constants";
 
 export const StickerTab = () => {

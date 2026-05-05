@@ -27,12 +27,11 @@ export const vcardSchema = z.object({
 });
 
 export const greetingCardSchema = z.object({
-  eventName: z.string().min(1, "Vui lòng nhập tên sự kiện"),
-  wishes: z.string().min(1, "Vui lòng nhập lời chúc"),
-  imageUrl: z.string().optional(),
-  videoLink: z.string().url("Link video không hợp lệ").optional().or(z.literal("")),
+  eventName: z.string().min(1, "Vui lòng nhập tên thiệp"),
+  wishes: z.string().optional(),
   password: z.string().optional(),
   maxAttempts: z.number().optional(),
+  cardId: z.string().optional(),
 });
 
 export const qrFormSchema = z

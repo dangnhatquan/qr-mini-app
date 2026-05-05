@@ -6,18 +6,16 @@ import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import Konva from "konva";
 import {
   buildQRCreatePayload,
-  generateGreetingPayload,
-  generateVCardLink,
-  generateVCardPayload,
+  generateDynamicLink,
   generateVietQRPayload,
   generateWifiPayload,
 } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import QRCodeStyling from "qr-code-styling";
-import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
+import { ZALO_APP_DEV_VERSION } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
 
-export const getQRPayload = (data: IQRFormValues): string => {
+export const getQRPayload = (data: IQRFormValues, id?: string): string => {
   switch (data.category) {
     case EQRCategory.BANKING: {
       const { bankId, accountNo } = data.bankingData!;
@@ -32,19 +30,11 @@ export const getQRPayload = (data: IQRFormValues): string => {
       return generateWifiPayload(ssid, password, security);
     }
 
-    case EQRCategory.VCARD: {
-      return generateVCardPayload(
-        data.vcardData!.fullName,
-        data.vcardData!.phone,
-        data.vcardData!.email,
-        data.vcardData!.company,
-        data.vcardData!.position,
-        data.vcardData!.website,
-      );
-    }
-
+    case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
-      return generateGreetingPayload(data.greetingData!.eventName, data.greetingData!.wishes);
+      const { version } = getSystemInfo();
+      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      return generateDynamicLink(finalVersion, id!, data.category, undefined);
     }
 
     default: {
@@ -150,10 +140,9 @@ export const qrService = {
       const { id, shortUrl } = qrResponse;
 
       const { version } = getSystemInfo();
-
       const finalVersion = version || ZALO_APP_DEV_VERSION;
 
-      const finalUrl = generateVCardLink(finalVersion, id, shortUrl);
+      const finalUrl = generateDynamicLink(finalVersion, id, data.category, shortUrl);
 
       const blob = await generateQRBlob(finalUrl);
 
@@ -202,7 +191,7 @@ export const qrService = {
   },
 
   async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: unknown) {
-    const payloadString = getQRPayload(data);
+    const payloadString = getQRPayload(data, id);
     const blob = customBlob || (await generateQRBlob(payloadString));
 
     const uploadInfo = await request.get<{

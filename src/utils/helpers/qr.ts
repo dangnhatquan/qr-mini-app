@@ -1,15 +1,9 @@
-import {
-  BankingQRData,
-  EQRCategory,
-  GreetingQRData,
-  QrCode,
-  VCardQRData,
-  WifiQRData,
-} from "@/types/qr";
+import { BankingQRData, EQRCategory, QrCode, WifiQRData } from "@/types/qr";
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
-import { ZALO_APP_ID } from "@/api";
+import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
+import { getSystemInfo } from "zmp-sdk/apis";
 
 function crc16(data: string): string {
   let crc = 0xffff;
@@ -76,36 +70,15 @@ export const generateWifiPayload = (ssid: string, password: string, security: st
   return `WIFI:S:${ssid};T:${security};P:${password};;`;
 };
 
-export const generateGreetingPayload = (eventName: string, wishes: string) => {
-  return `Event: ${eventName}\nWishes: ${wishes}`;
-};
-
-export const generateVCardPayload = (
-  fullName: string,
-  phone: string,
-  email?: string,
-  company?: string,
-  position?: string,
-  website?: string,
-) => {
-  let payload = `BEGIN:VCARD\nVERSION:3.0\nFN:${fullName}\nTEL:${phone}`;
-  if (email) payload += `\nEMAIL:${email}`;
-  if (company) payload += `\nORG:${company}`;
-  if (position) payload += `\nTITLE:${position}`;
-  if (website) payload += `\nURL:${website}`;
-  payload += `\nEND:VCARD`;
-  return payload;
-};
-
 export const buildQRCreatePayload = (data: IQRFormValues, file: { id: string }) => {
   return {
     qrType: data.qrType,
     category: data.category,
     previewImageId: file.id,
-    wifiData: data.category === "wifi" ? data.wifiData : undefined,
-    bankingData: data.category === "banking" ? data.bankingData : undefined,
-    vcardData: data.category === "vcard" ? data.vcardData : undefined,
-    greetingData: data.category === "greeting" ? data.greetingData : undefined,
+    wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
+    bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
+    vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
+    greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
     editorStage: DEFAULT_EDITOR_STAGE,
   };
 };
@@ -120,23 +93,32 @@ export const generateQRPayload = (qr: QrCode) => {
       const { ssid, password, security } = qr.payload?.wifiData as WifiQRData;
       return generateWifiPayload(ssid, password, security);
     }
-    case EQRCategory.VCARD: {
-      const { fullName, phone, email, company, position, website } = qr.payload
-        ?.vcardData as VCardQRData;
-      return generateVCardPayload(fullName, phone, email, company, position, website);
-    }
+    case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
-      const { eventName, wishes } = qr.payload?.greetingData as GreetingQRData;
-      return generateGreetingPayload(eventName, wishes);
+      const { version } = getSystemInfo();
+      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      return generateDynamicLink(finalVersion, qr.id, qr.category, undefined);
     }
     default:
       return ZALO_APP_LINK;
   }
 };
 
-export const generateVCardLink = (version: string, id: string, shortUrl?: string) => {
-  return (
-    shortUrl ||
-    `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=vcards/${id}`
-  );
+export const generateDynamicLink = (
+  version: string,
+  id: string,
+  category: EQRCategory,
+  shortUrl?: string,
+) => {
+  if (shortUrl) return shortUrl;
+
+  let page = "vcards";
+  if (category === EQRCategory.GREETING) {
+    page = "greetings";
+  }
+
+  return `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=${page}/${id}`;
 };
+
+export const isRemoteImage = (imageSrc?: string) =>
+  imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));

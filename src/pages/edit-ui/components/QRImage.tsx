@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
-import { useKonvaEditor, CanvasElement } from "../context/KonvaEditorContext";
+import { CanvasElement } from "../context/KonvaEditorContext";
 
 export const URLImage = ({
   imageProps,
@@ -15,8 +15,7 @@ export const URLImage = ({
   onSelect: () => void;
   onChange: (newProps: CanvasElement) => void;
 }) => {
-  const { assetCache } = useKonvaEditor();
-  const displaySrc = (imageProps.src && assetCache[imageProps.src]) || imageProps.src;
+  const displaySrc = imageProps.src;
   const [img] = useImage(displaySrc || "", "anonymous");
   const shapeRef = useRef<Konva.Image | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);

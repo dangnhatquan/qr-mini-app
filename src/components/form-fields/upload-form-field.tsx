@@ -17,19 +17,12 @@ import { Avatar, Button, Icon, Spinner } from "zmp-ui";
 interface IUploadFormFieldProps<T extends FieldValues> {
   name: Path<T>;
   control: Control<T>;
-  label: string;
-  placeholder?: string;
-  type?: "text" | "password" | "number";
-  required?: boolean;
   helperText?: string;
   setValue: UseFormSetValue<T>;
 }
 export const UploadFormField = ({
   name,
   control,
-  label,
-  placeholder,
-  required,
   helperText,
   setValue,
 }: IUploadFormFieldProps<IQRFormValues>) => {
@@ -86,21 +79,7 @@ export const UploadFormField = ({
       name={name}
       control={control}
       render={({ field, formState: { errors } }) => {
-        console.log("UploadFormField render with value:", field);
         const fieldError = get(errors, name) as FieldError | undefined;
-
-        const inputProps = {
-          ...field,
-          label: (
-            <span className="text-sm font-medium">
-              {label} {required && <span className="text-red-500">*</span>}
-            </span>
-          ),
-          placeholder: placeholder,
-          helperText: helperText,
-          errorText: fieldError?.message,
-          status: (fieldError ? "error" : undefined) as any,
-        };
 
         return (
           <div className="h-[216px] flex items-center justify-center">
@@ -121,6 +100,11 @@ export const UploadFormField = ({
                     Tải lên
                   </Button>
                 </div>
+                {(fieldError?.message || helperText) && (
+                  <div className={`text-xs mt-1 ${fieldError ? "text-red-500" : "text-gray-500"}`}>
+                    {fieldError?.message || helperText}
+                  </div>
+                )}
               </div>
             ) : (
               <Spinner />

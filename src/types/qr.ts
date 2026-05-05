@@ -54,6 +54,9 @@ export interface VCardQRData {
 export interface GreetingQRData {
   eventName: string;
   wishes: string;
+  password?: string;
+  maxAttempts?: number;
+  cardId?: string;
 }
 
 export interface QrCode {

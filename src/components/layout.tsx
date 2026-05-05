@@ -7,8 +7,18 @@ import CreatePage from "@/pages/create";
 import MyQRsPage from "@/pages/my-qrs";
 import EditUIPage from "@/pages/edit-ui";
 import VCardDetailPage from "@/pages/vcard-detail";
+import CardEditorPage from "@/pages/card-editor";
+import GreetingDetailPage from "@/pages/greeting-detail";
 import { AuthProvider } from "@/contexts";
-import { createRoute, defaultRoute, editRoute, myQrsRoute, vcardDetailRoute } from "@/utils/routes";
+import {
+  createRoute,
+  defaultRoute,
+  editRoute,
+  myQrsRoute,
+  vcardDetailRoute,
+  cardEditorRoute,
+  greetingDetailRoute,
+} from "@/utils/routes";
 
 const Layout = () => {
   return (
@@ -22,6 +32,8 @@ const Layout = () => {
               <Route path={myQrsRoute} element={<MyQRsPage />} />
               <Route path={editRoute} element={<EditUIPage />} />
               <Route path={vcardDetailRoute} element={<VCardDetailPage />} />
+              <Route path={greetingDetailRoute} element={<GreetingDetailPage />} />
+              <Route path={cardEditorRoute} element={<CardEditorPage />} />
             </AnimationRoutes>
           </AuthProvider>
         </ZMPRouter>

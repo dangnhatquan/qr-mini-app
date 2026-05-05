@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Page, Button, Box, useSnackbar, Icon } from "zmp-ui";
+import { Page, Button, Box, useSnackbar } from "zmp-ui";
+import { IconChevronLeft } from "@tabler/icons-react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IQRFormValues, qrFormSchema } from "@/utils/schemas/qr";
@@ -158,7 +159,7 @@ const CreatePage: React.FC = () => {
         <div className="flex items-center">
           <Button
             variant="tertiary"
-            icon={<Icon icon="zi-chevron-left" size={24} className="text-black" />}
+            icon={<IconChevronLeft size={24} className="text-black" />}
             onClick={() => handleNavigateAway(() => navigate(-1))}
           />
           <div className="zaui-header-title">Tạo mã QR mới</div>

@@ -1,5 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Page, Box, Button, Text, Icon, Spinner, Modal } from "zmp-ui";
+import { Page, Box, Button, Text, Spinner, Modal } from "zmp-ui";
+import {
+  IconTrash,
+  IconGridDots,
+  IconPlus,
+  IconDownload,
+  IconEdit,
+  IconShare,
+  IconEye,
+  IconRefresh,
+} from "@tabler/icons-react";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";
@@ -277,12 +287,7 @@ const MyQRsPage: React.FC = () => {
           className="absolute top-0 left-0 right-0 h-16 flex items-center justify-center -translate-y-full pointer-events-none"
           style={{ zIndex: 100 }}
         >
-          <Icon
-            id="ptr-spinner"
-            icon="zi-auto-solid"
-            className="text-gray-400 text-2xl"
-            style={{ opacity: 0 }}
-          />
+          <IconRefresh id="ptr-spinner" className="text-gray-400 text-2xl" style={{ opacity: 0 }} />
         </div>
         {loading ? (
           <Box flex justifyContent="center" alignItems="center" p={10}>
@@ -310,7 +315,7 @@ const MyQRsPage: React.FC = () => {
                   style={{ zIndex: 0 }}
                   onClick={() => setDeleteConfirmQR(qr)}
                 >
-                  <Icon icon="zi-delete" className="text-2xl" />
+                  <IconTrash className="text-2xl" />
                 </div>
                 <div
                   id={`swipe-content-${qr.id}`}
@@ -354,7 +359,7 @@ const MyQRsPage: React.FC = () => {
             className="h-[60vh]"
           >
             <div className="bg-white p-8 rounded-full shadow-inner mb-6">
-              <Icon icon="zi-more-grid" className="text-gray-200 text-6xl" />
+              <IconGridDots className="text-gray-200 text-6xl" />
             </div>
             <Text className="text-gray-400 font-medium text-lg">Chưa có mã QR nào</Text>
             <Text className="text-gray-300 text-sm mt-2">Bấm nút bên dưới để tạo mã đầu tiên</Text>
@@ -371,7 +376,7 @@ const MyQRsPage: React.FC = () => {
           size="large"
           type="highlight"
           onClick={() => navigate(createRoute)}
-          prefixIcon={<Icon icon="zi-plus" />}
+          prefixIcon={<IconPlus />}
         >
           Tạo mã QR mới
         </Button>
@@ -389,7 +394,7 @@ const MyQRsPage: React.FC = () => {
               <Image src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full animate-pulse flex flex-col items-center justify-center gap-4">
-                <Icon icon="zi-more-grid" size={48} className="text-gray-200" />
+                <IconGridDots size={48} className="text-gray-200" />
                 <div className="w-1/3 h-2 bg-gray-200 rounded-full opacity-50" />
               </div>
             )}
@@ -408,7 +413,7 @@ const MyQRsPage: React.FC = () => {
               className="cursor-pointer"
             >
               <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <Icon icon="zi-download" className="text-gray-800" />
+                <IconDownload className="text-gray-800" />
               </div>
               <Text size="xxSmall" className="text-gray-600 font-medium">
                 Tải xuống
@@ -423,7 +428,7 @@ const MyQRsPage: React.FC = () => {
               className="cursor-pointer"
             >
               <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <Icon icon="zi-edit-text" className="text-gray-800" />
+                <IconEdit className="text-gray-800" />
               </div>
               <Text size="xxSmall" className="text-gray-600 font-medium">
                 Tuỳ chỉnh
@@ -438,7 +443,7 @@ const MyQRsPage: React.FC = () => {
               className="cursor-pointer"
             >
               <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <Icon icon="zi-share-external-1" className="text-gray-800" />
+                <IconShare className="text-gray-800" />
               </div>
               <Text size="xxSmall" className="text-gray-600 font-medium">
                 Chia sẻ
@@ -454,7 +459,7 @@ const MyQRsPage: React.FC = () => {
                 className="cursor-pointer"
               >
                 <div className="bg-blue-100 p-3 rounded-full mb-2">
-                  <Icon icon="zi-user" className="text-blue-600" />
+                  <IconEye className="text-blue-600" />
                 </div>
                 <Text size="xxSmall" className="text-blue-600 font-medium">
                   Xem chi tiết

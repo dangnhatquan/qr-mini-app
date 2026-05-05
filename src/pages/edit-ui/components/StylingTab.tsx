@@ -1,5 +1,6 @@
 import { Accordion } from "@/components/accordion";
-import { Box, Button, Icon, Input } from "zmp-ui";
+import { Box, Button, Input } from "zmp-ui";
+import { IconUser, IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { COLORS, CORNER_DOT_TYPES, CORNER_SQUARE_TYPES, DOT_TYPES } from "../utils/constants";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
@@ -211,17 +212,13 @@ export const StylingTab = () => {
       >
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="secondary"
-              onClick={handleUseAvatar}
-              prefixIcon={<Icon icon="zi-user" />}
-            >
+            <Button variant="secondary" onClick={handleUseAvatar} prefixIcon={<IconUser />}>
               Dùng Avatar
             </Button>
             <Button
               variant="secondary"
               fullWidth
-              prefixIcon={<Icon icon={"zi-plus"} />}
+              prefixIcon={<IconPlus />}
               onClick={handleUploadLogo}
               loading={uploading}
             >

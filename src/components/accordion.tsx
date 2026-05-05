@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Icon } from "zmp-ui";
+import { Box } from "zmp-ui";
+import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 
 export interface IAccordionProps {
   title: string;
@@ -16,7 +17,11 @@ export const Accordion = ({ title, children, isOpen, onClick }: IAccordionProps)
         onClick={onClick}
       >
         <span className="font-semibold text-gray-800">{title}</span>
-        <Icon icon={isOpen ? "zi-chevron-up" : "zi-chevron-down"} className="text-gray-400" />
+        {isOpen ? (
+          <IconChevronUp className="text-gray-400 w-5 h-5" />
+        ) : (
+          <IconChevronDown className="text-gray-400 w-5 h-5" />
+        )}
       </div>
       {isOpen && (
         <Box p={4} className="bg-gray-50/50">

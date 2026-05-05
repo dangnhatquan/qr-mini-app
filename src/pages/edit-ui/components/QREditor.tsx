@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useMemo, useState } from "react";
-import { Page, Box, Icon, Header } from "zmp-ui";
+import { Page, Box, Header } from "zmp-ui";
 import { useParams, useNavigate } from "react-router-dom";
 import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
@@ -15,7 +15,7 @@ import { generateQRPayload, isRemoteImage } from "@/utils/helpers/qr";
 import { EQRCategory, EQRType, QrCode } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
-import { IconFocusCentered } from "@tabler/icons-react";
+import { IconFocusCentered, IconRotate, IconCheck, IconTrash } from "@tabler/icons-react";
 import { CanvasElement, CanvasElementType } from "@/types/editor";
 
 export const QREditor: React.FC = () => {
@@ -395,7 +395,7 @@ export const QREditor: React.FC = () => {
             id="reset-button"
             className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-10 h-10 flex items-center justify-center p-0"
           >
-            <Icon icon="zi-retry" className="text-black font-bold" size={20} />
+            <IconRotate className="text-black font-bold" size={20} />
           </div>
 
           {/* Save button */}
@@ -404,7 +404,7 @@ export const QREditor: React.FC = () => {
             id="save-button"
             className="cursor-pointer bg-blue-500 text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
           >
-            <Icon icon="zi-check" className="font-bold" size={20} />
+            <IconCheck className="font-bold" size={20} />
           </div>
         </div>
       </div>
@@ -541,7 +541,7 @@ export const QREditor: React.FC = () => {
                   setSelectedId(null);
                 }}
               >
-                <Icon icon="zi-delete" className="text-white font-bold" size={20} />
+                <IconTrash className="text-white font-bold" size={20} />
               </div>
             )}
           </div>

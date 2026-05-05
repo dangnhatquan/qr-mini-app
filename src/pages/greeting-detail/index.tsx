@@ -174,7 +174,7 @@ const GreetingDetailPage: React.FC = () => {
         ) : (
           <Box className="w-full aspect-[350/450] bg-white rounded-xl shadow-lg flex items-center justify-center flex-col gap-4">
             <IconLoader className="animate-spin" />
-            <Text className="text-gray-400">Đang tải nội dung thiệp...</Text>
+            <Text className="text-gray-400">Thiệp chưa được tạo</Text>
           </Box>
         )}
 

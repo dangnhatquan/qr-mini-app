@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Page, Box, Text, Icon, Button, Spinner, Header, Avatar, useNavigate } from "zmp-ui";
+import { Page, Box, Text, Button, Spinner, Header, Avatar, useNavigate } from "zmp-ui";
+import { IconMail, IconPhone, IconWorld, IconUserCircle } from "@tabler/icons-react";
 import { qrService } from "@/services/qr";
 import { QrCode, VCardQRData } from "@/types/qr";
 import { openPhone, openWebview } from "zmp-sdk/apis";
@@ -138,7 +139,7 @@ const VCardDetailPage: React.FC = () => {
             className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
             onClick={handleEmail}
           >
-            <Icon icon="zi-notif" className="text-blue-300 mb-2" size={20} />
+            <IconMail className="text-blue-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               E-mail
             </Text>
@@ -151,7 +152,7 @@ const VCardDetailPage: React.FC = () => {
             className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
             onClick={handleCall}
           >
-            <Icon icon="zi-call" className="text-green-300 mb-2" size={20} />
+            <IconPhone className="text-green-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Số điện thoại
             </Text>
@@ -162,7 +163,7 @@ const VCardDetailPage: React.FC = () => {
             className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
             onClick={handleWebsite}
           >
-            <Icon icon="zi-link" className="text-purple-300 mb-2" size={20} />
+            <IconWorld className="text-purple-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Website
             </Text>
@@ -172,7 +173,7 @@ const VCardDetailPage: React.FC = () => {
           </Box>
 
           <Box className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity">
-            <Icon icon="zi-user-circle-solid" className="text-red-300 mb-2" size={20} />
+            <IconUserCircle className="text-red-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Mạng xã hội
             </Text>

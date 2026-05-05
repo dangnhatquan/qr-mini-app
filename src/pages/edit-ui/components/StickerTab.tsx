@@ -1,4 +1,5 @@
-import { Box, Button, Icon } from "zmp-ui";
+import { Box, Button } from "zmp-ui";
+import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
@@ -72,7 +73,7 @@ export const StickerTab = () => {
           <Button
             variant="secondary"
             fullWidth
-            icon={<Icon icon={"zi-plus"} />}
+            icon={<IconPlus />}
             onClick={handleUploadSticker}
             loading={uploading}
           >

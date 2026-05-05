@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Tabs, Button, Icon, Input } from "zmp-ui";
+import { Box, Tabs, Button, Input } from "zmp-ui";
+import {
+  IconPlus,
+  IconPolaroid,
+  IconTexture,
+  IconUpload,
+  IconTypography,
+} from "@tabler/icons-react";
 import { useCardEditor } from "../context/CardEditorContext";
 import { BACKGROUND_COLORS, COLLAPSED_Y, SHEET_HEIGHT } from "@/pages/edit-ui/utils/constants";
 import { chooseImage, showToast } from "zmp-sdk/apis";
@@ -16,28 +23,7 @@ interface CardBottomSheetProps {
 }
 
 const CardLayoutTab = () => {
-  const { canvasBg, setCanvasBg, elements, setElements, selectedId, setSelectedId } =
-    useCardEditor();
-
-  const handleAddText = () => {
-    const elId = "text-" + Date.now();
-    setElements([
-      ...elements,
-      {
-        id: elId,
-        type: "text",
-        text: "Lời chúc",
-        x: 80,
-        y: 200,
-        fontSize: 22,
-        fill: "#333333",
-        width: 200,
-        align: "center",
-        rotation: 0,
-      },
-    ]);
-    setSelectedId(elId);
-  };
+  const { canvasBg, setCanvasBg } = useCardEditor();
 
   return (
     <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
@@ -59,25 +45,50 @@ const CardLayoutTab = () => {
           </div>
         ))}
       </div>
+    </Box>
+  );
+};
 
-      <div className="mt-6">
-        <Button
-          variant="secondary"
-          onClick={handleAddText}
-          prefixIcon={<Icon icon="zi-plus" />}
-          fullWidth
-        >
+const CardTextTab = () => {
+  const { elements, setElements, selectedId, setSelectedId } = useCardEditor();
+
+  const handleAddText = () => {
+    const elId = "text-" + Date.now();
+    setElements([
+      ...elements,
+      {
+        id: elId,
+        type: "text",
+        text: "Lời chúc",
+        x: 80,
+        y: 200,
+        fontSize: 22,
+        fill: "#333333",
+        width: 200,
+        align: "center",
+        rotation: 0,
+      },
+    ]);
+    setSelectedId(elId);
+  };
+
+  const selectedTextElement = elements.find((el) => el.id === selectedId && el.type === "text");
+
+  return (
+    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+      <div className="mb-4">
+        <Button variant="secondary" onClick={handleAddText} prefixIcon={<IconPlus />} fullWidth>
           Thêm Chữ
         </Button>
       </div>
 
-      {selectedId && elements.find((el) => el.id === selectedId)?.type === "text" && (
-        <Box mt={4} p={3} className="bg-gray-50 rounded-lg border border-gray-200">
+      {selectedTextElement && (
+        <Box p={3} className="bg-gray-50 rounded-lg border border-gray-200">
           <span className="text-xs font-semibold text-gray-500 uppercase block mb-2">
             Chỉnh sửa nội dung chữ
           </span>
           <Input
-            value={elements.find((el) => el.id === selectedId)?.text || ""}
+            value={selectedTextElement.text || ""}
             onChange={(e) => {
               setElements(
                 elements.map((el) => (el.id === selectedId ? { ...el, text: e.target.value } : el)),
@@ -90,7 +101,7 @@ const CardLayoutTab = () => {
               <span className="text-[10px] text-gray-400 block uppercase">Cỡ chữ</span>
               <Input
                 type="number"
-                value={String(elements.find((el) => el.id === selectedId)?.fontSize)}
+                value={String(selectedTextElement.fontSize)}
                 onChange={(e) => {
                   setElements(
                     elements.map((el) =>
@@ -105,7 +116,7 @@ const CardLayoutTab = () => {
               <span className="text-[10px] text-gray-400 block uppercase">Màu</span>
               <input
                 type="color"
-                value={elements.find((el) => el.id === selectedId)?.fill}
+                value={selectedTextElement.fill}
                 onChange={(e) => {
                   setElements(
                     elements.map((el) =>
@@ -170,7 +181,7 @@ const CardStickerTab = () => {
       <Button
         variant="secondary"
         fullWidth
-        prefixIcon={<Icon icon="zi-upload" />}
+        prefixIcon={<IconUpload />}
         onClick={handleUploadSticker}
         loading={uploading}
       >
@@ -230,10 +241,37 @@ export const CardBottomSheet = ({
         className={`flex-1 flex flex-col transition-opacity duration-300 ${translateY > COLLAPSED_Y - 100 ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
         <Tabs id="card-editor-tabs" className="flex-1 overflow-hidden">
-          <Tabs.Tab key="layout" label="Bố cục">
+          <Tabs.Tab
+            key="layout"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconTexture className="w-5 h-5" />
+                Bố cục
+              </div>
+            }
+          >
             <CardLayoutTab />
           </Tabs.Tab>
-          <Tabs.Tab key="stickers" label="Hình ảnh">
+          <Tabs.Tab
+            key="text"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconTypography className="w-5 h-5" />
+                Chữ
+              </div>
+            }
+          >
+            <CardTextTab />
+          </Tabs.Tab>
+          <Tabs.Tab
+            key="stickers"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconPolaroid className="w-5 h-5" />
+                Hình ảnh
+              </div>
+            }
+          >
             <CardStickerTab />
           </Tabs.Tab>
         </Tabs>

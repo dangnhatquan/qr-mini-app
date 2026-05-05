@@ -1,6 +1,6 @@
 import { preloadImage } from "@/utils/helpers/image";
 import React, { useEffect, useState } from "react";
-import { Icon } from "zmp-ui";
+import { IconGridDots } from "@tabler/icons-react";
 
 interface IImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -20,7 +20,7 @@ export const Image = ({ src, ...props }: IImageProps) => {
   if (!imgSrc) {
     return (
       <div className="w-full h-full flex items-center justify-center text-gray-300">
-        <Icon icon="zi-more-grid" />
+        <IconGridDots />
       </div>
     );
   }

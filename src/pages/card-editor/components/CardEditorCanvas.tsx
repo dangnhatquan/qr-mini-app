@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Page, Box, Icon, Header } from "zmp-ui";
+import { Page, Box, Header } from "zmp-ui";
 import { Stage, Layer, Rect, Group, StageProps } from "react-konva";
 import { showToast } from "zmp-sdk/apis";
 import { useCardEditor } from "../context/CardEditorContext";
@@ -10,7 +10,7 @@ import { COLLAPSED_Y, SHEET_HEIGHT } from "@/pages/edit-ui/utils/constants";
 import { KonvaEventObject } from "konva/lib/Node";
 import { cardService } from "@/services/card";
 import { uploadFile } from "@/utils/helpers/image";
-import { IconFocusCentered } from "@tabler/icons-react";
+import { IconFocusCentered, IconCheck, IconTrash } from "@tabler/icons-react";
 import { CanvasElement, CanvasElementType } from "@/types/editor";
 
 export interface CardEditorCanvasProps {
@@ -241,7 +241,7 @@ export const CardEditorCanvas: React.FC<CardEditorCanvasProps> = ({ onSaved, ini
             id="card-editor-save"
             className="cursor-pointer bg-blue-500 text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center"
           >
-            <Icon icon="zi-check" className="font-bold" size={20} />
+            <IconCheck className="font-bold" size={20} />
           </div>
         </div>
       </div>
@@ -366,7 +366,7 @@ export const CardEditorCanvas: React.FC<CardEditorCanvasProps> = ({ onSaved, ini
                   setSelectedId(null);
                 }}
               >
-                <Icon icon="zi-delete" className="text-white font-bold" size={20} />
+                <IconTrash className="text-white font-bold" size={20} />
               </div>
             )}
           </div>

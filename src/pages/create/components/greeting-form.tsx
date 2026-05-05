@@ -2,12 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { Control, UseFormSetValue } from "react-hook-form";
 import { InputFormField } from "@/components/form-fields/input-field";
 import { IQRFormValues } from "@/utils/schemas/qr";
-import { Button, Icon } from "zmp-ui";
+import { Button } from "zmp-ui";
 import { useNavigate } from "react-router-dom";
 import { cardEditorRoute } from "@/utils/routes";
 import { cardService } from "@/services/card";
 import { getFullUrl } from "@/utils/axios";
-import { IconExclamationCircle, IconPolaroid } from "@tabler/icons-react";
+import {
+  IconExclamationCircle,
+  IconCircleCheck,
+  IconPlus,
+  IconGiftCard,
+} from "@tabler/icons-react";
 import { getString, removeItem } from "@/utils/storage";
 
 interface GreetingFormProps {
@@ -123,7 +128,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
 
               <div className="flex items-center justify-between px-3 py-2 border-t border-green-100">
                 <div className="flex items-center gap-2">
-                  <Icon icon="zi-check-circle" className="text-green-600" size={16} />
+                  <IconCircleCheck className="text-green-600 w-4 h-4" />
                   <span className="text-xs font-semibold text-green-700">Thiệp đã được tạo</span>
                 </div>
                 <button
@@ -139,7 +144,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 p-3 bg-gray-50 border border-dashed border-gray-300 rounded-xl">
                 <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <IconPolaroid />
+                  <IconGiftCard />
                 </div>
                 <p className="text-sm text-gray-400 italic">
                   Chưa có thiệp — hãy tạo thiệp bên dưới
@@ -148,7 +153,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
               <Button
                 type="neutral"
                 size="medium"
-                prefixIcon={<Icon icon="zi-plus" />}
+                prefixIcon={<IconPlus />}
                 onClick={handleOpenEditor}
                 fullWidth
               >

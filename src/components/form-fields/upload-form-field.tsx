@@ -12,7 +12,8 @@ import {
   UseFormSetValue,
 } from "react-hook-form";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
-import { Avatar, Button, Icon, Spinner } from "zmp-ui";
+import { Avatar, Button, Spinner } from "zmp-ui";
+import { IconUserCircle } from "@tabler/icons-react";
 
 interface IUploadFormFieldProps<T extends FieldValues> {
   name: Path<T>;
@@ -90,7 +91,7 @@ export const UploadFormField = ({
                   src={field.value ? getFullUrl(field.value) : undefined}
                   backgroundColor="BLUE-BLUELIGHT"
                 >
-                  <Icon icon="zi-user-circle" size={64} />
+                  <IconUserCircle size={64} />
                 </Avatar>
                 <div className="flex justify-center items-center gap-2">
                   <Button loading={uploading} size="small" onClick={handleUseAvatar}>

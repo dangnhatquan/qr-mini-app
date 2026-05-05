@@ -3,9 +3,10 @@ import { Box, Tabs } from "zmp-ui";
 import { StickerTab } from "./StickerTab";
 import { LayoutTab } from "./LayoutTab";
 import { StylingTab } from "./StylingTab";
+import { TextTab } from "./TextTab";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
-import { IconQrcode, IconSticker, IconTexture } from "@tabler/icons-react";
+import { IconQrcode, IconSticker, IconTexture, IconTypography } from "@tabler/icons-react";
 
 export interface IBottomSheetProps {
   isDragging: boolean;
@@ -90,6 +91,18 @@ export const BottomSheet = ({
             }
           >
             <LayoutTab />
+          </Tabs.Tab>
+
+          <Tabs.Tab
+            key="text"
+            label={
+              <div className="flex items-center justify-center gap-2">
+                <IconTypography className="w-5 h-5" />
+                Chữ
+              </div>
+            }
+          >
+            <TextTab />
           </Tabs.Tab>
 
           <Tabs.Tab

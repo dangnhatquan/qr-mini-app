@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Text, Icon } from "zmp-ui";
+import { Box, Text } from "zmp-ui";
+import { IconGridDots } from "@tabler/icons-react";
 import { getCategoryLabel } from "../utils/functions";
 import { Image } from "@/components/image";
 import { EQRCategory } from "@/types/qr";
@@ -50,7 +51,7 @@ export const QRCard: React.FC<QRCardProps> = ({
               <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300">
-                <Icon icon="zi-more-grid" />
+                <IconGridDots />
               </div>
             )}
           </div>
@@ -87,7 +88,7 @@ export const QRCard: React.FC<QRCardProps> = ({
               <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300">
-                <Icon icon="zi-more-grid" />
+                <IconGridDots />
               </div>
             )}
           </div>
@@ -131,7 +132,7 @@ export const QRCard: React.FC<QRCardProps> = ({
             <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300">
-              <Icon icon="zi-more-grid" />
+              <IconGridDots />
             </div>
           )}
         </div>

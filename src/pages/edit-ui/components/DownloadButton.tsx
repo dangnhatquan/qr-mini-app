@@ -1,4 +1,6 @@
-import { Button, Icon, useParams } from "zmp-ui";
+import { Button } from "zmp-ui";
+import { useParams } from "react-router-dom";
+import { IconDownload } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
 
@@ -62,7 +64,7 @@ export const DownloadButton = () => {
   };
 
   return (
-    <Button fullWidth onClick={handleDownload} prefixIcon={<Icon icon="zi-download" />}>
+    <Button fullWidth onClick={handleDownload} prefixIcon={<IconDownload />}>
       Tải xuống thành phẩm
     </Button>
   );

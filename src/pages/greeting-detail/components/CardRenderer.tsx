@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Rect, Group, Image as KonvaImage, Text as KonvaText } from "react-konva";
 import useImage from "use-image";
-import { CanvasElement } from "@/pages/edit-ui/context/KonvaEditorContext";
+import { CanvasElement, CanvasElementType } from "@/types/editor";
 
 interface CardRendererProps {
   elements: CanvasElement[];
@@ -42,7 +42,7 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           <Rect width={width} height={height} fill={canvasBg} />
           <Group>
             {elements.map((el) => {
-              if (el.type === "image") {
+              if (el.type === CanvasElementType.IMAGE) {
                 return <URLImage key={el.id} imageProps={el} />;
               }
               if (el.type === "text") {

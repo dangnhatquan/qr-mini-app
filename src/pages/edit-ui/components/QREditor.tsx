@@ -4,11 +4,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import QRCodeStyling from "qr-code-styling";
 import { qrService } from "@/services/qr";
 import { showToast } from "zmp-sdk/apis";
-import { Stage, Layer, Rect, Group } from "react-konva";
+import { Stage, Layer, Rect, Group, StageProps } from "react-konva";
 import { URLImage } from "./QRImage";
 import { TextElement } from "./TextElement";
-import { useKonvaEditor, CanvasElement } from "../context/KonvaEditorContext";
-import { preloadImage } from "@/utils/helpers/image";
+import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { BottomSheet } from "./BottomSheet";
 import { KonvaEventObject } from "konva/lib/Node";
@@ -17,6 +16,7 @@ import { EQRCategory, EQRType, QrCode } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import { IconFocusCentered } from "@tabler/icons-react";
+import { CanvasElement, CanvasElementType } from "@/types/editor";
 
 export const QREditor: React.FC = () => {
   const { id } = useParams();
@@ -54,8 +54,6 @@ export const QREditor: React.FC = () => {
     setInitialElements,
     initialCanvasBg,
     setInitialCanvasBg,
-    assetCache,
-    setAssetCache,
   } = useKonvaEditor();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,28 +66,9 @@ export const QREditor: React.FC = () => {
     let isMounted = true;
 
     const updateQRPreview = async () => {
-      const imageSrc = (qrOptions.image && assetCache[qrOptions.image]) || qrOptions.image;
-
       const displayOptions = {
         ...qrOptions,
-        image: imageSrc,
       };
-
-      if (isRemoteImage(imageSrc) && !assetCache[imageSrc!]) {
-        try {
-          await new Promise((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = imageSrc!;
-            setTimeout(resolve, 3000);
-          });
-        } catch (e) {
-          console.warn("Failed to wait for logo load:", e);
-        }
-      }
-
       qrCode.update(displayOptions);
 
       await new Promise((r) => setTimeout(r, 150));
@@ -117,7 +96,7 @@ export const QREditor: React.FC = () => {
       isMounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qrOptions, qrCode, assetCache]);
+  }, [qrOptions, qrCode]);
 
   useEffect(() => {
     const initialEls = [
@@ -148,7 +127,7 @@ export const QREditor: React.FC = () => {
           setOriginalQR(qr);
           const textData = generateQRPayload(qr);
 
-          let savedStage: any = qr.editorStage;
+          let savedStage: StageProps = qr.editorStage;
           if (typeof savedStage === "string") {
             try {
               savedStage = JSON.parse(savedStage);
@@ -159,52 +138,6 @@ export const QREditor: React.FC = () => {
 
           if (savedStage && savedStage.qrOptions) {
             const newOptions = { ...savedStage.qrOptions, data: textData };
-
-            if (
-              newOptions.image &&
-              (newOptions.image.startsWith("http") || newOptions.image.startsWith("/minio-proxy/"))
-            ) {
-              await new Promise((resolve) => {
-                preloadImage(
-                  newOptions.image,
-                  (base64: string) => {
-                    setAssetCache((prev) => ({ ...prev, [newOptions.image!]: base64 }));
-                    resolve(null);
-                  },
-                  () => {
-                    resolve(null);
-                  },
-                );
-              });
-            }
-
-            if (savedStage.elements) {
-              const imageElements = (savedStage.elements as any[]).filter(
-                (el: any) =>
-                  el.type === "image" &&
-                  el.src &&
-                  typeof el.src === "string" &&
-                  (el.src.startsWith("http") || el.src.startsWith("/minio-proxy/")),
-              );
-
-              await Promise.all(
-                imageElements.map(
-                  (el: any) =>
-                    new Promise((resolve) => {
-                      preloadImage(
-                        el.src,
-                        (base64: string) => {
-                          setAssetCache((prev) => ({ ...prev, [el.src]: base64 }));
-                          resolve(null);
-                        },
-                        () => {
-                          resolve(null);
-                        },
-                      );
-                    }),
-                ),
-              );
-            }
 
             setQrOptions(newOptions);
             setInitialOptions(newOptions);
@@ -542,7 +475,7 @@ export const QREditor: React.FC = () => {
                   return a.originalIndex - b.originalIndex;
                 })
                 .map(({ el, originalIndex: i }) => {
-                  if (el.type === "image") {
+                  if (el.type === CanvasElementType.IMAGE) {
                     return (
                       <URLImage
                         key={el.id}

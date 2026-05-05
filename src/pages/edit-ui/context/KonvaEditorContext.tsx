@@ -3,28 +3,12 @@ import { Options } from "qr-code-styling";
 import { COLOR, STYLE_SECTION } from "../utils/constants";
 import Konva from "konva";
 import { DEFAULT_QR_STYLE } from "@/utils/constants/qr";
-
-export interface CanvasElement {
-  id: string;
-  type: string;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  rotation?: number;
-  src?: string;
-  text?: string;
-  fontSize?: number;
-  fill?: string;
-  align?: string;
-}
+import { CanvasElement } from "@/types/editor";
 
 interface KonvaEditorContextType {
-  // Ref
   stageRef: React.MutableRefObject<Konva.Stage | null>;
   mainGroupRef: React.MutableRefObject<Konva.Group | null>;
 
-  // QR Styling State
   qrOptions: Options;
   setQrOptions: React.Dispatch<React.SetStateAction<Options>>;
   qrImageSrc: string;
@@ -32,7 +16,6 @@ interface KonvaEditorContextType {
   isRendering: boolean;
   setIsRendering: React.Dispatch<React.SetStateAction<boolean>>;
 
-  // Konva State
   elements: CanvasElement[];
   setElements: React.Dispatch<React.SetStateAction<CanvasElement[]>>;
   selectedId: string | null;
@@ -47,7 +30,6 @@ interface KonvaEditorContextType {
   openSection: string | null;
   setOpenSection: React.Dispatch<React.SetStateAction<string | null>>;
 
-  // Bottom Sheet State
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   translateY: number;
@@ -61,10 +43,6 @@ interface KonvaEditorContextType {
   setInitialElements: React.Dispatch<React.SetStateAction<CanvasElement[] | null>>;
   initialCanvasBg: string;
   setInitialCanvasBg: React.Dispatch<React.SetStateAction<string>>;
-
-  // Asset Cache for bypass CORS/ngrok
-  assetCache: Record<string, string>;
-  setAssetCache: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const KonvaEditorContext = createContext<KonvaEditorContextType | undefined>(undefined);
@@ -86,17 +64,13 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
   const [openSection, setOpenSection] = useState<string | null>(STYLE_SECTION.DOTS);
 
-  // Bottom Sheet
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  // History for Discard
   const [initialOptions, setInitialOptions] = useState<Options | null>(null);
   const [initialElements, setInitialElements] = useState<CanvasElement[] | null>(null);
   const [initialCanvasBg, setInitialCanvasBg] = useState("");
-
-  const [assetCache, setAssetCache] = useState<Record<string, string>>({});
 
   const value = {
     stageRef,
@@ -132,8 +106,6 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setInitialElements,
     initialCanvasBg,
     setInitialCanvasBg,
-    assetCache,
-    setAssetCache,
   };
 
   return <KonvaEditorContext.Provider value={value}>{children}</KonvaEditorContext.Provider>;

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useRef, useState } from "react";
 import Konva from "konva";
 import { COLOR } from "@/pages/edit-ui/utils/constants";
-import { CanvasElement } from "@/pages/edit-ui/context/KonvaEditorContext";
+import { CanvasElement } from "@/types/editor";
 
 interface CardEditorContextType {
   stageRef: React.MutableRefObject<Konva.Stage | null>;
@@ -25,9 +25,6 @@ interface CardEditorContextType {
   setTranslateY: React.Dispatch<React.SetStateAction<number>>;
   isDragging: boolean;
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
-
-  assetCache: Record<string, string>;
-  setAssetCache: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 
   isRendering: boolean;
   setIsRendering: React.Dispatch<React.SetStateAction<boolean>>;
@@ -53,7 +50,6 @@ export const CardEditorProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  const [assetCache, setAssetCache] = useState<Record<string, string>>({});
   const [isRendering, setIsRendering] = useState(false);
 
   const [cardId, setCardId] = useState<string | null>(null);
@@ -80,8 +76,6 @@ export const CardEditorProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setTranslateY,
         isDragging,
         setIsDragging,
-        assetCache,
-        setAssetCache,
         isRendering,
         setIsRendering,
         cardId,

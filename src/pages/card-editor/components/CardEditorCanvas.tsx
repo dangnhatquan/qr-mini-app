@@ -6,12 +6,12 @@ import { useCardEditor } from "../context/CardEditorContext";
 import { CardBottomSheet } from "./CardBottomSheet";
 import { URLImage } from "@/pages/edit-ui/components/QRImage";
 import { TextElement } from "@/pages/edit-ui/components/TextElement";
-import { CanvasElement } from "@/pages/edit-ui/context/KonvaEditorContext";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "@/pages/edit-ui/utils/constants";
 import { KonvaEventObject } from "konva/lib/Node";
 import { cardService } from "@/services/card";
 import { uploadFile } from "@/utils/helpers/image";
 import { IconFocusCentered } from "@tabler/icons-react";
+import { CanvasElement, CanvasElementType } from "@/types/editor";
 
 export interface CardEditorCanvasProps {
   onSaved: (cardId: string) => void;
@@ -302,7 +302,7 @@ export const CardEditorCanvas: React.FC<CardEditorCanvasProps> = ({ onSaved, ini
               {elements
                 .map((el, i) => ({ el, i }))
                 .map(({ el, i }) => {
-                  if (el.type === "image") {
+                  if (el.type === CanvasElementType.IMAGE) {
                     return (
                       <URLImage
                         key={el.id}
@@ -317,7 +317,7 @@ export const CardEditorCanvas: React.FC<CardEditorCanvasProps> = ({ onSaved, ini
                       />
                     );
                   }
-                  if (el.type === "text") {
+                  if (el.type === CanvasElementType.TEXT) {
                     return (
                       <TextElement
                         key={el.id}

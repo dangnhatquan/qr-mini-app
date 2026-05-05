@@ -124,14 +124,11 @@ const CardLayoutTab = () => {
 };
 
 const CardStickerTab = () => {
-  const { elements, setElements, setSelectedId, setAssetCache } = useCardEditor();
+  const { elements, setElements, setSelectedId } = useCardEditor();
   const [uploading, setUploading] = useState(false);
 
   const handleAddSticker = (url: string, base64?: string) => {
     const id = `sticker-${Date.now()}`;
-    if (base64) {
-      setAssetCache((prev) => ({ ...prev, [url]: base64 }));
-    }
     setElements([
       ...elements,
       { id, type: "image", src: url, x: 100, y: 100, width: 120, height: 120, rotation: 0 },
@@ -150,15 +147,9 @@ const CardStickerTab = () => {
             const response = await fetch(path);
             const blob = await response.blob();
 
-            // Convert to base64 for cache (avoids CORS issues in Konva)
-            const base64 = await new Promise<string>((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.readAsDataURL(blob);
-            });
             const file = await uploadFile(blob);
             const url = getFullUrl(file.path);
-            handleAddSticker(url, base64);
+            handleAddSticker(url);
             showToast({ message: "Đã thêm hình ảnh" });
           } catch {
             showToast({ message: "Lỗi tải hình ảnh" });

@@ -182,10 +182,6 @@ const VCardDetailPage: React.FC = () => {
             </Text>
           </Box>
         </div>
-
-        <Box className="flex flex-col items-center mt-6">
-          <Text className="text-gray-300 text-[10px] italic">Powered by QR Mini App</Text>
-        </Box>
       </Box>
     </Page>
   );

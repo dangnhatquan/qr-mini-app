@@ -1,11 +1,12 @@
 import { getPresignedUrl, qrRecordResource } from "@/resources";
 import { EQRCategory, EQRType, QrCode } from "@/types/qr";
-import request from "@/utils/axios";
+import request, { getFullUrl } from "@/utils/axios";
 import { ZALO_APP_LINK } from "@/utils/constants/common";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import Konva from "konva";
 import {
   buildQRCreatePayload,
+  cleanUpBase64,
   generateDynamicLink,
   generateVietQRPayload,
   generateWifiPayload,
@@ -14,6 +15,9 @@ import { IQRFormValues } from "@/utils/schemas/qr";
 import QRCodeStyling from "qr-code-styling";
 import { ZALO_APP_DEV_VERSION } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
+import { StageProps } from "react-konva";
+import { CanvasElement, CanvasElementType } from "@/types/editor";
+import { uploadFile } from "@/utils/helpers/image";
 
 export const getQRPayload = (data: IQRFormValues, id?: string): string => {
   switch (data.category) {
@@ -43,9 +47,11 @@ export const getQRPayload = (data: IQRFormValues, id?: string): string => {
   }
 };
 
-export const generateQRBlob = async (text: string): Promise<Blob> => {
+export const generateQRBlob = async (text: string, editorStage?: StageProps): Promise<Blob> => {
+  const stageData = editorStage || DEFAULT_EDITOR_STAGE;
+
   const qrCode = new QRCodeStyling({
-    ...DEFAULT_EDITOR_STAGE.qrOptions,
+    ...(stageData.qrOptions || DEFAULT_EDITOR_STAGE.qrOptions),
     data: text,
   });
 
@@ -65,6 +71,7 @@ export const generateQRBlob = async (text: string): Promise<Blob> => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = reject;
+    img.crossOrigin = "Anonymous";
     img.src = imgUrl;
   });
 
@@ -86,12 +93,14 @@ export const generateQRBlob = async (text: string): Promise<Blob> => {
   const bgRect = new Konva.Rect({
     width: 350,
     height: 450,
-    fill: DEFAULT_EDITOR_STAGE.canvasBg,
+    fill: stageData.canvasBg || DEFAULT_EDITOR_STAGE.canvasBg,
     cornerRadius: 8,
   });
   group.add(bgRect);
 
-  const qrEl = DEFAULT_EDITOR_STAGE.elements.find((e) => e.id === "qr-main");
+  const qrEl = (stageData.elements || DEFAULT_EDITOR_STAGE.elements).find(
+    (e: CanvasElement) => e.id === "qr-main",
+  );
   if (qrEl) {
     const konvaImg = new Konva.Image({
       image,
@@ -102,6 +111,26 @@ export const generateQRBlob = async (text: string): Promise<Blob> => {
       rotation: qrEl.rotation,
     });
     group.add(konvaImg);
+  }
+
+  const otherElements = (stageData.elements || []).filter((e: CanvasElement) => e.id !== "qr-main");
+  for (const el of otherElements) {
+    if (el.type === CanvasElementType.IMAGE && el.src) {
+      const konvaSticker = new Konva.Image(el);
+      group.add(konvaSticker);
+    } else if (el.type === CanvasElementType.TEXT) {
+      const konvaText = new Konva.Text({
+        text: el.text,
+        x: el.x,
+        y: el.y,
+        fontSize: el.fontSize,
+        fill: el.fill,
+        width: el.width,
+        align: el.align,
+        rotation: el.rotation,
+      });
+      group.add(konvaText);
+    }
   }
 
   layer.add(group);
@@ -146,16 +175,7 @@ export const qrService = {
 
       const blob = await generateQRBlob(finalUrl);
 
-      const uploadInfo = await request.get<{
-        file: { id: string; path: string };
-        uploadSignedUrl: string;
-      }>(getPresignedUrl);
-
-      const { uploadSignedUrl, file } = uploadInfo;
-
-      await request.put(uploadSignedUrl, blob, {
-        headers: { "Content-Type": "image/webp" },
-      });
+      const file = await uploadFile(blob);
 
       const updatePayload = {
         editorStage: DEFAULT_EDITOR_STAGE,
@@ -168,16 +188,7 @@ export const qrService = {
     const payloadString = getQRPayload(data);
     const blob = await generateQRBlob(payloadString);
 
-    const uploadInfo = await request.get<{
-      file: { id: string; path: string };
-      uploadSignedUrl: string;
-    }>(getPresignedUrl);
-
-    const { uploadSignedUrl, file } = uploadInfo;
-
-    await request.put(uploadSignedUrl, blob, {
-      headers: { "Content-Type": "image/webp" },
-    });
+    const file = await uploadFile(blob);
 
     const payload = buildQRCreatePayload(data, file);
 
@@ -190,9 +201,15 @@ export const qrService = {
     return await request.get<QrCode>(`${qrRecordResource}/${id}`);
   },
 
-  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: unknown) {
+  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: StageProps) {
+    let finalEditorStage = editorStage;
+    if (!finalEditorStage) {
+      const existing = await this.getQRDetail(id);
+      finalEditorStage = existing.editorStage;
+    }
+
     const payloadString = getQRPayload(data, id);
-    const blob = customBlob || (await generateQRBlob(payloadString));
+    const blob = customBlob || (await generateQRBlob(payloadString, finalEditorStage));
 
     const uploadInfo = await request.get<{
       file: { id: string; path: string };
@@ -205,9 +222,18 @@ export const qrService = {
       headers: { "Content-Type": "image/webp" },
     });
 
-    const payload = buildQRCreatePayload(data, file) as Record<string, unknown>;
+    const payload: any = {
+      qrType: data.qrType,
+      category: data.category,
+      previewImageId: file.id,
+      wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
+      bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
+      vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
+      greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
+    };
+
     if (editorStage) {
-      payload.editorStage = editorStage;
+      payload.editorStage = cleanUpBase64(editorStage);
     }
 
     const response = await request.patch(`${qrRecordResource}/${id}`, payload);

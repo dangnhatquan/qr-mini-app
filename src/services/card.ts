@@ -1,21 +1,10 @@
 import request from "@/utils/axios";
 import { cardsResource } from "@/resources";
-
-export interface CardResponse {
-  id: string;
-  editorStage: Record<string, unknown> | null;
-  previewImage?: { id: string; path: string } | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
+import { Card } from "@/types/card";
 
 export const cardService = {
-  async createCard(
-    editorStage?: Record<string, unknown>,
-    previewImageId?: string,
-  ): Promise<CardResponse> {
-    return await request.post<CardResponse>(cardsResource, {
+  async createCard(editorStage?: Record<string, unknown>, previewImageId?: string): Promise<Card> {
+    return await request.post<Card>(cardsResource, {
       editorStage: editorStage ?? null,
       previewImageId: previewImageId ?? null,
     });
@@ -25,8 +14,8 @@ export const cardService = {
     id: string,
     editorStage?: Record<string, unknown>,
     previewImageId?: string,
-  ): Promise<CardResponse> {
-    return await request.patch<CardResponse>(`${cardsResource}/${id}`, {
+  ): Promise<Card> {
+    return await request.patch<Card>(`${cardsResource}/${id}`, {
       editorStage: editorStage ?? null,
       previewImageId: previewImageId ?? null,
     });
@@ -36,7 +25,7 @@ export const cardService = {
     return await request.delete(`${cardsResource}/${id}`);
   },
 
-  async getCard(id: string): Promise<CardResponse> {
-    return await request.get<CardResponse>(`${cardsResource}/${id}`);
+  async getCard(id: string): Promise<Card> {
+    return await request.get<Card>(`${cardsResource}/${id}`);
   },
 };

@@ -9,6 +9,7 @@ import {
   IconShare,
   IconEye,
   IconRefresh,
+  IconSettings,
 } from "@tabler/icons-react";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ import { QRCard } from "./components/qr-card";
 import { EQRCategory, QrCode } from "@/types/qr";
 import "./styles.scss";
 import { Image } from "@/components/image";
+import { getFullUrl } from "@/utils/axios";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -231,7 +233,7 @@ const MyQRsPage: React.FC = () => {
     if (!modalImgSrc) return;
     try {
       await saveImageToGallery({
-        imageBase64Data: modalImgSrc,
+        imageBase64Data: getFullUrl(modalImgSrc),
       });
       showToast({ message: "Lưu ảnh thành công" });
     } catch (error) {
@@ -246,7 +248,7 @@ const MyQRsPage: React.FC = () => {
       await openShareSheet({
         type: "image",
         data: {
-          imageUrls: [selectedQR.previewImage.path],
+          imageUrls: [getFullUrl(selectedQR.previewImage?.path)],
         },
       });
     } catch (error) {
@@ -259,6 +261,12 @@ const MyQRsPage: React.FC = () => {
     if (!selectedQR) return;
     setModalVisible(false);
     navigate(`/edit-ui/${selectedQR.id}`);
+  };
+
+  const handleEditInfo = () => {
+    if (!selectedQR) return;
+    setModalVisible(false);
+    navigate(`${createRoute}?id=${selectedQR.id}`);
   };
 
   const handleView = () => {
@@ -389,7 +397,7 @@ const MyQRsPage: React.FC = () => {
         verticalActions
       >
         <Box flex flexDirection="column" alignItems="center" justifyContent="center">
-          <div className="w-full max-w-[280px] aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
+          <div className="w-full aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
             {modalImgSrc ? (
               <Image src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
             ) : (
@@ -404,7 +412,7 @@ const MyQRsPage: React.FC = () => {
             Bạn có thể quét mã này trực tiếp bằng Zalo
           </Text>
 
-          <Box flex flexDirection="row" justifyContent="space-around" className="w-full mt-6 px-4">
+          <Box flex flexDirection="row" justifyContent="space-around" className="w-full mt-6">
             <Box
               flex
               flexDirection="column"
@@ -431,7 +439,22 @@ const MyQRsPage: React.FC = () => {
                 <IconEdit className="text-gray-800" />
               </div>
               <Text size="xxSmall" className="text-gray-600 font-medium">
-                Tuỳ chỉnh
+                Giao diện
+              </Text>
+            </Box>
+
+            <Box
+              flex
+              flexDirection="column"
+              alignItems="center"
+              onClick={handleEditInfo}
+              className="cursor-pointer"
+            >
+              <div className="bg-gray-100 p-3 rounded-full mb-2">
+                <IconSettings className="text-gray-800" />
+              </div>
+              <Text size="xxSmall" className="text-gray-600 font-medium">
+                Thông tin
               </Text>
             </Box>
 

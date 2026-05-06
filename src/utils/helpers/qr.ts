@@ -4,6 +4,7 @@ import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
 import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
+import { StageProps } from "react-konva";
 
 function crc16(data: string): string {
   let crc = 0xffff;
@@ -117,8 +118,18 @@ export const generateDynamicLink = (
     page = "greetings";
   }
 
-  return `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=${page}/${id}`;
+  return `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`;
 };
 
 export const isRemoteImage = (imageSrc?: string) =>
   imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
+
+export const cleanUpBase64 = (editorStage: StageProps) => {
+  return {
+    ...editorStage,
+    elements: editorStage.elements?.map((el) => ({
+      ...el,
+      src: isRemoteImage(el.src) ? el.src : "",
+    })),
+  };
+};

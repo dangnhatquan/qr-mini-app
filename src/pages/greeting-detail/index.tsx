@@ -6,19 +6,35 @@ import { cardService } from "@/services/card";
 import { QrCode, GreetingQRData } from "@/types/qr";
 import { CardRenderer } from "./components/CardRenderer";
 import { myQrsRoute } from "@/utils/routes";
-import { IconLoader, IconLock } from "@tabler/icons-react";
+import { IconDownload, IconLoader, IconLock } from "@tabler/icons-react";
+import { saveImageToGallery, showToast } from "zmp-sdk/apis";
+import { Card } from "@/types/card";
+import { getFullUrl } from "@/utils/axios";
 
 const GreetingDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
   const [qr, setQr] = useState<QrCode | null>(null);
-  const [card, setCard] = useState<any | null>(null);
+  const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
+
+  const handleDownload = async () => {
+    if (!card) return;
+    try {
+      await saveImageToGallery({
+        imageUrl: getFullUrl(card.previewImage.path),
+      });
+      showToast({ message: "Lưu ảnh thành công" });
+    } catch (error) {
+      console.error("Save image error:", error);
+      showToast({ message: "Lưu ảnh thất bại hoặc bị từ chối quyền" });
+    }
+  };
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -163,9 +179,9 @@ const GreetingDetailPage: React.FC = () => {
         onBackClick={() => navigate(myQrsRoute, { direction: "backward" })}
       />
 
-      <Box p={4} className="h-full flex flex-col justify-center items-center">
+      <Box p={4} className="h-full flex flex-col justify-center items-center gap-4">
         {card ? (
-          <Box className="w-full max-w-[350px]">
+          <Box className="w-full">
             <CardRenderer
               elements={card.editorStage?.elements || []}
               canvasBg={card.editorStage?.canvasBg || "#ffffff"}
@@ -173,22 +189,13 @@ const GreetingDetailPage: React.FC = () => {
           </Box>
         ) : (
           <Box className="w-full aspect-[350/450] bg-white rounded-xl shadow-lg flex items-center justify-center flex-col gap-4">
-            <IconLoader className="animate-spin" />
             <Text className="text-gray-400">Thiệp chưa được tạo</Text>
           </Box>
         )}
 
-        <Box mt={6} className="w-full text-center px-4">
-          <Text className="text-gray-400 text-xs italic mb-4">
-            Thiệp điện tử được tạo bởi QR Mini App
-          </Text>
-
-          {greetingData.wishes && (
-            <Box className="bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-white/80 shadow-sm mt-2">
-              <Text className="text-gray-600 leading-relaxed">{greetingData.wishes}</Text>
-            </Box>
-          )}
-        </Box>
+        <Button prefixIcon={<IconDownload />} onClick={handleDownload} fullWidth size="medium">
+          Tải thiệp xuống
+        </Button>
       </Box>
     </Page>
   );

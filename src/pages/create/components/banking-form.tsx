@@ -6,6 +6,7 @@ import { DEFAULT_BANK_ID } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { bankService } from "@/services/bank";
 import { Bank } from "@/types/bank";
+import { Box, Spinner } from "zmp-ui";
 
 interface BankingFormProps {
   control: Control<IQRFormValues>;
@@ -13,10 +14,12 @@ interface BankingFormProps {
 
 export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
   const [banks, setBanks] = useState<{ value: string; label: string }[]>([]);
+  const [isFetchingBanks, setIsFetchingBanks] = useState(false);
 
   useEffect(() => {
     const fetchBanks = async () => {
       try {
+        setIsFetchingBanks(true);
         const response = await bankService.getBanks();
         const data = Array.isArray(response) ? response : (response as any).data || [];
         const bankOptions = data.map((bank: Bank) => ({
@@ -30,6 +33,14 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
     };
     fetchBanks();
   }, []);
+
+  if (isFetchingBanks) {
+    return (
+      <Box className="w-full h-screen flex items-center justify-center">
+        <Spinner />
+      </Box>
+    );
+  }
 
   return (
     <>

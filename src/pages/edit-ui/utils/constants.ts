@@ -12,6 +12,7 @@ export const COLORS = [
 ];
 
 export const STYLES = {
+  DOTS: "dots",
   DOT: "dot",
   ROUNDED: "rounded",
   CLASSY: "classy",
@@ -36,7 +37,7 @@ export const STYLE_SECTION = {
 
 export const DOT_TYPES = [
   STYLES.ROUNDED,
-  STYLES.DOT,
+  STYLES.DOTS,
   STYLES.CLASSY,
   STYLES.CLASSY_ROUNDED,
   STYLES.SQUARE,
@@ -69,9 +70,20 @@ export const COLOR = {
     name: "Pink",
     color: "#fdf2f8",
   },
+  BLACK: {
+    name: "Black",
+    color: "#000000",
+  },
 };
 
-export const BACKGROUND_COLORS = [COLOR.WHITE, COLOR.GRAY, COLOR.BLUE, COLOR.YELLOW, COLOR.PINK];
+export const BACKGROUND_COLORS = [
+  COLOR.WHITE,
+  COLOR.GRAY,
+  COLOR.BLUE,
+  COLOR.YELLOW,
+  COLOR.PINK,
+  COLOR.BLACK,
+];
 
 export const STICKERS = [
   `${PUBLIC_API_URL}/api/v1/files/serve/961361ea-890a-4bdd-ae75-b7dc47fcd054`,

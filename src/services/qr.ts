@@ -101,23 +101,26 @@ export const generateQRBlob = async (text: string, editorStage?: StageProps): Pr
   const qrEl = (stageData.elements || DEFAULT_EDITOR_STAGE.elements).find(
     (e: CanvasElement) => e.id === "qr-main",
   );
-  if (qrEl) {
-    const konvaImg = new Konva.Image({
-      image,
-      x: qrEl.x,
-      y: qrEl.y,
-      width: qrEl.width,
-      height: qrEl.height,
-      rotation: qrEl.rotation,
-    });
-    group.add(konvaImg);
-  }
 
   const otherElements = (stageData.elements || []).filter((e: CanvasElement) => e.id !== "qr-main");
   for (const el of otherElements) {
     if (el.type === CanvasElementType.IMAGE && el.src) {
-      const konvaSticker = new Konva.Image(el);
-      group.add(konvaSticker);
+      const imageElement = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.crossOrigin = "Anonymous";
+        img.src = el.src;
+      });
+      const newKonvaImage = new Konva.Image({
+        image: imageElement,
+        x: el.x,
+        y: el.y,
+        width: el.width,
+        height: el.height,
+        rotation: el.rotation,
+      });
+      group.add(newKonvaImage);
     } else if (el.type === CanvasElementType.TEXT) {
       const konvaText = new Konva.Text({
         text: el.text,
@@ -131,6 +134,18 @@ export const generateQRBlob = async (text: string, editorStage?: StageProps): Pr
       });
       group.add(konvaText);
     }
+  }
+
+  if (qrEl) {
+    const konvaImg = new Konva.Image({
+      image,
+      x: qrEl.x,
+      y: qrEl.y,
+      width: qrEl.width,
+      height: qrEl.height,
+      rotation: qrEl.rotation,
+    });
+    group.add(konvaImg);
   }
 
   layer.add(group);

@@ -2,13 +2,31 @@ import { PUBLIC_API_URL } from "@/api";
 
 export const COLORS = [
   "#000000",
-  "#1D4ED8",
-  "#15803D",
-  "#B91C1C",
-  "#7E22CE",
-  "#EA580C",
-  "#0369A1",
   "#ffffff",
+  "#3B82F6",
+  "#1D4ED8",
+  "#1E40AF",
+  "#0ea5e9",
+  "#06b6d4",
+  "#14b8a6",
+  "#10b981",
+  "#15803D",
+  "#16a34a",
+  "#84cc16",
+  "#eab308",
+  "#f59e0b",
+  "#EA580C",
+  "#f97316",
+  "#ef4444",
+  "#B91C1C",
+  "#f43f5e",
+  "#ec4899",
+  "#d946ef",
+  "#8b5cf6",
+  "#7E22CE",
+  "#6366f1",
+  "#64748b",
+  "#475569",
 ];
 
 export const STYLES = {
@@ -33,6 +51,7 @@ export const STYLE_SECTION = {
   CORNERS_DOT: "cornersDot",
   BG: "bg",
   IMAGE: "image",
+  ERROR_CORRECTION: "errorCorrection",
 };
 
 export const DOT_TYPES = [
@@ -74,6 +93,18 @@ export const COLOR = {
     name: "Black",
     color: "#000000",
   },
+  GREEN: {
+    name: "Green",
+    color: "#f0fdf4",
+  },
+  PURPLE: {
+    name: "Purple",
+    color: "#f5f3ff",
+  },
+  ORANGE: {
+    name: "Orange",
+    color: "#fff7ed",
+  },
 };
 
 export const BACKGROUND_COLORS = [
@@ -82,6 +113,9 @@ export const BACKGROUND_COLORS = [
   COLOR.BLUE,
   COLOR.YELLOW,
   COLOR.PINK,
+  COLOR.GREEN,
+  COLOR.PURPLE,
+  COLOR.ORANGE,
   COLOR.BLACK,
 ];
 
@@ -99,4 +133,11 @@ export const STICKERS = [
   `${PUBLIC_API_URL}/api/v1/files/serve/d62f4173-ef6c-46bb-94b3-fa73f0bf1655`,
   `${PUBLIC_API_URL}/api/v1/files/serve/4f952945-d9e8-4180-8582-ffb5a7730f0c`,
   `${PUBLIC_API_URL}/api/v1/files/serve/7dc65d82-9eb5-4180-929a-940c48f8105b`,
+];
+
+export const ERROR_CORRECTION_LEVELS = [
+  { label: "Tốt nhất", value: "H" },
+  { label: "Cao", value: "Q" },
+  { label: "Trung bình", value: "M" },
+  { label: "Nhỏ nhất", value: "L" },
 ];

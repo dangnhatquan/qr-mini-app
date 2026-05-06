@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Page, Box, Text, Button, Spinner, Header, Avatar, useNavigate } from "zmp-ui";
-import { IconMail, IconPhone, IconWorld, IconUserCircle } from "@tabler/icons-react";
+import { Page, Box, Text, Button, Spinner, Header, Avatar, useNavigate, useSnackbar } from "zmp-ui";
+import { IconMail, IconPhone, IconWorld, IconUserCircle, IconCopy } from "@tabler/icons-react";
 import { qrService } from "@/services/qr";
 import { QrCode, VCardQRData } from "@/types/qr";
 import { openPhone, openWebview } from "zmp-sdk/apis";
@@ -11,6 +11,7 @@ import { myQrsRoute } from "@/utils/routes";
 const VCardDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { openSnackbar } = useSnackbar();
   const [qr, setQr] = useState<QrCode | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,13 +60,46 @@ const VCardDetailPage: React.FC = () => {
 
   const handleEmail = () => {
     if (vcardData?.email) {
-      window.location.href = `mailto:${vcardData.email}`;
+      openWebview({ url: `mailto:${vcardData.email}` });
     }
   };
 
   const handleWebsite = () => {
     if (vcardData?.website) {
       openWebview({ url: vcardData.website });
+    }
+  };
+
+  const handleCopyField = (e: React.MouseEvent, label: string, value?: string) => {
+    e.stopPropagation();
+    if (!value) {
+      openSnackbar({
+        type: "error",
+        text: `Không có ${label} để sao chép`,
+        duration: 2000,
+      });
+      return;
+    }
+
+    try {
+      const tempInput = document.createElement("textarea");
+      tempInput.value = value;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      openSnackbar({
+        type: "success",
+        text: `Đã sao chép ${label}`,
+        duration: 2000,
+      });
+    } catch (err) {
+      console.error("Could not copy text: ", err);
+      openSnackbar({
+        type: "error",
+        text: `Lỗi khi sao chép ${label}`,
+        duration: 2000,
+      });
     }
   };
 
@@ -125,20 +159,30 @@ const VCardDetailPage: React.FC = () => {
         </Box>
 
         <Box className="mb-8">
-          <Text size="xLarge" className="font-bold text-blue-500 text-2xl mb-1">
-            {vcardData.fullName || "N/A"}
-          </Text>
-          <Text className="text-gray-500 font-medium text-base">
-            {vcardData.position || "Professional"}
-            {vcardData.company ? ` tại ${vcardData.company}` : ""}
-          </Text>
+          <Box flex alignItems="center" justifyContent="space-between">
+            <Box>
+              <Text size="xLarge" className="font-bold text-blue-500 text-2xl mb-1">
+                {vcardData.fullName || "N/A"}
+              </Text>
+              <Text className="text-gray-500 font-medium text-base">
+                {vcardData.position || "Professional"}
+                {vcardData.company ? ` tại ${vcardData.company}` : ""}
+              </Text>
+            </Box>
+          </Box>
         </Box>
 
         <div className="grid grid-cols-2 gap-3">
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleEmail}
           >
+            <div
+              className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={(e) => handleCopyField(e, "Email", vcardData.email)}
+            >
+              <IconCopy size={14} className="text-white/70" />
+            </div>
             <IconMail className="text-blue-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               E-mail
@@ -149,9 +193,15 @@ const VCardDetailPage: React.FC = () => {
           </Box>
 
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleCall}
           >
+            <div
+              className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={(e) => handleCopyField(e, "Số điện thoại", vcardData.phone)}
+            >
+              <IconCopy size={14} className="text-white/70" />
+            </div>
             <IconPhone className="text-green-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Số điện thoại
@@ -160,9 +210,15 @@ const VCardDetailPage: React.FC = () => {
           </Box>
 
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity"
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleWebsite}
           >
+            <div
+              className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={(e) => handleCopyField(e, "Website", vcardData.website)}
+            >
+              <IconCopy size={14} className="text-white/70" />
+            </div>
             <IconWorld className="text-purple-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Website
@@ -172,12 +228,21 @@ const VCardDetailPage: React.FC = () => {
             </Text>
           </Box>
 
-          <Box className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity">
+          <Box
+            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
+            onClick={handleWebsite}
+          >
+            <div
+              className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={(e) => handleCopyField(e, "Mạng xã hội", vcardData.socialLinks)}
+            >
+              <IconCopy size={14} className="text-white/70" />
+            </div>
             <IconUserCircle className="text-red-300 mb-2" size={20} />
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Mạng xã hội
             </Text>
-            <Text className="text-white text-xs font-medium">
+            <Text className="text-white text-xs font-medium truncate">
               {vcardData.socialLinks || "Global"}
             </Text>
           </Box>

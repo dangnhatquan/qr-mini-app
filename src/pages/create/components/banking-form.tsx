@@ -29,6 +29,8 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
         setBanks(bankOptions);
       } catch (error) {
         console.error("Failed to fetch banks", error);
+      } finally {
+        setIsFetchingBanks(false);
       }
     };
     fetchBanks();

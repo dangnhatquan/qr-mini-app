@@ -10,6 +10,7 @@ import {
   IconEye,
   IconRefresh,
   IconSettings,
+  IconPalette,
 } from "@tabler/icons-react";
 import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ import { EQRCategory, QrCode } from "@/types/qr";
 import "./styles.scss";
 import { Image } from "@/components/image";
 import { getFullUrl } from "@/utils/axios";
+import { Divider } from "@/components/divider";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -392,12 +394,12 @@ const MyQRsPage: React.FC = () => {
 
       <Modal
         visible={modalVisible}
-        title={selectedQR ? `Mã QR: ${getCategoryLabel(selectedQR.category)}` : "Chi tiết mã QR"}
+        title={selectedQR ? `${getCategoryLabel(selectedQR.category)}` : "Chi tiết mã QR"}
         onClose={() => setModalVisible(false)}
         verticalActions
       >
         <Box flex flexDirection="column" alignItems="center" justifyContent="center">
-          <div className="w-full aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
+          <div className="relative w-full aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
             {modalImgSrc ? (
               <Image src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
             ) : (
@@ -406,92 +408,47 @@ const MyQRsPage: React.FC = () => {
                 <div className="w-1/3 h-2 bg-gray-200 rounded-full opacity-50" />
               </div>
             )}
-          </div>
-
-          <Text className="mt-6 text-center text-gray-500 text-sm px-4 font-medium">
-            Bạn có thể quét mã này trực tiếp bằng Zalo
-          </Text>
-
-          <Box flex flexDirection="row" justifyContent="space-around" className="w-full mt-6">
-            <Box
-              flex
-              flexDirection="column"
-              alignItems="center"
-              onClick={handleDownload}
-              className="cursor-pointer"
-            >
-              <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <IconDownload className="text-gray-800" />
-              </div>
-              <Text size="xxSmall" className="text-gray-600 font-medium">
-                Tải xuống
-              </Text>
-            </Box>
-
-            <Box
-              flex
-              flexDirection="column"
-              alignItems="center"
-              onClick={handleEdit}
-              className="cursor-pointer"
-            >
-              <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <IconEdit className="text-gray-800" />
-              </div>
-              <Text size="xxSmall" className="text-gray-600 font-medium">
-                Giao diện
-              </Text>
-            </Box>
-
-            <Box
-              flex
-              flexDirection="column"
-              alignItems="center"
-              onClick={handleEditInfo}
-              className="cursor-pointer"
-            >
-              <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <IconSettings className="text-gray-800" />
-              </div>
-              <Text size="xxSmall" className="text-gray-600 font-medium">
-                Thông tin
-              </Text>
-            </Box>
-
-            <Box
-              flex
-              flexDirection="column"
-              alignItems="center"
-              onClick={handleShare}
-              className="cursor-pointer"
-            >
-              <div className="bg-gray-100 p-3 rounded-full mb-2">
-                <IconShare className="text-gray-800" />
-              </div>
-              <Text size="xxSmall" className="text-gray-600 font-medium">
-                Chia sẻ
-              </Text>
-            </Box>
-
             {selectedQR?.type === "dynamic" && (
-              <Box
-                flex
-                flexDirection="column"
-                alignItems="center"
+              <div
+                className="absolute right-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl"
                 onClick={handleView}
-                className="cursor-pointer"
               >
-                <div className="bg-blue-100 p-3 rounded-full mb-2">
-                  <IconEye className="text-blue-600" />
-                </div>
-                <Text size="xxSmall" className="text-blue-600 font-medium">
-                  Xem chi tiết
-                </Text>
-              </Box>
+                <IconEye size={20} className="text-gray-800 cursor-pointer" />
+              </div>
             )}
-          </Box>
-
-          <Button className="mt-6" fullWidth onClick={() => setModalVisible(false)} type="neutral">
+            <div
+              className="absolute left-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl"
+              onClick={handleEdit}
+            >
+              <IconPalette size={20} className="text-gray-800 cursor-pointer" />
+            </div>
+          </div>
+          <div className="flex justify-between items-center w-full mt-6 border py-2 px-4 rounded-xl">
+            <div
+              className="flex justify-center items-center gap-2 text-sm"
+              onClick={handleDownload}
+            >
+              <IconDownload size={12} className="text-gray-800" /> Tải xuống
+            </div>
+            <Divider direction="vertical" />
+            <div
+              className="flex justify-center items-center gap-2 text-sm"
+              onClick={handleEditInfo}
+            >
+              <IconEdit size={12} className="text-gray-800" /> Thông tin
+            </div>
+            <Divider direction="vertical" />
+            <div className="flex justify-center items-center gap-2  text-sm" onClick={handleShare}>
+              <IconShare size={12} className="text-gray-800" /> Chia sẻ
+            </div>
+          </div>
+          <Button
+            className="mt-6"
+            size="small"
+            fullWidth
+            onClick={() => setModalVisible(false)}
+            type="neutral"
+          >
             Đóng
           </Button>
         </Box>

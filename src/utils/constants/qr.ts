@@ -37,6 +37,7 @@ export const DEFAULT_QR_STYLE: Partial<Options> = {
   cornersSquareOptions: { color: COLOR.BLACK.color, type: "extra-rounded" },
   cornersDotOptions: { color: COLOR.BLACK.color, type: "dot" },
   imageOptions: { crossOrigin: "anonymous", margin: 10 },
+  qrOptions: { errorCorrectionLevel: "Q" },
 };
 
 export const DEFAULT_EDITOR_STAGE = {

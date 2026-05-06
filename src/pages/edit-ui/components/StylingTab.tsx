@@ -2,7 +2,14 @@ import { Accordion } from "@/components/accordion";
 import { Box, Button, Input } from "zmp-ui";
 import { IconUser, IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
-import { COLORS, CORNER_DOT_TYPES, CORNER_SQUARE_TYPES, DOT_TYPES } from "../utils/constants";
+import {
+  BACKGROUND_COLORS,
+  COLORS,
+  CORNER_DOT_TYPES,
+  CORNER_SQUARE_TYPES,
+  DOT_TYPES,
+  ERROR_CORRECTION_LEVELS,
+} from "../utils/constants";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
 import { Options } from "qr-code-styling";
 import { uploadFile } from "@/utils/helpers/image";
@@ -190,19 +197,17 @@ export const StylingTab = () => {
           >
             <div className="w-full h-0.5 bg-red-500 rotate-45"></div>
           </div>
-          {["#ffffff", "#f8fafc", "#fef3c7", "#dcfce7", "#e0e7ff", "#fce7f3", "#000000"].map(
-            (c) => (
-              <div
-                key={c}
-                onClick={() => updateQrOption("backgroundOptions", "color", c)}
-                className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border"
-                style={{
-                  backgroundColor: c,
-                  borderColor: qrOptions.backgroundOptions?.color === c ? "#3b82f6" : "#e2e8f0",
-                }}
-              />
-            ),
-          )}
+          {BACKGROUND_COLORS.map((c) => (
+            <div
+              key={c.color}
+              onClick={() => updateQrOption("backgroundOptions", "color", c.color)}
+              className="w-8 h-8 rounded-full flex-shrink-0 cursor-pointer border"
+              style={{
+                backgroundColor: c.color,
+                borderColor: qrOptions.backgroundOptions?.color === c.color ? "#3b82f6" : "#e2e8f0",
+              }}
+            />
+          ))}
         </div>
       </Accordion>
       <Accordion
@@ -246,6 +251,36 @@ export const StylingTab = () => {
               className="h-8 text-sm"
             />
           </div>
+        </div>
+      </Accordion>
+      <Accordion
+        title="Mức độ sửa lỗi"
+        isOpen={openSection === "errorCorrection"}
+        onClick={() => setOpenSection(openSection === "errorCorrection" ? null : "errorCorrection")}
+      >
+        <div className="text-xs text-gray-500 mb-3 leading-relaxed">
+          Mức độ sửa lỗi càng cao thì QR càng có khả năng khôi phục thông tin nếu bị hư hỏng hoặc bị
+          che khuất bởi logo, nhưng bù lại mã QR sẽ trở nên phức tạp hơn (nhiều điểm ảnh hơn).
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {ERROR_CORRECTION_LEVELS.map((level) => (
+            <div
+              key={level.value}
+              onClick={() =>
+                setQrOptions((prev) => ({
+                  ...prev,
+                  qrOptions: { ...prev.qrOptions, errorCorrectionLevel: level.value as any },
+                }))
+              }
+              className={`px-3 py-2 rounded-lg border text-xs text-center cursor-pointer font-medium transition-all ${
+                qrOptions?.qrOptions?.errorCorrectionLevel === level.value
+                  ? "bg-blue-50 border-blue-500 text-blue-600 shadow-sm"
+                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+              }`}
+            >
+              {level.label}
+            </div>
+          ))}
         </div>
       </Accordion>
     </Box>

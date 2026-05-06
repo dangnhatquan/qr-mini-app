@@ -22,10 +22,12 @@ import { uploadFile } from "@/utils/helpers/image";
 export const getQRPayload = (data: IQRFormValues, id?: string): string => {
   switch (data.category) {
     case EQRCategory.BANKING: {
-      const { bankId, accountNo } = data.bankingData!;
+      const { bankId, accountNo, amount, description } = data.bankingData!;
       return generateVietQRPayload({
         bankId,
         accountNumber: accountNo,
+        amount,
+        description,
       });
     }
 

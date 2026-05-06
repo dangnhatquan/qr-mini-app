@@ -58,7 +58,7 @@ export function generateVietQRPayload({
   payload += tlv("60", merchantCity);
 
   if (description) {
-    const addData = tlv("08", description);
+    const addData = tlv("08", removeVietnameseTones(description));
     payload += tlv("62", addData);
   }
 
@@ -132,4 +132,12 @@ export const cleanUpBase64 = (editorStage: StageProps) => {
       src: isRemoteImage(el.src) ? el.src : "",
     })),
   };
+};
+
+export const removeVietnameseTones = (str: string) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
 };

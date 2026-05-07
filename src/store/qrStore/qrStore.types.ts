@@ -85,3 +85,11 @@ export interface EditorStage {
   dots: string;
   color: string;
 }
+
+export interface QRStore {
+  qrCodeRecords: QrCode[];
+  isFetching: boolean;
+  error: string | null;
+  fetchQRRecords: () => Promise<void>;
+  removeQRRecord: (id: string, callback?: () => void) => Promise<void>;
+}

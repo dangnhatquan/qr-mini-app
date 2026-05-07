@@ -1,42 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Control } from "react-hook-form";
 import { InputFormField } from "@/components/form-fields/input-field";
 import { SelectFormField } from "@/components/form-fields/select-field";
 import { IQRFormValues } from "@/utils/schemas/qr";
-import { bankService } from "@/services/bank";
-import { Bank } from "@/types/bank";
 import { Box, Spinner } from "zmp-ui";
 import { DEFAULT_BANK_ID } from "@/utils/constants/qr";
+import { useBankStore } from "@/store";
 
 interface BankingFormProps {
   control: Control<IQRFormValues>;
 }
 
 export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
-  const [banks, setBanks] = useState<{ value: string; label: string }[]>([]);
-  const [isFetchingBanks, setIsFetchingBanks] = useState(false);
+  const { isFetching, banks, fetchBanks } = useBankStore();
 
   useEffect(() => {
-    const fetchBanks = async () => {
-      try {
-        setIsFetchingBanks(true);
-        const response = await bankService.getBanks();
-        const data = Array.isArray(response) ? response : (response as any).data || [];
-        const bankOptions = data.map((bank: Bank) => ({
-          value: bank.bin || bank.code || bank.id.toString(), // prefer BIN for VietQR
-          label: bank.shortName || bank.name,
-        }));
-        setBanks(bankOptions);
-      } catch (error) {
-        console.error("Failed to fetch banks", error);
-      } finally {
-        setIsFetchingBanks(false);
-      }
-    };
     fetchBanks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isFetchingBanks) {
+  if (isFetching) {
     return (
       <Box className="w-full h-screen flex items-center justify-center">
         <Spinner />
@@ -51,7 +34,10 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
         control={control}
         label="Ngân hàng"
         placeholder="Chọn ngân hàng"
-        options={banks}
+        options={banks.map((bank) => ({
+          value: bank.bin || bank.code || bank.id.toString(), // prefer BIN for VietQR
+          label: bank.shortName || bank.name,
+        }))}
         defaultValue={DEFAULT_BANK_ID}
         required
       />

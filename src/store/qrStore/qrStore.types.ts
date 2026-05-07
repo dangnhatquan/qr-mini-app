@@ -90,6 +90,13 @@ export interface QRStore {
   qrCodeRecords: QrCode[];
   isFetching: boolean;
   error: string | null;
+
+  selectedQR: QrCode | null;
+  isFetchingSelectedQR: boolean;
+  errorSelectedQR: string | null;
+
+  setSelectedQR: (qr: QrCode) => void;
   fetchQRRecords: () => Promise<void>;
+  fetchQRDetail: (id: string) => Promise<void>;
   removeQRRecord: (id: string, callback?: () => void) => Promise<void>;
 }

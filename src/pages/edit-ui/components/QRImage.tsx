@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
-import { CanvasElement } from "@/types/editor";
+import { CanvasElement } from "@/store";
 
 export const URLImage = ({
   imageProps,

@@ -15,7 +15,7 @@ import { generateQRPayload } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import { IconFocusCentered, IconRotate, IconCheck, IconTrash } from "@tabler/icons-react";
-import { CanvasElement, CanvasElementType } from "@/types/editor";
+import { CanvasElement, CanvasElementType } from "@/store";
 import { EQRCategory, EQRType, QrCode } from "@/store";
 
 export const QREditor: React.FC = () => {

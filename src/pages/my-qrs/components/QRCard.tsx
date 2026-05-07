@@ -1,9 +1,10 @@
 import React from "react";
 import { Box, Text } from "zmp-ui";
 import { IconGridDots } from "@tabler/icons-react";
-import { getCategoryLabel } from "../utils/functions";
 import { Image } from "@/components/image";
 import { EQRCategory } from "@/store";
+import { getCategoryLabel } from "@/utils/helpers/qr";
+import { getFullUrl } from "@/utils/axios";
 
 interface QRCardProps {
   id: string;
@@ -30,6 +31,8 @@ export const QRCard: React.FC<QRCardProps> = ({
   greetingData,
   onClick,
 }) => {
+  console.log("previewUrl", previewUrl);
+
   if (category === EQRCategory.GREETING) {
     return (
       <Box
@@ -48,7 +51,11 @@ export const QRCard: React.FC<QRCardProps> = ({
           </Box>
           <div className="w-14 aspect-[350/450] bg-white rounded-lg shadow-2xl overflow-hidden flex-shrink-0">
             {previewUrl ? (
-              <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
+              <img
+                src={getFullUrl(previewUrl)}
+                alt="QR Thumbnail"
+                className="w-full h-full object-contain"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300">
                 <IconGridDots />
@@ -85,7 +92,11 @@ export const QRCard: React.FC<QRCardProps> = ({
           </Box>
           <div className="w-14 aspect-[350/450] bg-white rounded-lg shadow-2xl overflow-hidden flex-shrink-0">
             {previewUrl ? (
-              <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
+              <img
+                src={getFullUrl(previewUrl)}
+                alt="QR Thumbnail"
+                className="w-full h-full object-contain"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300">
                 <IconGridDots />
@@ -129,7 +140,11 @@ export const QRCard: React.FC<QRCardProps> = ({
 
         <div className="w-14 aspect-[350/450] bg-white rounded-xl shadow-lg overflow-hidden flex-shrink-0 border border-white/50">
           {previewUrl ? (
-            <Image src={previewUrl} alt="QR Thumbnail" className="w-full h-full object-contain" />
+            <img
+              src={getFullUrl(previewUrl)}
+              alt="QR Thumbnail"
+              className="w-full h-full object-contain"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300">
               <IconGridDots />

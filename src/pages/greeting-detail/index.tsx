@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Page, Box, Text, Button, Spinner, Header, Input, useSnackbar, useNavigate } from "zmp-ui";
-import { qrService } from "@/services/qr";
-import { cardService } from "@/services/card";
-import { QrCode, GreetingQRData } from "@/store";
+import { GreetingQRData, useCardStore, useQRStore } from "@/store";
 import { CardRenderer } from "./components/CardRenderer";
 import { myQrsRoute } from "@/utils/routes";
 import { IconDownload, IconLock } from "@tabler/icons-react";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
-import { Card } from "@/types/card";
 import { getFullUrl } from "@/utils/axios";
 
 const GreetingDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
-  const [qr, setQr] = useState<QrCode | null>(null);
-  const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
+
+  const { selectedQR, isFetchingSelectedQR, fetchQRDetail } = useQRStore();
+  const { card, isFetching, fetchCard } = useCardStore();
+
+  const isLoading = isFetching || isFetchingSelectedQR;
+
+  useEffect(() => {
+    fetchQRDetail(id as string);
+  }, [id]);
 
   const handleDownload = async () => {
     if (!card) return;
@@ -36,42 +39,15 @@ const GreetingDetailPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchDetail = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        const data = await qrService.getQRDetail(id);
-        setQr(data);
-
-        const greetingData = data.payload?.greetingData as GreetingQRData;
-
-        if (!greetingData?.password) {
-          setIsAuthorized(true);
-          if (greetingData?.cardId) {
-            const cardData = await cardService.getCard(greetingData.cardId);
-            setCard(cardData);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch Greeting detail:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetail();
-  }, [id]);
-
   const handleAuthorize = async () => {
-    if (!qr) return;
-    const greetingData = qr.payload?.greetingData as GreetingQRData;
+    if (!selectedQR) return;
+    const greetingData = selectedQR.payload?.greetingData as GreetingQRData;
 
     if (password === greetingData.password) {
       setIsAuthorized(true);
       if (greetingData.cardId) {
         try {
-          const cardData = await cardService.getCard(greetingData.cardId);
-          setCard(cardData);
+          fetchCard(greetingData.cardId);
         } catch (e) {
           console.error("Failed to fetch card content:", e);
         }
@@ -98,7 +74,7 @@ const GreetingDetailPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Page className="flex items-center justify-center bg-gray-50">
         <Spinner />
@@ -106,7 +82,7 @@ const GreetingDetailPage: React.FC = () => {
     );
   }
 
-  if (!qr || !qr.payload?.greetingData) {
+  if (!selectedQR || !selectedQR?.payload?.greetingData) {
     return (
       <Page className="bg-gray-50">
         <Header title="Chi tiết QR" />
@@ -117,7 +93,7 @@ const GreetingDetailPage: React.FC = () => {
     );
   }
 
-  const greetingData = qr.payload.greetingData as GreetingQRData;
+  const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
 
   if (isLocked) {
     return (

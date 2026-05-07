@@ -12,7 +12,7 @@ import {
 import { Divider } from "@/components/divider";
 import { openShareSheet, saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { createRoute } from "@/utils/routes";
-import { getCategoryLabel } from "@/pages/my-qrs/utils/functions";
+import { getCategoryLabel } from "@/utils/helpers/qr";
 
 export interface IQRModalProps {
   selectedQR?: QrCode | null;

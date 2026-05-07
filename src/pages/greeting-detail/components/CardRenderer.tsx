@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Stage, Layer, Rect, Group, Image as KonvaImage, Text as KonvaText } from "react-konva";
 import useImage from "use-image";
-import { CanvasElement, CanvasElementType } from "@/types/editor";
+import { CanvasElement, CanvasElementType } from "@/store";
 
 interface CardRendererProps {
   elements: CanvasElement[];

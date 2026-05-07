@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Page, Box, Text, Spinner, Header, Avatar, useNavigate, useSnackbar } from "zmp-ui";
 import { IconMail, IconPhone, IconWorld, IconUserCircle, IconCopy } from "@tabler/icons-react";
-import { qrService } from "@/services/qr";
-import { QrCode, VCardQRData } from "@/store";
+import { useQRStore, VCardQRData } from "@/store";
 import { openPhone, openWebview } from "zmp-sdk/apis";
 import { getFullUrl } from "@/utils/axios";
 import { myQrsRoute } from "@/utils/routes";
@@ -12,26 +11,13 @@ const VCardDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
-  const [qr, setQr] = useState<QrCode | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { selectedQR, isFetchingSelectedQR, fetchQRDetail } = useQRStore();
 
   useEffect(() => {
-    const fetchDetail = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        const data = await qrService.getQRDetail(id);
-        setQr(data);
-      } catch (error) {
-        console.error("Failed to fetch VCard detail:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetail();
+    fetchQRDetail(id as string);
   }, [id]);
 
-  if (loading) {
+  if (isFetchingSelectedQR) {
     return (
       <Page className="flex items-center justify-center bg-gray-50">
         <Spinner />
@@ -39,7 +25,7 @@ const VCardDetailPage: React.FC = () => {
     );
   }
 
-  if (!qr || !qr.payload?.vcardData) {
+  if (!selectedQR || !selectedQR.payload?.vcardData) {
     return (
       <Page className="bg-gray-50">
         <Header title="Chi tiết QR" />
@@ -50,7 +36,7 @@ const VCardDetailPage: React.FC = () => {
     );
   }
 
-  const vcardData = qr.payload.vcardData as VCardQRData;
+  const vcardData = selectedQR.payload.vcardData as VCardQRData;
 
   const handleCall = () => {
     if (vcardData?.phone) {
@@ -134,7 +120,6 @@ const VCardDetailPage: React.FC = () => {
           <rect width="100" height="100" fill="url(#hexagons)" />
         </svg>
       </div>
-
       <Box className="relative px-6 -mt-16 z-10">
         <Box flex alignItems="center" justifyContent="center" className="mb-6 relative">
           <div className="relative">

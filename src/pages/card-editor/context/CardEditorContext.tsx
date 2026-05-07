@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useRef, useState } from "react";
 import Konva from "konva";
 import { COLOR } from "@/pages/edit-ui/utils/constants";
-import { CanvasElement } from "@/types/editor";
+import { CanvasElement } from "@/store";
 
 interface CardEditorContextType {
   stageRef: React.MutableRefObject<Konva.Stage | null>;

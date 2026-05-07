@@ -6,7 +6,7 @@ import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
 import { StageProps } from "react-konva";
 import Konva from "konva";
-import { CanvasElement, CanvasElementType } from "@/types/editor";
+import { CanvasElement, CanvasElementType } from "@/store";
 import QRCodeStyling from "qr-code-styling";
 import { generateVietQRPayload } from "./viet-qr";
 
@@ -219,4 +219,14 @@ export const generateQRBlob = async (text: string, editorStage?: StageProps): Pr
 
   const res = await fetch(dataURL);
   return await res.blob();
+};
+
+export const getCategoryLabel = (cat: string) => {
+  const labels: Record<string, string> = {
+    wifi: "QR Wifi",
+    banking: "QR Chuyển khoản",
+    vcard: "Danh thiếp điện tử",
+    greeting: "Thiệp điện tử",
+  };
+  return labels[cat] || cat;
 };

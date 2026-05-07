@@ -3,7 +3,7 @@ import { Options } from "qr-code-styling";
 import { COLOR, STYLE_SECTION } from "../utils/constants";
 import Konva from "konva";
 import { DEFAULT_QR_STYLE } from "@/utils/constants/qr";
-import { CanvasElement } from "@/types/editor";
+import { CanvasElement } from "@/store";
 
 interface KonvaEditorContextType {
   stageRef: React.MutableRefObject<Konva.Stage | null>;

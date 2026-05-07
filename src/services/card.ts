@@ -1,6 +1,6 @@
 import request from "@/utils/axios";
 import { cardsResource } from "@/resources";
-import { Card } from "@/types/card";
+import { Card } from "@/store";
 
 export const cardService = {
   async createCard(editorStage?: Record<string, unknown>, previewImageId?: string): Promise<Card> {

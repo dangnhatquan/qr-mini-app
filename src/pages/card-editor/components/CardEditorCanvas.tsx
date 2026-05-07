@@ -11,7 +11,7 @@ import { KonvaEventObject } from "konva/lib/Node";
 import { cardService } from "@/services/card";
 import { uploadFile } from "@/utils/helpers/image";
 import { IconFocusCentered, IconCheck, IconTrash } from "@tabler/icons-react";
-import { CanvasElement, CanvasElementType } from "@/types/editor";
+import { CanvasElement, CanvasElementType } from "@/store";
 
 export interface CardEditorCanvasProps {
   onSaved: (cardId: string) => void;

@@ -3,15 +3,14 @@ import { Page, Box, Button, Text, Spinner, Modal } from "zmp-ui";
 import { IconTrash, IconGridDots, IconPlus, IconRefresh } from "@tabler/icons-react";
 import { showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
-import { qrService } from "@/services/qr";
 import { createRoute } from "@/utils/routes";
-import { QRCard } from "./components/qr-card";
 import { QrCode } from "@/store";
 import "./styles.scss";
 
 import { useQRStore } from "@/store";
 import { QRModal } from "../edit-ui/components/QRModal";
 import { usePullToRefresh } from "./hooks/usePullToRefresh";
+import { QRCard } from "./components/QRCard";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ const MyQRsPage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteConfirmQR) return;
     try {
-      await qrService.deleteQR(deleteConfirmQR.id);
+      await removeQRRecord(deleteConfirmQR.id);
 
       const cardId = deleteConfirmQR.id;
       setDeleteConfirmQR(null);

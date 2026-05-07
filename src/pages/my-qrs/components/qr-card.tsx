@@ -3,7 +3,7 @@ import { Box, Text } from "zmp-ui";
 import { IconGridDots } from "@tabler/icons-react";
 import { getCategoryLabel } from "../utils/functions";
 import { Image } from "@/components/image";
-import { EQRCategory } from "@/types/qr";
+import { EQRCategory } from "@/store";
 
 interface QRCardProps {
   id: string;

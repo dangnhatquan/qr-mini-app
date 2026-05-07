@@ -11,18 +11,13 @@ import { WifiForm } from "./components/wifi-form";
 import { BankingForm } from "./components/banking-form";
 import { VCardForm } from "./components/vcard-form";
 import { GreetingForm } from "./components/greeting-form";
-import {
-  EQRType,
-  EQRCategory,
-  DEFAULT_BANK_ID,
-  DEFAULT_WIFI_SECURITY,
-  DEFAULT_MAX_ATTEMPTS,
-} from "@/types/qr";
+import { EQRType, EQRCategory } from "@/store";
 import { qrService } from "@/services/qr";
 import { cardService } from "@/services/card";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { myQrsRoute } from "@/utils/routes";
 import { getString, removeItem, setString } from "@/utils/storage";
+import { DEFAULT_BANK_ID, DEFAULT_MAX_ATTEMPTS, DEFAULT_WIFI_SECURITY } from "@/utils/constants/qr";
 
 const CreatePage: React.FC = () => {
   const navigate = useNavigate();

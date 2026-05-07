@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Page, Box, Text, Button, Spinner, Header, Avatar, useNavigate, useSnackbar } from "zmp-ui";
+import { Page, Box, Text, Spinner, Header, Avatar, useNavigate, useSnackbar } from "zmp-ui";
 import { IconMail, IconPhone, IconWorld, IconUserCircle, IconCopy } from "@tabler/icons-react";
 import { qrService } from "@/services/qr";
-import { QrCode, VCardQRData } from "@/types/qr";
+import { QrCode, VCardQRData } from "@/store";
 import { openPhone, openWebview } from "zmp-sdk/apis";
 import { getFullUrl } from "@/utils/axios";
 import { myQrsRoute } from "@/utils/routes";

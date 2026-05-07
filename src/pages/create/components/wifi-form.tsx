@@ -3,8 +3,8 @@ import { Control } from "react-hook-form";
 import { InputFormField } from "@/components/form-fields/input-field";
 import { SelectFormField } from "@/components/form-fields/select-field";
 import { WIFI_SECURITY_OPTIONS } from "../constants";
-import { DEFAULT_WIFI_SECURITY } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
+import { DEFAULT_WIFI_SECURITY } from "@/utils/constants/qr";
 
 interface WifiFormProps {
   control: Control<IQRFormValues>;

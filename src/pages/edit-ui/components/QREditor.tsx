@@ -11,12 +11,12 @@ import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { BottomSheet } from "./BottomSheet";
 import { KonvaEventObject } from "konva/lib/Node";
-import { generateQRPayload, isRemoteImage } from "@/utils/helpers/qr";
-import { EQRCategory, EQRType, QrCode } from "@/types/qr";
+import { generateQRPayload } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import { IconFocusCentered, IconRotate, IconCheck, IconTrash } from "@tabler/icons-react";
 import { CanvasElement, CanvasElementType } from "@/types/editor";
+import { EQRCategory, EQRType, QrCode } from "@/store";
 
 export const QREditor: React.FC = () => {
   const { id } = useParams();

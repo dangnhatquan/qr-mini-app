@@ -10,7 +10,7 @@ import {
 import { useCardEditor } from "../context/CardEditorContext";
 import { BACKGROUND_COLORS, COLLAPSED_Y, SHEET_HEIGHT } from "@/pages/edit-ui/utils/constants";
 import { chooseImage, showToast } from "zmp-sdk/apis";
-import { uploadFile } from "@/utils/helpers/image";
+import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
 import { useState } from "react";
 
@@ -138,11 +138,23 @@ const CardStickerTab = () => {
   const { elements, setElements, setSelectedId } = useCardEditor();
   const [uploading, setUploading] = useState(false);
 
-  const handleAddSticker = (url: string, base64?: string) => {
+  const handleAddSticker = async (url: string, width = 100, height = 100) => {
     const id = `sticker-${Date.now()}`;
+
+    const ratio = width / height;
+
     setElements([
       ...elements,
-      { id, type: "image", src: url, x: 100, y: 100, width: 120, height: 120, rotation: 0 },
+      {
+        id,
+        type: "image",
+        src: url,
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100 / ratio,
+        rotation: 0,
+      },
     ]);
     setSelectedId(id);
   };
@@ -157,10 +169,10 @@ const CardStickerTab = () => {
             setUploading(true);
             const response = await fetch(path);
             const blob = await response.blob();
-
             const file = await uploadFile(blob);
             const url = getFullUrl(file.path);
-            handleAddSticker(url);
+            const { width, height } = await getImageDimensions(blob);
+            handleAddSticker(url, width, height);
             showToast({ message: "Đã thêm hình ảnh" });
           } catch {
             showToast({ message: "Lỗi tải hình ảnh" });

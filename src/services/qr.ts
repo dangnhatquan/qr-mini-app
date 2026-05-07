@@ -1,6 +1,5 @@
 import { getPresignedUrl, qrRecordResource } from "@/resources";
-import { EQRCategory, EQRType, QrCode } from "@/types/qr";
-import request, { getFullUrl } from "@/utils/axios";
+import request from "@/utils/axios";
 import { ZALO_APP_LINK } from "@/utils/constants/common";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import Konva from "konva";
@@ -18,6 +17,7 @@ import { getSystemInfo } from "zmp-sdk/apis";
 import { StageProps } from "react-konva";
 import { CanvasElement, CanvasElementType } from "@/types/editor";
 import { uploadFile } from "@/utils/helpers/image";
+import { EQRCategory, EQRType, QrCode } from "@/store";
 
 export const getQRPayload = (data: IQRFormValues, id?: string): string => {
   switch (data.category) {
@@ -114,14 +114,16 @@ export const generateQRBlob = async (text: string, editorStage?: StageProps): Pr
         img.crossOrigin = "Anonymous";
         img.src = el.src;
       });
+
       const newKonvaImage = new Konva.Image({
         image: imageElement,
         x: el.x,
         y: el.y,
-        width: el.width,
-        height: el.height,
+        width: imageElement.width,
+        height: imageElement.height,
         rotation: el.rotation,
       });
+
       group.add(newKonvaImage);
     } else if (el.type === CanvasElementType.TEXT) {
       const konvaText = new Konva.Text({

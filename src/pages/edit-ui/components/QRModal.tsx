@@ -1,5 +1,4 @@
-import { getCategoryLabel } from "@/pages/my-qrs/utils/functions";
-import { EQRCategory, QrCode } from "@/types/qr";
+import { EQRCategory, QrCode } from "@/store";
 import { getFullUrl } from "@/utils/axios";
 import { Box, Button, Modal, useNavigate } from "zmp-ui";
 import {
@@ -13,6 +12,7 @@ import {
 import { Divider } from "@/components/divider";
 import { openShareSheet, saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { createRoute } from "@/utils/routes";
+import { getCategoryLabel } from "@/pages/my-qrs/utils/functions";
 
 export interface IQRModalProps {
   selectedQR?: QrCode | null;

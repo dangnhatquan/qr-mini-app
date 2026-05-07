@@ -1,4 +1,4 @@
-import { EQRType, EQRCategory, EWifiSecurity } from "@/types/qr";
+import { EQRCategory, EQRType, EWifiSecurity } from "@/store";
 
 export const QR_TYPES = [
   { value: EQRType.STATIC, label: "QR Tĩnh (Static)" },

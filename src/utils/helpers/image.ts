@@ -85,3 +85,13 @@ export const uploadFile = async (blob: Blob | File): Promise<{ id: string; path:
 
   return file;
 };
+
+export const getImageDimensions = (blob: Blob) => {
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = URL.createObjectURL(blob);
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = reject;
+  });
+};

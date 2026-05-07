@@ -3,7 +3,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
-import { uploadFile } from "@/utils/helpers/image";
+import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
 import { STICKERS } from "../utils/constants";
 
@@ -11,9 +11,12 @@ export const StickerTab = () => {
   const { elements, setElements, setSelectedId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
-  const handleAddSticker = (url: string) => {
+  const handleAddSticker = async (url: string, width = 100, height = 100) => {
     // eslint-disable-next-line react-hooks/purity
-    const id = `sticker-${Date.now().toString()}`;
+    const id = `sticker-${Date.now()}`;
+
+    const ratio = width / height;
+
     setElements([
       ...elements,
       {
@@ -22,8 +25,8 @@ export const StickerTab = () => {
         src: url,
         x: 100,
         y: 100,
-        width: 80,
-        height: 80,
+        width: 100,
+        height: 100 / ratio,
         rotation: 0,
       },
     ]);
@@ -41,7 +44,9 @@ export const StickerTab = () => {
             const response = await fetch(path);
             const blob = await response.blob();
             const file = await uploadFile(blob);
-            handleAddSticker(getFullUrl(file.path));
+            const url = getFullUrl(file.path);
+            const { width, height } = await getImageDimensions(blob);
+            handleAddSticker(url, width, height);
             showToast({ message: "Đã thêm Sticker" });
           } catch (err) {
             console.error("Upload sticker error:", err);

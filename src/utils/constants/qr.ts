@@ -1,6 +1,10 @@
-import { COLOR, COLORS } from "@/pages/edit-ui/utils/constants";
-import { DEFAULT_BANK_ID, DEFAULT_WIFI_SECURITY, EQRCategory, EQRType } from "@/types/qr";
+import { COLOR } from "@/pages/edit-ui/utils/constants";
+import { EQRCategory, EQRType, EWifiSecurity } from "@/store/qrStore/qrStore.types";
 import { Options } from "qr-code-styling";
+
+export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
+export const DEFAULT_BANK_ID = "970422";
+export const DEFAULT_MAX_ATTEMPTS = 5;
 
 export const DEFAULT_QR_FORM_VALUES = {
   qrType: EQRType.STATIC,

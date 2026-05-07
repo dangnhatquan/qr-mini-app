@@ -1,5 +1,5 @@
 import React from "react";
-import { QrCode } from "@/types/qr";
+import { QrCode } from "@/store";
 import { useRef, useState } from "react";
 import { showToast } from "zmp-sdk/apis";
 

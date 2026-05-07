@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Control } from "react-hook-form";
 import { InputFormField } from "@/components/form-fields/input-field";
 import { SelectFormField } from "@/components/form-fields/select-field";
-import { DEFAULT_BANK_ID } from "@/types/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { bankService } from "@/services/bank";
 import { Bank } from "@/types/bank";
 import { Box, Spinner } from "zmp-ui";
+import { DEFAULT_BANK_ID } from "@/utils/constants/qr";
 
 interface BankingFormProps {
   control: Control<IQRFormValues>;

@@ -1,5 +1,5 @@
 import { qrService } from "@/services/qr";
-import { QrCode } from "@/types/qr";
+import { QrCode } from "@/store";
 import { create } from "zustand";
 
 export interface QRStore {

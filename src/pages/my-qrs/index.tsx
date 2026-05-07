@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";
 import { createRoute } from "@/utils/routes";
 import { QRCard } from "./components/qr-card";
-import { QrCode } from "@/types/qr";
+import { QrCode } from "@/store";
 import "./styles.scss";
 
 import { useQRStore } from "@/store";
@@ -28,6 +28,7 @@ const MyQRsPage: React.FC = () => {
 
   useEffect(() => {
     fetchQRRecords();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

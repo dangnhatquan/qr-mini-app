@@ -1,4 +1,4 @@
-import { BankingQRData, EQRCategory, QrCode, WifiQRData } from "@/types/qr";
+import { BankingQRData, EQRCategory, QrCode, WifiQRData } from "@/store";
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";

@@ -1,48 +1,34 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Page, Box, Button, Text, Spinner, Modal } from "zmp-ui";
-import {
-  IconTrash,
-  IconGridDots,
-  IconPlus,
-  IconDownload,
-  IconEdit,
-  IconShare,
-  IconEye,
-  IconRefresh,
-  IconSettings,
-  IconPalette,
-} from "@tabler/icons-react";
-import { saveImageToGallery, openShareSheet, showToast } from "zmp-sdk/apis";
+import { IconTrash, IconGridDots, IconPlus, IconRefresh } from "@tabler/icons-react";
+import { showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { qrService } from "@/services/qr";
 import { createRoute } from "@/utils/routes";
-import { getCategoryLabel } from "./utils/functions";
 import { QRCard } from "./components/qr-card";
-import { EQRCategory, QrCode } from "@/types/qr";
+import { QrCode } from "@/types/qr";
 import "./styles.scss";
-import { Image } from "@/components/image";
-import { getFullUrl } from "@/utils/axios";
-import { Divider } from "@/components/divider";
+
+import { useQRStore } from "@/store";
+import { QRModal } from "../edit-ui/components/QRModal";
+import { usePullToRefresh } from "./hooks/usePullToRefresh";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [qrs, setQrs] = useState<QrCode[]>([]);
-  const [loading, setLoading] = useState(false);
   const [selectedQR, setSelectedQR] = useState<QrCode | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalImgSrc, setModalImgSrc] = useState<string>("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const container = useRef<HTMLDivElement>(null!);
 
-  const [swipeState, setSwipeState] = useState<{ [id: string]: number }>({});
-  const touchStart = useRef<{ x: number; y: number; val: number } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QrCode | null>(null);
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const ptrStart = useRef<{ y: number; val: number; isPulling: boolean } | null>(null);
-
   const [isInitialRender, setIsInitialRender] = useState(true);
+
+  const { isFetching, removeQRRecord, qrCodeRecords: qrs, fetchQRRecords } = useQRStore();
+
+  useEffect(() => {
+    fetchQRRecords();
+  }, []);
 
   useEffect(() => {
     if (qrs.length > 0 && isInitialRender) {
@@ -50,142 +36,6 @@ const MyQRsPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [qrs, isInitialRender]);
-
-  const fetchQRs = async (isBackground = false) => {
-    try {
-      if (!isBackground) setLoading(true);
-      const data = await qrService.getMyQRs();
-      setQrs(data || []);
-    } catch (error) {
-      console.error("Failed to fetch QRs:", error);
-    } finally {
-      if (!isBackground) setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    (async () => {
-      await fetchQRs();
-    })();
-  }, []);
-
-  const handlePtrStart = (e: React.TouchEvent) => {
-    const pageContent = document.querySelector(".zaui-page-content") || document.documentElement;
-    if (pageContent.scrollTop <= 0) {
-      ptrStart.current = { y: e.touches[0].clientY, val: 0, isPulling: false };
-    }
-  };
-
-  const handlePtrMove = (e: React.TouchEvent) => {
-    if (!ptrStart.current || isRefreshing) return;
-    const currentY = e.touches[0].clientY;
-    const diffY = currentY - ptrStart.current.y;
-
-    if (diffY > 0) {
-      ptrStart.current.isPulling = true;
-      let val = diffY * 0.4;
-      if (val > 80) val = 80;
-      ptrStart.current.val = val;
-
-      const ptrEl = document.getElementById("ptr-wrapper");
-      if (ptrEl) ptrEl.style.transform = `translate3d(0, ${val}px, 0)`;
-
-      const spinnerEl = document.getElementById("ptr-spinner");
-      if (spinnerEl) {
-        spinnerEl.style.transform = `translate3d(0, ${val - 40}px, 0) rotate(${val * 5}deg)`;
-        spinnerEl.style.opacity = `${val / 80}`;
-      }
-    }
-  };
-
-  const handlePtrEnd = async () => {
-    if (!ptrStart.current || !ptrStart.current.isPulling || isRefreshing) {
-      ptrStart.current = null;
-      return;
-    }
-    const val = ptrStart.current.val;
-    const ptrEl = document.getElementById("ptr-wrapper");
-    const spinnerEl = document.getElementById("ptr-spinner");
-
-    if (val >= 60) {
-      setIsRefreshing(true);
-      if (ptrEl) {
-        ptrEl.style.transition = "transform 0.3s ease-out";
-        ptrEl.style.transform = `translate3d(0, 60px, 0)`;
-      }
-      if (spinnerEl) {
-        spinnerEl.style.transition = "all 0.3s ease-out";
-        spinnerEl.style.transform = `translate3d(0, 20px, 0) rotate(360deg)`;
-        spinnerEl.style.opacity = `1`;
-        spinnerEl.classList.add("animate-spin");
-      }
-
-      await fetchQRs(true);
-      setIsRefreshing(false);
-      showToast({ message: "Đã làm mới danh sách" });
-    }
-
-    if (ptrEl) {
-      ptrEl.style.transition = "transform 0.3s ease-out";
-      ptrEl.style.transform = `translate3d(0, 0, 0)`;
-    }
-    if (spinnerEl) {
-      spinnerEl.style.transition = "all 0.3s ease-out";
-      spinnerEl.style.transform = `translate3d(0, -40px, 0)`;
-      spinnerEl.style.opacity = `0`;
-      spinnerEl.classList.remove("animate-spin");
-    }
-
-    setTimeout(() => {
-      if (ptrEl) ptrEl.style.transition = "";
-      if (spinnerEl) spinnerEl.style.transition = "";
-    }, 300);
-
-    ptrStart.current = null;
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, val: 0 };
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent, id: string, index: number) => {
-    if (expandedId !== id && index !== qrs.length - 1) return;
-
-    if (!touchStart.current) return;
-    const currentX = e.touches[0].clientX;
-    const currentY = e.touches[0].clientY;
-    const diffX = currentX - touchStart.current.x;
-    const diffY = currentY - touchStart.current.y;
-
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      const val = diffX < 0 ? Math.max(diffX, -90) : Math.min(diffX, 0);
-      touchStart.current.val = val;
-
-      const el = document.getElementById(`swipe-content-${id}`);
-      if (el) {
-        el.style.transform = `translate3d(${val}px, 0, 0)`;
-      }
-    }
-  };
-
-  const handleTouchEnd = (id: string, index: number) => {
-    setIsDragging(false);
-    if (expandedId !== id && index !== qrs.length - 1) return;
-
-    if (!touchStart.current) return;
-    const diffX = touchStart.current.val || 0;
-
-    const el = document.getElementById(`swipe-content-${id}`);
-    if (el) el.style.transform = "";
-
-    if (diffX < -50) {
-      setSwipeState({ [id]: -90 });
-    } else {
-      setSwipeState({});
-    }
-    touchStart.current = null;
-  };
 
   const handleDeleteConfirm = async () => {
     if (!deleteConfirmQR) return;
@@ -201,13 +51,13 @@ const MyQRsPage: React.FC = () => {
       if (cardElement) {
         cardElement.classList.add("card-delete");
 
-        setTimeout(() => {
-          setQrs((prev) => prev.filter((q) => q.id !== cardId));
+        removeQRRecord(cardId, () => {
           showToast({ message: "Xoá mã QR thành công" });
-        }, 500);
+        });
       } else {
-        setQrs((prev) => prev.filter((q) => q.id !== cardId));
-        showToast({ message: "Xoá mã QR thành công" });
+        removeQRRecord(cardId, () => {
+          showToast({ message: "Xoá mã QR thành công" });
+        });
       }
     } catch (error) {
       console.error(error);
@@ -224,64 +74,26 @@ const MyQRsPage: React.FC = () => {
     setExpandedId(qr.id);
     setSelectedQR(qr);
     setModalVisible(true);
-    setModalImgSrc("");
-
-    if (qr.previewImage?.path) {
-      setModalImgSrc(qr.previewImage?.path);
-    }
-  };
-
-  const handleDownload = async () => {
-    if (!modalImgSrc) return;
-    try {
-      await saveImageToGallery({
-        imageBase64Data: getFullUrl(modalImgSrc),
-      });
-      showToast({ message: "Lưu ảnh thành công" });
-    } catch (error) {
-      console.error("Save image error:", error);
-      showToast({ message: "Lưu ảnh thất bại hoặc bị từ chối quyền" });
-    }
-  };
-
-  const handleShare = async () => {
-    if (!selectedQR?.previewImage?.path) return;
-    try {
-      await openShareSheet({
-        type: "image",
-        data: {
-          imageUrls: [getFullUrl(selectedQR.previewImage?.path)],
-        },
-      });
-    } catch (error) {
-      console.error("Share error:", error);
-      showToast({ message: "Không thể chia sẻ, vui lòng thử lại" });
-    }
-  };
-
-  const handleEdit = () => {
-    if (!selectedQR) return;
-    setModalVisible(false);
-    navigate(`/edit-ui/${selectedQR.id}`);
-  };
-
-  const handleEditInfo = () => {
-    if (!selectedQR) return;
-    setModalVisible(false);
-    navigate(`${createRoute}?id=${selectedQR.id}`);
-  };
-
-  const handleView = () => {
-    if (!selectedQR) return;
-    setModalVisible(false);
-    if (selectedQR.category === EQRCategory.GREETING) {
-      navigate(`/greetings/${selectedQR.id}`);
-    } else {
-      navigate(`/vcards/${selectedQR.id}`);
-    }
   };
 
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
+
+  const {
+    swipeState,
+    setSwipeState,
+    isDragging,
+    handlePtrStart,
+    handlePtrMove,
+    handlePtrEnd,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = usePullToRefresh({
+    onRefresh: fetchQRRecords,
+    isFetching,
+    expandedId,
+    qrs,
+  });
 
   return (
     <Page className="bg-gray-50">
@@ -299,7 +111,7 @@ const MyQRsPage: React.FC = () => {
         >
           <IconRefresh id="ptr-spinner" className="text-gray-400 text-2xl" style={{ opacity: 0 }} />
         </div>
-        {loading ? (
+        {isFetching ? (
           <Box flex justifyContent="center" alignItems="center" p={10}>
             <Spinner />
           </Box>
@@ -392,67 +204,11 @@ const MyQRsPage: React.FC = () => {
         </Button>
       </Box>
 
-      <Modal
-        visible={modalVisible}
-        title={selectedQR ? `${getCategoryLabel(selectedQR.category)}` : "Chi tiết mã QR"}
-        onClose={() => setModalVisible(false)}
-        verticalActions
-      >
-        <Box flex flexDirection="column" alignItems="center" justifyContent="center">
-          <div className="relative w-full aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
-            {modalImgSrc ? (
-              <Image src={modalImgSrc} alt="QR Code" className="w-full h-full object-contain" />
-            ) : (
-              <div className="w-full h-full animate-pulse flex flex-col items-center justify-center gap-4">
-                <IconGridDots size={48} className="text-gray-200" />
-                <div className="w-1/3 h-2 bg-gray-200 rounded-full opacity-50" />
-              </div>
-            )}
-            {selectedQR?.type === "dynamic" && (
-              <div
-                className="absolute right-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl"
-                onClick={handleView}
-              >
-                <IconEye size={20} className="text-gray-800 cursor-pointer" />
-              </div>
-            )}
-            <div
-              className="absolute left-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl"
-              onClick={handleEdit}
-            >
-              <IconPalette size={20} className="text-gray-800 cursor-pointer" />
-            </div>
-          </div>
-          <div className="flex justify-between items-center w-full mt-6 border py-2 px-4 rounded-xl">
-            <div
-              className="flex justify-center items-center gap-2 text-sm"
-              onClick={handleDownload}
-            >
-              <IconDownload size={12} className="text-gray-800" /> Tải xuống
-            </div>
-            <Divider direction="vertical" />
-            <div
-              className="flex justify-center items-center gap-2 text-sm"
-              onClick={handleEditInfo}
-            >
-              <IconEdit size={12} className="text-gray-800" /> Thông tin
-            </div>
-            <Divider direction="vertical" />
-            <div className="flex justify-center items-center gap-2  text-sm" onClick={handleShare}>
-              <IconShare size={12} className="text-gray-800" /> Chia sẻ
-            </div>
-          </div>
-          <Button
-            className="mt-6"
-            size="small"
-            fullWidth
-            onClick={() => setModalVisible(false)}
-            type="neutral"
-          >
-            Đóng
-          </Button>
-        </Box>
-      </Modal>
+      <QRModal
+        selectedQR={selectedQR}
+        modalVisible={modalVisible}
+        onToggle={() => setModalVisible(!modalVisible)}
+      />
 
       <Modal
         visible={!!deleteConfirmQR}

@@ -1,6 +1,6 @@
 import { getPresignedUrl, qrRecordResource } from "@/resources";
 import { EQRCategory, EQRType, QrCode } from "@/types/qr";
-import request, { getFullUrl } from "@/utils/axios";
+import request from "@/utils/axios";
 import { ZALO_APP_LINK } from "@/utils/constants/common";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 import Konva from "konva";
@@ -14,7 +14,6 @@ import {
 import { IQRFormValues } from "@/utils/schemas/qr";
 import QRCodeStyling from "qr-code-styling";
 import { ZALO_APP_DEV_VERSION } from "@/api";
-import { getSystemInfo } from "zmp-sdk/apis";
 import { StageProps } from "react-konva";
 import { CanvasElement, CanvasElementType } from "@/types/editor";
 import { uploadFile } from "@/utils/helpers/image";
@@ -38,8 +37,7 @@ export const getQRPayload = (data: IQRFormValues, id?: string): string => {
 
     case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
-      const { version } = getSystemInfo();
-      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      const finalVersion = ZALO_APP_DEV_VERSION;
       return generateDynamicLink(finalVersion, id!, data.category, undefined);
     }
 
@@ -185,8 +183,7 @@ export const qrService = {
 
       const { id, shortUrl } = qrResponse;
 
-      const { version } = getSystemInfo();
-      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      const finalVersion = ZALO_APP_DEV_VERSION;
 
       const finalUrl = generateDynamicLink(finalVersion, id, data.category, shortUrl);
 

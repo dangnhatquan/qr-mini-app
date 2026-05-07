@@ -3,7 +3,6 @@ import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
 import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
-import { getSystemInfo } from "zmp-sdk/apis";
 import { StageProps } from "react-konva";
 
 function crc16(data: string): string {
@@ -96,8 +95,7 @@ export const generateQRPayload = (qr: QrCode) => {
     }
     case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
-      const { version } = getSystemInfo();
-      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      const finalVersion = ZALO_APP_DEV_VERSION;
       return generateDynamicLink(finalVersion, qr.id, qr.category, undefined);
     }
     default:
@@ -117,6 +115,10 @@ export const generateDynamicLink = (
   if (category === EQRCategory.GREETING) {
     page = "greetings";
   }
+
+  console.log(
+    `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`,
+  );
 
   return `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`;
 };

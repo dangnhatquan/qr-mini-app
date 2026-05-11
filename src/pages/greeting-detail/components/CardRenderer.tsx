@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Stage, Layer, Rect, Group, Image as KonvaImage, Text as KonvaText } from "react-konva";
-import useImage from "use-image";
+import { ImageElement } from "@/components/za-editor/qr-element";
+import { TextElement } from "@/components/za-editor/text-element";
 import { CanvasElement, CanvasElementType } from "@/store";
+import { FC, useEffect, useRef, useState } from "react";
+import { Stage, Layer, Rect, Group } from "react-konva";
 
 interface CardRendererProps {
   elements: CanvasElement[];
@@ -10,12 +11,7 @@ interface CardRendererProps {
   height?: number;
 }
 
-const URLImage = ({ imageProps }: { imageProps: CanvasElement }) => {
-  const [img] = useImage(imageProps.src || "", "anonymous");
-  return <KonvaImage image={img} {...imageProps} />;
-};
-
-export const CardRenderer: React.FC<CardRendererProps> = ({
+export const CardRenderer: FC<CardRendererProps> = ({
   elements,
   canvasBg,
   width = 350,
@@ -43,10 +39,10 @@ export const CardRenderer: React.FC<CardRendererProps> = ({
           <Group>
             {elements.map((el) => {
               if (el.type === CanvasElementType.IMAGE) {
-                return <URLImage key={el.id} imageProps={el} />;
+                return <ImageElement key={el.id} imageProps={el} {...el} />;
               }
-              if (el.type === "text") {
-                return <KonvaText key={el.id} {...el} />;
+              if (el.type === CanvasElementType.TEXT) {
+                return <TextElement key={el.id} textProps={el} {...el} />;
               }
               return null;
             })}

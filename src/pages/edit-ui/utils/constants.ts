@@ -141,3 +141,6 @@ export const ERROR_CORRECTION_LEVELS = [
   { label: "Trung bình", value: "M" },
   { label: "Nhỏ nhất", value: "L" },
 ];
+
+export const DEFAULT_FRAME_WIDTH = 350;
+export const DEFAULT_FRAME_HEIGHT = 450;

@@ -8,9 +8,9 @@ import { QrCode } from "@/store";
 import "./styles.scss";
 
 import { useQRStore } from "@/store";
-import { QRModal } from "../edit-ui/components/QRModal";
 import { usePullToRefresh } from "./hooks/usePullToRefresh";
 import { QRCard } from "./components/QRCard";
+import { QRModal } from "./components/QRModal";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -39,25 +39,25 @@ const MyQRsPage: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (!deleteConfirmQR) return;
-    try {
-      await removeQRRecord(deleteConfirmQR.id);
+    const cardId = deleteConfirmQR.id;
 
-      const cardId = deleteConfirmQR.id;
+    try {
       setDeleteConfirmQR(null);
       setSwipeState({});
-      if (expandedId === cardId) setExpandedId(null);
 
       const cardElement = document.getElementById(`qr-card-wrapper-${cardId}`);
       if (cardElement) {
         cardElement.classList.add("card-delete");
-
-        removeQRRecord(cardId, () => {
+        // Wait for animation duration (0.5s)
+        setTimeout(async () => {
+          await removeQRRecord(cardId);
           showToast({ message: "Xoá mã QR thành công" });
-        });
+          if (expandedId === cardId) setExpandedId(null);
+        }, 500);
       } else {
-        removeQRRecord(cardId, () => {
-          showToast({ message: "Xoá mã QR thành công" });
-        });
+        await removeQRRecord(cardId);
+        showToast({ message: "Xoá mã QR thành công" });
+        if (expandedId === cardId) setExpandedId(null);
       }
     } catch (error) {
       console.error(error);
@@ -65,15 +65,19 @@ const MyQRsPage: React.FC = () => {
     }
   };
 
-  const handleCardClick = async (qr: QrCode, index: number) => {
-    if (expandedId !== qr.id && index !== qrs.length - 1) {
-      setExpandedId(qr.id);
-      return;
-    }
-
-    setExpandedId(qr.id);
-    setSelectedQR(qr);
+  const handleMoreClick = () => {
     setModalVisible(true);
+  };
+
+  const handleCardClick = async (qr: QrCode) => {
+    if (expandedId !== qr.id) {
+      setExpandedId(qr.id);
+      setSelectedQR(qr);
+      return;
+    } else {
+      setExpandedId(null);
+      setSelectedQR(null);
+    }
   };
 
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
@@ -127,9 +131,9 @@ const MyQRsPage: React.FC = () => {
                   zIndex: index,
                   animationDelay: isInitialRender ? `${index * 0.1}s` : "0s",
                   transform:
-                    expandedIndex !== -1 && index > expandedIndex
-                      ? "translate3d(0, 105px, 0)"
-                      : "translate3d(0, 0, 0)",
+                    expandedIndex !== -1 && index !== expandedIndex
+                      ? `translate3d(0, ${index > expandedIndex ? "385px" : "500px"}, 0)`
+                      : `translate3d(0, ${expandedIndex !== -1 ? index * -115 : 0}px, 0)`,
                 }}
               >
                 <div
@@ -147,9 +151,9 @@ const MyQRsPage: React.FC = () => {
                     transition: isDragging ? "none" : "transform 0.3s ease-out",
                     willChange: "transform",
                   }}
-                  onTouchStart={(e) => handleTouchStart(e)}
-                  onTouchMove={(e) => handleTouchMove(e, qr.id, index)}
-                  onTouchEnd={() => handleTouchEnd(qr.id, index)}
+                  onTouchStart={(e) => handleTouchStart(e, qr.id)}
+                  onTouchMove={(e) => handleTouchMove(e, qr.id)}
+                  onTouchEnd={() => handleTouchEnd(qr.id)}
                 >
                   <QRCard
                     id={qr.id}
@@ -166,6 +170,7 @@ const MyQRsPage: React.FC = () => {
                         handleCardClick(qr, index);
                       }
                     }}
+                    onMoreClick={handleMoreClick}
                   />
                 </div>
               </div>

@@ -10,54 +10,66 @@ export interface PullToRefreshOptions {
   qrs: QrCode[];
 }
 
-export const usePullToRefresh = ({
-  onRefresh,
-  isFetching,
-  expandedId,
-  qrs,
-}: PullToRefreshOptions) => {
-  const touchStart = useRef<{ x: number; y: number; val: number } | null>(null);
+export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions) => {
+  const touchStart = useRef<{ x: number; y: number; val: number; currentVal?: number } | null>(
+    null,
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [swipeState, setSwipeState] = useState<{ [id: string]: number }>({});
 
   const ptrStart = useRef<{ y: number; val: number; isPulling: boolean } | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, val: 0 };
+  const handleTouchStart = (e: React.TouchEvent, id: string) => {
+    const initialOffset = swipeState[id] || 0;
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, val: initialOffset };
     setIsDragging(true);
+
+    // Close other swiped cards when starting a new swipe
+    if (Object.keys(swipeState).length > 0 && !swipeState[id]) {
+      setSwipeState({});
+    }
   };
 
-  const handleTouchMove = (e: React.TouchEvent, id: string, index: number) => {
-    if (expandedId !== id && index !== qrs.length - 1) return;
-
+  const handleTouchMove = (e: React.TouchEvent, id: string) => {
     if (!touchStart.current) return;
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
     const diffX = currentX - touchStart.current.x;
     const diffY = currentY - touchStart.current.y;
 
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      const val = diffX < 0 ? Math.max(diffX, -90) : Math.min(diffX, 0);
-      touchStart.current.val = val;
+    // If it's more horizontal than vertical, it's a swipe
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+      // Prevent pull to refresh if we are swiping
+      if (ptrStart.current) {
+        ptrStart.current.isPulling = false;
+      }
+
+      const val = touchStart.current.val + diffX;
+      const cappedVal = Math.max(Math.min(val, 0), -90);
+
+      // Update ref to track the latest value for handleTouchEnd
+      touchStart.current.currentVal = cappedVal;
 
       const el = document.getElementById(`swipe-content-${id}`);
       if (el) {
-        el.style.transform = `translate3d(${val}px, 0, 0)`;
+        el.style.transform = `translate3d(${cappedVal}px, 0, 0)`;
       }
     }
   };
 
-  const handleTouchEnd = (id: string, index: number) => {
+  const handleTouchEnd = (id: string) => {
     setIsDragging(false);
-    if (expandedId !== id && index !== qrs.length - 1) return;
-
     if (!touchStart.current) return;
-    const diffX = touchStart.current.val || 0;
+
+    const finalVal =
+      touchStart.current.currentVal !== undefined
+        ? touchStart.current.currentVal
+        : touchStart.current.val;
 
     const el = document.getElementById(`swipe-content-${id}`);
     if (el) el.style.transform = "";
 
-    if (diffX < -50) {
+    if (finalVal < -45) {
       setSwipeState({ [id]: -90 });
     } else {
       setSwipeState({});

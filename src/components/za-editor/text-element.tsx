@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Konva from "konva";
 import { Text, Transformer } from "react-konva";
-import { CanvasElement } from "../context/KonvaEditorContext";
+import { CanvasElement } from "@/store";
 
 export const TextElement = ({
   textProps,
@@ -10,9 +10,9 @@ export const TextElement = ({
   onChange,
 }: {
   textProps: CanvasElement;
-  isSelected: boolean;
-  onSelect: () => void;
-  onChange: (newProps: CanvasElement) => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  onChange?: (newProps: CanvasElement) => void;
 }) => {
   const shapeRef = useRef<Konva.Text | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
@@ -33,7 +33,7 @@ export const TextElement = ({
         onTap={onSelect}
         draggable
         onDragEnd={(e) => {
-          onChange({
+          onChange?.({
             ...textProps,
             x: e.target.x(),
             y: e.target.y(),
@@ -41,9 +41,10 @@ export const TextElement = ({
         }}
         onTransformEnd={() => {
           const node = shapeRef.current;
+          if (!node) return;
           const scaleX = node.scaleX();
           node.scaleX(1);
-          onChange({
+          onChange?.({
             ...textProps,
             x: node.x(),
             y: node.y(),

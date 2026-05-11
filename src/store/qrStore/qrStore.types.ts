@@ -1,3 +1,8 @@
+import { IQRFormValues } from "@/utils/schemas/qr";
+import { Options } from "qr-code-styling";
+import { StageProps } from "react-konva";
+import { CanvasElement } from "../editorStore";
+
 export enum EQRType {
   STATIC = "static",
   DYNAMIC = "dynamic",
@@ -82,8 +87,11 @@ export interface PreviewImage {
 }
 
 export interface EditorStage {
+  canvasBg: string;
   dots: string;
   color: string;
+  qrOptions: Options;
+  elements: CanvasElement[];
 }
 
 export interface QRStore {
@@ -99,4 +107,12 @@ export interface QRStore {
   fetchQRRecords: () => Promise<void>;
   fetchQRDetail: (id: string) => Promise<void>;
   removeQRRecord: (id: string, callback?: () => void) => Promise<void>;
+
+  updateQRRecord: (
+    id: string,
+    data: IQRFormValues,
+    blob?: Blob,
+    editorStage?: StageProps,
+    callback?: () => void,
+  ) => Promise<void>;
 }

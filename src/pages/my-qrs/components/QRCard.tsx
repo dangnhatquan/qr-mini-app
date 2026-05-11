@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, Text } from "zmp-ui";
 import { IconGridDots } from "@tabler/icons-react";
-import { Image } from "@/components/image";
 import { EQRCategory } from "@/store";
 import { getCategoryLabel } from "@/utils/helpers/qr";
 import { getFullUrl } from "@/utils/axios";
@@ -20,6 +19,7 @@ interface QRCardProps {
     eventName?: string;
   };
   onClick: () => void;
+  onMoreClick: () => void;
 }
 
 export const QRCard: React.FC<QRCardProps> = ({
@@ -30,8 +30,12 @@ export const QRCard: React.FC<QRCardProps> = ({
   vcardData,
   greetingData,
   onClick,
+  onMoreClick,
 }) => {
-  console.log("previewUrl", previewUrl);
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onMoreClick?.();
+  };
 
   if (category === EQRCategory.GREETING) {
     return (
@@ -68,6 +72,26 @@ export const QRCard: React.FC<QRCardProps> = ({
             <Text className="font-bold text-lg uppercase tracking-tight text-white/90">
               {greetingData?.eventName || "Chưa đặt tên"}
             </Text>
+          </div>
+        </div>
+        <div className="flex justify-between items-end relative z-10 mt-6">
+          <div>
+            <Text className="text-white/70 text-xs font-medium uppercase tracking-wider mb-0.5">
+              Ngày tạo
+            </Text>
+            <Text className="font-semibold text-white text-sm">
+              {new Date(createdAt).toLocaleDateString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+            </Text>
+          </div>
+
+          <div className="flex space-x-1" onClick={handleMoreClick}>
+            <div className="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
           </div>
         </div>
       </Box>
@@ -111,6 +135,26 @@ export const QRCard: React.FC<QRCardProps> = ({
             </Text>
           </div>
         </div>
+        <div className="flex justify-between items-end relative z-10 mt-6">
+          <div>
+            <Text className="text-white/70 text-xs font-medium uppercase tracking-wider mb-0.5">
+              Ngày tạo
+            </Text>
+            <Text className="font-semibold text-white text-sm">
+              {new Date(createdAt).toLocaleDateString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+            </Text>
+          </div>
+
+          <div className="flex space-x-1" onClick={handleMoreClick}>
+            <div className="w-1.5 h-1.5 rounded-full bg-white/50"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+          </div>
+        </div>
       </Box>
     );
   }
@@ -118,7 +162,7 @@ export const QRCard: React.FC<QRCardProps> = ({
   return (
     <Box
       className={`rounded-2xl shadow-xl p-5 w-full flex flex-col justify-between relative overflow-hidden cursor-pointer text-white ${
-        type === "static"
+        category === EQRCategory.WIFI
           ? "bg-gradient-to-br from-blue-500 to-blue-700"
           : "bg-gradient-to-br from-indigo-500 to-purple-700"
       }`}
@@ -167,7 +211,7 @@ export const QRCard: React.FC<QRCardProps> = ({
           </Text>
         </div>
 
-        <div className="flex space-x-1">
+        <div className="flex space-x-1" onClick={handleMoreClick}>
           <div className="w-1.5 h-1.5 rounded-full bg-white/50"></div>
           <div className="w-1.5 h-1.5 rounded-full bg-white/70"></div>
           <div className="w-1.5 h-1.5 rounded-full bg-white"></div>

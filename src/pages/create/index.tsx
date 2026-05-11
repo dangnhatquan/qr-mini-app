@@ -183,7 +183,7 @@ const CreatePage: React.FC = () => {
         });
       }
 
-      setTimeout(() => navigate(myQrsRoute), 1500);
+      setTimeout(() => navigate(myQrsRoute), 0);
     } catch (error) {
       console.error("Failed to save QR:", error);
       openSnackbar({

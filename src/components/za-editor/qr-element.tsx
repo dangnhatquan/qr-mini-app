@@ -4,16 +4,16 @@ import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
 import { CanvasElement } from "@/store";
 
-export const URLImage = ({
+export const ImageElement = ({
   imageProps,
   isSelected,
   onSelect,
   onChange,
 }: {
   imageProps: CanvasElement;
-  isSelected: boolean;
-  onSelect: () => void;
-  onChange: (newProps: CanvasElement) => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  onChange?: (newProps: CanvasElement) => void;
 }) => {
   const displaySrc = imageProps.src;
   const [img] = useImage(displaySrc || "", "anonymous");
@@ -37,7 +37,7 @@ export const URLImage = ({
         onTap={onSelect}
         draggable
         onDragEnd={(e) => {
-          onChange({
+          onChange?.({
             ...imageProps,
             x: e.target.x(),
             y: e.target.y(),
@@ -50,7 +50,7 @@ export const URLImage = ({
             const scaleY = node.scaleY();
             node.scaleX(1);
             node.scaleY(1);
-            onChange({
+            onChange?.({
               ...imageProps,
               x: node.x(),
               y: node.y(),

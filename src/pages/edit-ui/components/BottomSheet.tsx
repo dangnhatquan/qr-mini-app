@@ -1,19 +1,17 @@
-import React from "react";
 import { Box, Tabs } from "zmp-ui";
-import { StickerTab } from "./StickerTab";
-import { LayoutTab } from "./LayoutTab";
-import { StylingTab } from "./StylingTab";
-import { TextTab } from "./TextTab";
 import { COLLAPSED_Y, SHEET_HEIGHT } from "../utils/constants";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
-import { IconQrcode, IconSticker, IconTexture, IconTypography } from "@tabler/icons-react";
+import { ICustomTab } from "@/components/za-editor/types/editor.types";
+import React, { MutableRefObject } from "react";
 
 export interface IBottomSheetProps {
   isDragging: boolean;
   setIsDragging: (isDragging: boolean) => void;
   translateY: number;
-  dragStartYRef: React.MutableRefObject<number>;
-  currentTranslateYRef: React.MutableRefObject<number>;
+  dragStartYRef: MutableRefObject<number>;
+  currentTranslateYRef: MutableRefObject<number>;
+
+  customTabs?: ICustomTab[];
 }
 
 export const BottomSheet = ({
@@ -22,6 +20,8 @@ export const BottomSheet = ({
   translateY,
   dragStartYRef,
   currentTranslateYRef,
+
+  customTabs,
 }: IBottomSheetProps) => {
   const { setTranslateY, isCollapsed, setIsCollapsed } = useKonvaEditor();
 
@@ -68,54 +68,14 @@ export const BottomSheet = ({
       <Box
         className={`flex-1 flex flex-col transition-opacity duration-300 ${translateY > COLLAPSED_Y - 100 ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       >
-        <Tabs id="editor-tabs" className="flex-1 overflow-hidden">
-          <Tabs.Tab
-            key="qr"
-            label={
-              <div className="flex items-center justify-center gap-2">
-                <IconQrcode className="w-5 h-5" />
-                Thiết kế QR
-              </div>
-            }
-          >
-            <StylingTab />
-          </Tabs.Tab>
-
-          <Tabs.Tab
-            key="layout"
-            label={
-              <div className="flex items-center justify-center gap-2">
-                <IconTexture className="w-5 h-5" />
-                Bố cục
-              </div>
-            }
-          >
-            <LayoutTab />
-          </Tabs.Tab>
-
-          <Tabs.Tab
-            key="text"
-            label={
-              <div className="flex items-center justify-center gap-2">
-                <IconTypography className="w-5 h-5" />
-                Chữ
-              </div>
-            }
-          >
-            <TextTab />
-          </Tabs.Tab>
-
-          <Tabs.Tab
-            key="stickers"
-            label={
-              <div className="flex items-center justify-center gap-2">
-                <IconSticker className="w-5 h-5" />
-                Stickers
-              </div>
-            }
-          >
-            <StickerTab />
-          </Tabs.Tab>
+        <Tabs id="editor-tabs" scrollable className="flex-1 overflow-hidden">
+          {customTabs?.map((tab) => {
+            return (
+              <Tabs.Tab key={tab.key} label={tab.label}>
+                {tab.content}
+              </Tabs.Tab>
+            );
+          })}
         </Tabs>
       </Box>
     </Box>

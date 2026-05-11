@@ -22,6 +22,13 @@ export interface CanvasElement {
   align?: string;
 }
 
+export interface EditorOutputs {
+  qrOptions: Options;
+  elements: CanvasElement[];
+  canvasBg: string;
+  blob: Blob;
+}
+
 export interface KonvaEditorStore {
   stageRef: React.MutableRefObject<Konva.Stage | null>;
   mainGroupRef: React.MutableRefObject<Konva.Group | null>;

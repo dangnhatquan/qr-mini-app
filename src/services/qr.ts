@@ -1,7 +1,6 @@
 import { getPresignedUrl, qrRecordResource } from "@/resources";
 import request from "@/utils/axios";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
-import Konva from "konva";
 import {
   buildQRCreatePayload,
   cleanUpBase64,
@@ -29,7 +28,14 @@ export const qrService = {
         wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
         bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
         vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
-        greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
+        greetingData:
+          data.category === EQRCategory.GREETING
+            ? {
+                ...data.greetingData,
+                isPasswordProtected: !!data.greetingData?.password,
+                hasPassword: !!data.greetingData?.password,
+              }
+            : undefined,
       };
 
       const qrResponse = await request.post<{
@@ -94,14 +100,21 @@ export const qrService = {
       headers: { "Content-Type": "image/webp" },
     });
 
-    const payload: any = {
+    const payload: Record<string, unknown> = {
       qrType: data.qrType,
       category: data.category,
       previewImageId: file.id,
       wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
       bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
       vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
-      greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
+      greetingData:
+        data.category === EQRCategory.GREETING
+          ? {
+              ...data.greetingData,
+              isPasswordProtected: !!data.greetingData?.password,
+              hasPassword: !!data.greetingData?.password,
+            }
+          : undefined,
     };
 
     if (editorStage) {

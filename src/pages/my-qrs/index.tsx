@@ -67,7 +67,8 @@ const MyQRsPage: React.FC = () => {
     }
   };
 
-  const handleMoreClick = () => {
+  const handleMoreClick = (qr: QrCode) => {
+    setSelectedQR(qr);
     setModalVisible(true);
   };
 
@@ -191,7 +192,7 @@ const MyQRsPage: React.FC = () => {
                         handleCardClick(qr);
                       }
                     }}
-                    onMoreClick={handleMoreClick}
+                    onMoreClick={() => handleMoreClick(qr)}
                   />
                 </div>
               </div>

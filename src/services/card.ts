@@ -25,7 +25,9 @@ export const cardService = {
     return await request.delete(`${cardsResource}/${id}`);
   },
 
-  async getCard(id: string): Promise<Card> {
-    return await request.get<Card>(`${cardsResource}/${id}`);
+  async getCard(id: string, password?: string): Promise<Card> {
+    return await request.post<Card>(`${cardsResource}/${id}`, {
+      password,
+    });
   },
 };

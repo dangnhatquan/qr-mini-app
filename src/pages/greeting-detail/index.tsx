@@ -13,18 +13,28 @@ const GreetingDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
   const [password, setPassword] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
-
   const { selectedQR, isFetchingSelectedQR, fetchQRDetail } = useQRStore();
-  const { card, isFetching, fetchCard } = useCardStore();
+  const { card, isFetching, fetchCard, error: cardError } = useCardStore();
 
+  const isAuthorized = !!(card && card.editorStage);
   const isLoading = isFetching || isFetchingSelectedQR;
 
   useEffect(() => {
-    fetchQRDetail(id as string);
-  }, [id]);
+    if (id) {
+      fetchQRDetail(id);
+    }
+  }, [id, fetchQRDetail]);
+
+  useEffect(() => {
+    const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
+    if (greetingData?.cardId && !card && !cardError && !isFetching) {
+      fetchCard(greetingData.cardId).catch(() => {
+        // Expected if password protected
+      });
+    }
+  }, [selectedQR, card, cardError, isFetching, fetchCard]);
 
   const handleDownload = async () => {
     if (!card) return;
@@ -40,22 +50,15 @@ const GreetingDetailPage: React.FC = () => {
   };
 
   const handleAuthorize = async () => {
-    if (!selectedQR) return;
-    const greetingData = selectedQR.payload?.greetingData as GreetingQRData;
+    const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
+    if (!greetingData?.cardId) return;
 
-    if (password === greetingData.password) {
-      setIsAuthorized(true);
-      if (greetingData.cardId) {
-        try {
-          fetchCard(greetingData.cardId);
-        } catch (e) {
-          console.error("Failed to fetch card content:", e);
-        }
-      }
-    } else {
+    try {
+      await fetchCard(greetingData.cardId, password);
+    } catch (error: unknown) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
-      const max = greetingData.maxAttempts || 5;
+      const max = 5; // Default max attempts
 
       if (newAttempts >= max) {
         setIsLocked(true);

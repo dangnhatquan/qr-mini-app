@@ -83,8 +83,7 @@ export const QRCard: React.FC<QRCardProps> = ({ qr, onClick, onMoreClick }) => {
           </div>
         </Box>
 
-        {/* QR Preview with glass container */}
-        <div className="w-20 h-20 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden flex-shrink-0 border border-white/50 flex items-center justify-center p-2">
+        <div className="w-20 h-20 bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden flex-shrink-0 border border-white/50 flex items-center justify-center p-2">
           <QRDisplay data={qrText} size={80} />
         </div>
       </div>

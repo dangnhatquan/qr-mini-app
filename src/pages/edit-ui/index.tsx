@@ -1,5 +1,11 @@
 import React, { FC, useEffect } from "react";
-import { IconQrcode, IconSticker, IconTexture, IconTypography } from "@tabler/icons-react";
+import {
+  IconPhoto,
+  IconQrcode,
+  IconSticker,
+  IconTexture,
+  IconTypography,
+} from "@tabler/icons-react";
 import { StylingTab } from "./components/StylingTab";
 import { LayoutTab } from "./components/LayoutTab";
 import { TextTab } from "./components/TextTab";
@@ -37,7 +43,7 @@ const EditUIPage: FC = () => {
       key: "template",
       label: (
         <div className="flex items-center justify-center gap-2">
-          <IconQrcode className="w-5 h-5" />
+          <IconPhoto className="w-5 h-5" />
           Template
         </div>
       ),

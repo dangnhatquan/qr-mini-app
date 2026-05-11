@@ -24,7 +24,6 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, val: initialOffset };
     setIsDragging(true);
 
-    // Close other swiped cards when starting a new swipe
     if (Object.keys(swipeState).length > 0 && !swipeState[id]) {
       setSwipeState({});
     }
@@ -37,9 +36,7 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
     const diffX = currentX - touchStart.current.x;
     const diffY = currentY - touchStart.current.y;
 
-    // If it's more horizontal than vertical, it's a swipe
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
-      // Prevent pull to refresh if we are swiping
       if (ptrStart.current) {
         ptrStart.current.isPulling = false;
       }
@@ -47,7 +44,6 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
       const val = touchStart.current.val + diffX;
       const cappedVal = Math.max(Math.min(val, 0), -90);
 
-      // Update ref to track the latest value for handleTouchEnd
       touchStart.current.currentVal = cappedVal;
 
       const el = document.getElementById(`swipe-content-${id}`);
@@ -80,18 +76,35 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
   const handlePtrStart = (e: React.TouchEvent) => {
     const pageContent = document.querySelector(".zaui-page-content") || document.documentElement;
     if (pageContent.scrollTop <= 0) {
-      ptrStart.current = { y: e.touches[0].clientY, val: 0, isPulling: false };
+      ptrStart.current = {
+        y: e.touches[0].clientY,
+        val: 0,
+        isPulling: false,
+        startX: e.touches[0].clientX,
+        startY: e.touches[0].clientY,
+        isCancelled: false,
+      } as any;
     }
   };
 
   const handlePtrMove = (e: React.TouchEvent) => {
-    if (!ptrStart.current || isFetching) return;
+    if (!ptrStart.current || isFetching || (ptrStart.current as any).isCancelled) return;
+
+    const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
-    const diffY = currentY - ptrStart.current.y;
+    const diffX = currentX - (ptrStart.current as any).startX;
+    const diffY = currentY - (ptrStart.current as any).startY;
+
+    if (!ptrStart.current.isPulling && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 5) {
+      (ptrStart.current as any).isCancelled = true;
+      return;
+    }
+
+    if (!ptrStart.current.isPulling && diffY < 10) return;
 
     if (diffY > 0) {
       ptrStart.current.isPulling = true;
-      let val = diffY * 0.4;
+      let val = (diffY - 10) * 0.4;
       if (val > 80) val = 80;
       ptrStart.current.val = val;
 

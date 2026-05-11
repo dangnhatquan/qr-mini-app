@@ -1,7 +1,7 @@
 import { qrService } from "@/services/qr";
-import { QrCode, QRStore } from "@/store";
+import { QrCode, QRStore, EditorStage } from "@/store";
 import { IQRFormValues } from "@/utils/schemas/qr";
-import { StageProps } from "react-konva";
+
 import { create } from "zustand";
 
 export const useQRStore = create<QRStore>((set) => ({
@@ -49,12 +49,18 @@ export const useQRStore = create<QRStore>((set) => ({
     id: string,
     data: IQRFormValues,
     blob?: Blob,
-    editorStage?: StageProps,
+    editorStage?: EditorStage,
     callback?: () => void,
   ) => {
     await qrService.updateQR(id, data, blob, editorStage);
     set((state) => ({
-      qrCodeRecords: state.qrCodeRecords.map((qr) => (qr.id === id ? qr : qr)),
+      qrCodeRecords: state.qrCodeRecords.map((qr) =>
+        qr.id === id ? { ...qr, editorStage: editorStage || qr.editorStage } : qr,
+      ),
+      selectedQR:
+        state.selectedQR?.id === id
+          ? { ...state.selectedQR, editorStage: editorStage || state.selectedQR.editorStage }
+          : state.selectedQR,
     }));
     callback?.();
   },

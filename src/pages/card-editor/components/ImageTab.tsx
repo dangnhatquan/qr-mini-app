@@ -11,7 +11,7 @@ export const ImageTab = () => {
   const { elements, setElements, setSelectedId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
-  const handleAddImage = async (url: string, width = 100, height = 100) => {
+  const handleAddImage = async (url: string, fileId: string, width = 100, height = 100) => {
     const id = `image-${Date.now()}`;
     const ratio = width / height;
 
@@ -19,6 +19,7 @@ export const ImageTab = () => {
       id,
       type: CanvasElementType.IMAGE,
       src: url,
+      fileId,
       x: 0,
       y: 0,
       width: 100,
@@ -43,7 +44,7 @@ export const ImageTab = () => {
             const file = await uploadFile(blob);
             const url = getFullUrl(file.path);
             const { width, height } = await getImageDimensions(blob);
-            handleAddImage(url, width, height);
+            handleAddImage(url, file.id, width, height);
             showToast({ message: "Đã thêm hình ảnh" });
           } catch {
             showToast({ message: "Lỗi tải hình ảnh" });

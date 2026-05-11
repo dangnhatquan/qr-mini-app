@@ -43,7 +43,24 @@ export const SECTION = {
   STYLE: "style",
   LAYOUT: "layout",
   BACKGROUND: "background",
+  SIZE: "size",
 };
+
+export const FRAME_RATIOS = [
+  { label: "1:1", width: 400, height: 400 },
+  { label: "3:4", width: 337.5, height: 450 },
+  { label: "4:3", width: 450, height: 337.5 },
+  { label: "9:16", width: 253, height: 450 },
+  { label: "16:9", width: 450, height: 253 },
+  { label: "2:3", width: 300, height: 450 },
+  { label: "3:2", width: 450, height: 300 },
+  { label: "4:5", width: 360, height: 450 },
+  { label: "5:4", width: 450, height: 360 },
+  { label: "5:7", width: 321, height: 450 },
+  { label: "7:5", width: 450, height: 321 },
+  { label: "3:5", width: 270, height: 450 },
+  { label: "5:3", width: 450, height: 270 },
+];
 
 export const STYLE_SECTION = {
   DOTS: "dots",

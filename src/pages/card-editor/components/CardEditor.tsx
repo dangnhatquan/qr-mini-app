@@ -16,7 +16,10 @@ export const CardEditor = ({ customTabs, onSave, card }: ICardEditorProps) => {
       customTabs={customTabs}
       onSave={onSave}
       canvasBg={card?.editorStage?.canvasBg || DEFAULT_EDITOR_STAGE.canvasBg}
+      canvasBgFileId={card?.editorStage?.canvasBgFileId}
       elements={card?.editorStage?.elements || []}
+      stageSize={card?.editorStage?.stageSize}
+      logoFileId={card?.editorStage?.logoFileId}
     />
   );
 };

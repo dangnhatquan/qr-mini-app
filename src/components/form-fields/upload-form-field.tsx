@@ -1,5 +1,5 @@
 import { getFullUrl } from "@/utils/axios";
-import { uploadFile } from "@/utils/helpers/image";
+import { uploadFile, deleteFile } from "@/utils/helpers/image";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { get } from "radash";
 import { useState } from "react";
@@ -39,7 +39,13 @@ export const UploadFormField = ({
         const blob = await response.blob();
         const file = await uploadFile(blob);
 
-        setValue(name, file.path);
+        const currentFileId = get(control._formValues, `${name}FileId`) as string | null;
+        if (currentFileId) {
+          await deleteFile(currentFileId);
+        }
+
+        setValue(name, file.path as any);
+        setValue(`${name}FileId` as any, file.id as any);
         showToast({ message: "Đã thêm Avatar" });
       }
     } catch (_err) {
@@ -64,7 +70,13 @@ export const UploadFormField = ({
         const blob = await response.blob();
         const file = await uploadFile(blob);
 
-        setValue(name, file.path);
+        const currentFileId = get(control._formValues, `${name}FileId`) as string | null;
+        if (currentFileId) {
+          await deleteFile(currentFileId);
+        }
+
+        setValue(name, file.path as any);
+        setValue(`${name}FileId` as any, file.id as any);
         showToast({ message: "Đã thêm Avatar" });
       }
     } catch (_err) {

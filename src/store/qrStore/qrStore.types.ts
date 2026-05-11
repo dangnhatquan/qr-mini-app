@@ -1,7 +1,5 @@
 import { IQRFormValues } from "@/utils/schemas/qr";
-import { Options } from "qr-code-styling";
-import { StageProps } from "react-konva";
-import { CanvasElement } from "../editorStore";
+import { EditorStage } from "../editorStore";
 
 export enum EQRType {
   STATIC = "static",
@@ -86,13 +84,7 @@ export interface PreviewImage {
   deletedAt: string | null;
 }
 
-export interface EditorStage {
-  canvasBg: string;
-  dots: string;
-  color: string;
-  qrOptions: Options;
-  elements: CanvasElement[];
-}
+// Using EditorStage from editorStore.types.ts
 
 export interface QRStore {
   qrCodeRecords: QrCode[];
@@ -112,7 +104,7 @@ export interface QRStore {
     id: string,
     data: IQRFormValues,
     blob?: Blob,
-    editorStage?: StageProps,
+    editorStage?: EditorStage,
     callback?: () => void,
   ) => Promise<void>;
 }

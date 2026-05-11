@@ -18,8 +18,11 @@ export interface IZaEditorProps {
   customTabs?: ICustomTab[];
 
   canvasBg?: string;
-  qrOptions?: Options;
+  canvasBgFileId?: string | null;
+  qrOptions?: Partial<Options>;
   elements?: CanvasElement[];
+  stageSize?: { width: number; height: number };
+  logoFileId?: string | null;
 }
 
 export const ZaEditor: FC<IZaEditorProps> = ({
@@ -29,14 +32,20 @@ export const ZaEditor: FC<IZaEditorProps> = ({
   customTabs,
   onSave,
   canvasBg,
+  canvasBgFileId,
   qrOptions,
   elements,
+  stageSize,
+  logoFileId,
 }) => {
   return (
     <KonvaEditorProvider
       initialCanvasBg={canvasBg}
+      initialCanvasBgFileId={canvasBgFileId}
       initialQrOptions={qrOptions}
       initialElements={elements}
+      initialStageSize={stageSize}
+      initialLogoFileId={logoFileId}
     >
       <CanvasEditor
         onSave={onSave}

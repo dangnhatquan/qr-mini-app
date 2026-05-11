@@ -59,4 +59,5 @@ export const DEFAULT_EDITOR_STAGE = {
     },
   ],
   canvasBg: COLOR.WHITE.color,
+  stageSize: { width: 350, height: 450 },
 };

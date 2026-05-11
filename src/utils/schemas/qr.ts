@@ -24,6 +24,7 @@ export const vcardSchema = z.object({
   website: z.string().url("Website không hợp lệ").optional().or(z.literal("")),
   socialLinks: z.string().optional(),
   avatar: z.string().optional(),
+  avatarFileId: z.string().optional(),
 });
 
 export const greetingCardSchema = z.object({

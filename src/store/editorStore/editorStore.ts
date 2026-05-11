@@ -7,10 +7,10 @@ export const useEditorStore = create<KonvaEditorStore>((set) => {
   const createSetter =
     <T>(key: keyof KonvaEditorStore) =>
     (valueOrUpdater: React.SetStateAction<T>) =>
-      set((state: any) => ({
+      set((state: KonvaEditorStore) => ({
         [key]:
           typeof valueOrUpdater === "function"
-            ? (valueOrUpdater as (prev: any) => T)(state[key])
+            ? (valueOrUpdater as (prev: T) => T)(state[key] as T)
             : valueOrUpdater,
       }));
 
@@ -36,7 +36,13 @@ export const useEditorStore = create<KonvaEditorStore>((set) => {
     canvasBg: "",
     setCanvasBg: createSetter("canvasBg"),
 
-    stageSize: { width: 400, height: 600 },
+    canvasBgFileId: null,
+    setCanvasBgFileId: createSetter("canvasBgFileId"),
+
+    logoFileId: null,
+    setLogoFileId: createSetter("logoFileId"),
+
+    stageSize: { width: 350, height: 450 },
     setStageSize: createSetter("stageSize"),
 
     stageScale: 1,

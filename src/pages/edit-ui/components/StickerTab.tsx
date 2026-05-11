@@ -11,7 +11,7 @@ export const StickerTab = () => {
   const { elements, setElements, setSelectedId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
-  const handleAddSticker = async (url: string, width = 100, height = 100) => {
+  const handleAddSticker = async (url: string, fileId?: string, width = 100, height = 100) => {
     // eslint-disable-next-line react-hooks/purity
     const id = `sticker-${Date.now()}`;
 
@@ -23,6 +23,7 @@ export const StickerTab = () => {
         id,
         type: "image",
         src: url,
+        fileId,
         x: 0,
         y: 0,
         width: 100,
@@ -46,7 +47,7 @@ export const StickerTab = () => {
             const file = await uploadFile(blob);
             const url = getFullUrl(file.path);
             const { width, height } = await getImageDimensions(blob);
-            handleAddSticker(url, width, height);
+            handleAddSticker(url, file.id, width, height);
             showToast({ message: "Đã thêm Sticker" });
           } catch (err) {
             console.error("Upload sticker error:", err);

@@ -24,7 +24,7 @@ export const ZaToolbar: FC<IZaToolbarProps> = ({ customTabs }) => {
           {customTabs?.map((tab) => {
             return (
               <Tabs.Tab key={tab.key} label={tab.label}>
-                {tab.content}
+                <div style={{ height: SHEET_HEIGHT - 44, overflowY: "auto" }}>{tab.content}</div>
               </Tabs.Tab>
             );
           })}

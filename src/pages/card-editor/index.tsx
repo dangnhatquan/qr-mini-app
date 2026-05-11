@@ -3,7 +3,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { showToast } from "zmp-sdk/apis";
 import { setString } from "@/utils/storage";
 import { CardEditor } from "./components/CardEditor";
-import { IconPolaroid, IconSticker, IconTexture, IconTypography } from "@tabler/icons-react";
+import {
+  IconAspectRatio,
+  IconPolaroid,
+  IconSticker,
+  IconTexture,
+  IconTypography,
+} from "@tabler/icons-react";
 import { EditorOutputs, useCardStore } from "@/store";
 import { cardService } from "@/services/card";
 import { uploadFile } from "@/utils/helpers/image";
@@ -12,6 +18,7 @@ import { Page, Spinner } from "zmp-ui";
 import { LayoutTab } from "../edit-ui/components/LayoutTab";
 import { TextTab } from "../edit-ui/components/TextTab";
 import { ImageTab } from "./components/ImageTab";
+import { SizeTab } from "../edit-ui/components/SizeTab";
 
 const CardEditorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -59,11 +66,21 @@ const CardEditorPage: React.FC = () => {
       ),
       content: <StickerTab />,
     },
+    {
+      key: "size",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconAspectRatio className="w-5 h-5" />
+          Kích thước
+        </div>
+      ),
+      content: <SizeTab />,
+    },
   ];
 
   const handleSave = async (outputs: EditorOutputs) => {
-    const { elements, canvasBg, blob } = outputs;
-    const editorStage = { elements, canvasBg };
+    const { elements, canvasBg, logoFileId, canvasBgFileId, blob, stageSize } = outputs;
+    const editorStage = { elements, canvasBg, logoFileId, canvasBgFileId, stageSize };
 
     try {
       if (!blob) throw new Error("No blob provided");

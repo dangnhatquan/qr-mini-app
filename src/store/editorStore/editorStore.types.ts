@@ -16,16 +16,25 @@ export interface CanvasElement {
   height?: number;
   rotation?: number;
   src?: string;
+  fileId?: string;
   text?: string;
   fontSize?: number;
   fill?: string;
   align?: string;
 }
 
-export interface EditorOutputs {
-  qrOptions: Options;
+export interface EditorStage {
+  qrOptions?: Partial<Options>;
   elements: CanvasElement[];
   canvasBg: string;
+  canvasBgFileId?: string | null;
+  logoFileId?: string | null;
+  stageSize?: { width: number; height: number };
+  dots?: string;
+  color?: string;
+}
+
+export interface EditorOutputs extends EditorStage {
   blob: Blob;
 }
 
@@ -33,8 +42,8 @@ export interface KonvaEditorStore {
   stageRef: React.MutableRefObject<Konva.Stage | null>;
   mainGroupRef: React.MutableRefObject<Konva.Group | null>;
 
-  qrOptions: Options;
-  setQrOptions: React.Dispatch<React.SetStateAction<Options>>;
+  qrOptions: Partial<Options>;
+  setQrOptions: React.Dispatch<React.SetStateAction<Partial<Options>>>;
   qrImageSrc: string;
   setQrImageSrc: React.Dispatch<React.SetStateAction<string>>;
   isRendering: boolean;
@@ -46,6 +55,10 @@ export interface KonvaEditorStore {
   setSelectedId: React.Dispatch<React.SetStateAction<string | null>>;
   canvasBg: string;
   setCanvasBg: React.Dispatch<React.SetStateAction<string>>;
+  canvasBgFileId: string | null;
+  setCanvasBgFileId: React.Dispatch<React.SetStateAction<string | null>>;
+  logoFileId: string | null;
+  setLogoFileId: React.Dispatch<React.SetStateAction<string | null>>;
   stageSize: { width: number; height: number };
   setStageSize: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>;
   stageScale: number;
@@ -62,8 +75,8 @@ export interface KonvaEditorStore {
   isDragging: boolean;
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
 
-  initialOptions: Options | null;
-  setInitialOptions: React.Dispatch<React.SetStateAction<Options | null>>;
+  initialOptions: Partial<Options> | null;
+  setInitialOptions: React.Dispatch<React.SetStateAction<Partial<Options> | null>>;
   initialElements: CanvasElement[] | null;
   setInitialElements: React.Dispatch<React.SetStateAction<CanvasElement[] | null>>;
   initialCanvasBg: string;

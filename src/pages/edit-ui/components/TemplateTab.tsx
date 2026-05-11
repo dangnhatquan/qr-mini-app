@@ -3,7 +3,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
-import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
+import { getImageDimensions, uploadFile, deleteFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
 import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH } from "../utils/constants";
 
@@ -11,8 +11,17 @@ export const TemplateTab = () => {
   const { elements, setElements, setSelectedId, stageSize } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
-  const handleAddTemplate = (url: string) => {
+  const handleAddTemplate = async (url: string, fileId?: string) => {
     const id = `template-${Date.now()}`;
+
+    const oldTemplates = elements.filter((el) => el.id.startsWith("template-"));
+    for (const old of oldTemplates) {
+      if (old.fileId) {
+        await deleteFile(old.fileId);
+      }
+    }
+
+    const filteredElements = elements.filter((el) => !el.id.startsWith("template-"));
 
     // Add as background (prepend to elements)
     setElements([
@@ -20,13 +29,14 @@ export const TemplateTab = () => {
         id,
         type: "image",
         src: url,
+        fileId,
         x: 0,
         y: 0,
         width: stageSize.width ?? DEFAULT_FRAME_WIDTH,
         height: stageSize.height ?? DEFAULT_FRAME_HEIGHT,
         rotation: 0,
       },
-      ...elements,
+      ...filteredElements,
     ]);
     setSelectedId(id);
   };
@@ -43,8 +53,7 @@ export const TemplateTab = () => {
             const blob = await response.blob();
             const file = await uploadFile(blob);
             const url = getFullUrl(file.path);
-            const { width, height } = await getImageDimensions(blob);
-            handleAddTemplate(url);
+            handleAddTemplate(url, file.id);
             showToast({ message: "Đã thêm Template" });
           } catch (err) {
             console.error("Upload template error:", err);
@@ -79,6 +88,30 @@ export const TemplateTab = () => {
             </>
           )}
         </Box>
+
+        {elements.some((el) => el.id.startsWith("template-")) && (
+          <Box
+            className="w-full aspect-[35/45] flex flex-col justify-center items-center border-2 border-red-100 rounded-xl bg-red-50 hover:bg-red-100 transition-colors cursor-pointer group"
+            onClick={async () => {
+              const oldTemplates = elements.filter((el) => el.id.startsWith("template-"));
+              for (const old of oldTemplates) {
+                if (old.fileId) {
+                  await deleteFile(old.fileId);
+                }
+              }
+              setElements(elements.filter((el) => !el.id.startsWith("template-")));
+              setSelectedId(null);
+              showToast({ message: "Đã xoá Template" });
+            }}
+          >
+            <div className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 group-hover:bg-red-200 mb-2 transition-colors">
+              <IconPlus className="text-red-500 rotate-45" size={24} />
+            </div>
+            <span className="text-[10px] text-red-500 font-medium text-center px-2">
+              Xoá Template
+            </span>
+          </Box>
+        )}
       </div>
     </Box>
   );

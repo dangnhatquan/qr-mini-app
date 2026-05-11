@@ -1,5 +1,5 @@
 import request, { getFullUrl } from "../axios";
-import { getPresignedUrl } from "@/resources";
+import { getPresignedUrl, filesResource } from "@/resources";
 
 export const resizeImage = (
   base64: string,
@@ -94,4 +94,18 @@ export const getImageDimensions = (blob: Blob) => {
     img.onload = () => resolve({ width: img.width, height: img.height });
     img.onerror = reject;
   });
+};
+
+export const deleteFile = async (fileId?: string | null): Promise<void> => {
+  if (!fileId) {
+    console.info("⚠️ deleteFile called without ID. Skipping.");
+    return;
+  }
+  console.info("🚀 Attempting to delete file from S3. ID:", fileId);
+  try {
+    const response = await request.delete(`${filesResource}/${fileId}`);
+    console.info("✅ File deleted successfully:", fileId, response);
+  } catch (error) {
+    console.error("❌ deleteFile error for ID:", fileId, error);
+  }
 };

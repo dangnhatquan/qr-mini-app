@@ -16,6 +16,8 @@ export const useEditor = () => {
     elements,
     selectedId,
     canvasBg,
+    canvasBgFileId,
+    logoFileId,
     stageSize,
     stageScale,
     stagePos,
@@ -25,6 +27,7 @@ export const useEditor = () => {
     initialQrOptions,
     initialElements,
     initialCanvasBg,
+    initialStageSize,
 
     setSelectedId,
     setStageScale,
@@ -37,6 +40,8 @@ export const useEditor = () => {
     setQrImageSrc,
 
     setIsRendering,
+
+    setStageSize,
   } = useKonvaEditor();
 
   const qrCode = useMemo(() => new QRCodeStyling(qrOptions), [qrOptions]);
@@ -134,8 +139,8 @@ export const useEditor = () => {
         try {
           const frameAbsPos = frame.getAbsolutePosition();
 
-          const CAPTURE_WIDTH = 350;
-          const CAPTURE_HEIGHT = 450;
+          const CAPTURE_WIDTH = stageSize.width;
+          const CAPTURE_HEIGHT = stageSize.height;
 
           const uri = stage.toDataURL({
             x: frameAbsPos.x,
@@ -152,8 +157,15 @@ export const useEditor = () => {
           const response = await fetch(uri);
           const blob = await response.blob();
 
-          //TODO:
-          onSave?.({ qrOptions, elements, canvasBg, blob });
+          onSave?.({
+            qrOptions,
+            elements,
+            canvasBg,
+            canvasBgFileId,
+            logoFileId,
+            stageSize,
+            blob,
+          });
         } catch {
           showToast({ message: "Lỗi khi lưu!" });
         } finally {
@@ -175,8 +187,9 @@ export const useEditor = () => {
       setElements(DEFAULT_EDITOR_STAGE.elements);
     }
     setCanvasBg(initialCanvasBg ?? DEFAULT_EDITOR_STAGE.canvasBg);
+    setStageSize(initialStageSize ?? DEFAULT_EDITOR_STAGE.stageSize);
     setSelectedId(null);
-    handleResetView(); // Reset Konva view as well
+    handleResetView();
     showToast({ message: "Đã hoàn tác thay đổi" });
   };
 
@@ -246,6 +259,7 @@ export const useEditor = () => {
     setStagePos,
     setSelectedId,
     setElements,
+    setStageSize,
 
     setIsCollapsed,
     setTranslateY,

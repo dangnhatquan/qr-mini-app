@@ -11,9 +11,9 @@ import {
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { ZALO_APP_DEV_VERSION } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
-import { StageProps } from "react-konva";
-import { uploadFile } from "@/utils/helpers/image";
-import { EQRCategory, EQRType, QrCode } from "@/store";
+
+import { uploadFile, deleteFile } from "@/utils/helpers/image";
+import { EQRCategory, EQRType, QrCode, EditorStage } from "@/store";
 
 export const qrService = {
   async getMyQRs() {
@@ -79,12 +79,11 @@ export const qrService = {
     return await request.get<QrCode>(`${qrRecordResource}/${id}`);
   },
 
-  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: StageProps) {
-    let finalEditorStage = editorStage;
-    if (!finalEditorStage) {
-      const existing = await this.getQRDetail(id);
-      finalEditorStage = existing.editorStage;
-    }
+  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: EditorStage) {
+    const existing = await this.getQRDetail(id);
+    const oldPreviewImageId = existing.previewImage?.id;
+
+    let finalEditorStage = editorStage || existing.editorStage;
 
     const payloadString = getQRPayload(data, id);
     const blob = customBlob || (await generateQRBlob(payloadString, finalEditorStage));
@@ -123,10 +122,36 @@ export const qrService = {
 
     const response = await request.patch(`${qrRecordResource}/${id}`, payload);
 
+    if (oldPreviewImageId && oldPreviewImageId !== file.id) {
+      await deleteFile(oldPreviewImageId);
+    }
+
     return response;
   },
 
   async deleteQR(id: string) {
+    try {
+      const existing = await this.getQRDetail(id);
+      if (existing) {
+        if (existing.previewImage?.id) {
+          await deleteFile(existing.previewImage.id);
+        }
+
+        if (existing.editorStage?.elements) {
+          for (const el of existing.editorStage.elements) {
+            if (el.fileId) {
+              await deleteFile(el.fileId);
+            }
+          }
+        }
+
+        if (existing.editorStage?.logoFileId) {
+          await deleteFile(existing.editorStage.logoFileId);
+        }
+      }
+    } catch (err) {
+      console.error("Error cleaning up files for deleted QR:", err);
+    }
     return await request.delete(`${qrRecordResource}/${id}`);
   },
 };

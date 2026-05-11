@@ -6,6 +6,7 @@ import { Group, Layer, Rect, Stage } from "react-konva";
 import { Box } from "zmp-ui";
 import { useEditor } from "./hooks/useEditor";
 import { FC } from "react";
+import { deleteFile } from "@/utils/helpers/image";
 
 export interface IZaStageProps {
   toolbarHeight: number;
@@ -161,7 +162,14 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
           {selectedId && selectedId !== "qr-main" && (
             <div
               className="bg-red-500 flex items-center justify-center w-10 h-10 !rounded-full cursor-pointer"
-              onClick={() => {
+              onClick={async () => {
+                const elementToDelete = elements.find((el) => el.id === selectedId);
+                console.log("🗑️ Deleting element:", selectedId, "FileId:", elementToDelete?.fileId);
+                if (elementToDelete?.fileId) {
+                  await deleteFile(elementToDelete.fileId);
+                } else {
+                  console.log("⚠️ No FileId found for this element. Skipping S3 deletion.");
+                }
                 setElements(elements.filter((el) => el.id !== selectedId));
                 setSelectedId(null);
               }}

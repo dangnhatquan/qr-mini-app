@@ -12,12 +12,13 @@ import {
 } from "../utils/constants";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
 import { Options } from "qr-code-styling";
-import { uploadFile } from "@/utils/helpers/image";
+import { uploadFile, deleteFile } from "@/utils/helpers/image";
 import { useState } from "react";
 import { getFullUrl } from "@/utils/axios";
 
 export const StylingTab = () => {
-  const { openSection, setOpenSection, qrOptions, setQrOptions } = useKonvaEditor();
+  const { openSection, setOpenSection, qrOptions, setQrOptions, logoFileId, setLogoFileId } =
+    useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
   const updateQrOption = (category: keyof Options, key: string, value: string | number) => {
@@ -44,10 +45,15 @@ export const StylingTab = () => {
         const blob = await response.blob();
         const file = await uploadFile(blob);
 
+        if (logoFileId) {
+          await deleteFile(logoFileId);
+        }
+
         setQrOptions((prev) => ({
           ...prev,
           image: getFullUrl(file.path),
         }));
+        setLogoFileId(file.id);
         showToast({ message: "Đã thêm Avatar" });
       }
     } catch (_err) {
@@ -68,10 +74,16 @@ export const StylingTab = () => {
         const blob = await response.blob();
         const file = await uploadFile(blob);
 
+        console.log("🖼️ New logo uploaded. Previous LogoFileId:", logoFileId);
+        if (logoFileId) {
+          await deleteFile(logoFileId);
+        }
+
         setQrOptions((prev) => ({
           ...prev,
           image: getFullUrl(file.path),
         }));
+        setLogoFileId(file.id);
         showToast({ message: "Đã thêm Logo" });
       }
     } catch (_err) {
@@ -235,7 +247,14 @@ export const StylingTab = () => {
               size="small"
               type="danger"
               variant="secondary"
-              onClick={() => setQrOptions((prev) => ({ ...prev, image: "" }))}
+              onClick={async () => {
+                console.log("🗑️ Deleting logo. LogoFileId:", logoFileId);
+                if (logoFileId) {
+                  await deleteFile(logoFileId);
+                }
+                setQrOptions((prev) => ({ ...prev, image: "" }));
+                setLogoFileId(null);
+              }}
             >
               Xoá Logo
             </Button>

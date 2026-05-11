@@ -5,6 +5,7 @@ import {
   IconSticker,
   IconTexture,
   IconTypography,
+  IconAspectRatio,
 } from "@tabler/icons-react";
 import { StylingTab } from "./components/StylingTab";
 import { LayoutTab } from "./components/LayoutTab";
@@ -16,6 +17,7 @@ import { EditorOutputs, EQRCategory, EQRType, useQRStore } from "@/store";
 import { showToast } from "zmp-sdk/apis";
 import { QREditor } from "./components/QREditor";
 import { TemplateTab } from "./components/TemplateTab";
+import { SizeTab } from "./components/SizeTab";
 
 const EditUIPage: FC = () => {
   const { id } = useParams();
@@ -79,6 +81,16 @@ const EditUIPage: FC = () => {
       ),
       content: <StickerTab />,
     },
+    {
+      key: "size",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconAspectRatio className="w-5 h-5" />
+          Kích thước
+        </div>
+      ),
+      content: <SizeTab />,
+    },
   ];
 
   const handleSave = async (outputs: EditorOutputs) => {
@@ -90,8 +102,15 @@ const EditUIPage: FC = () => {
       ...selectedQR.payload,
     };
 
-    const { qrOptions, elements, canvasBg, blob } = outputs;
-    const editorStage = { qrOptions, elements, canvasBg };
+    const { qrOptions, elements, canvasBg, logoFileId, canvasBgFileId, blob, stageSize } = outputs;
+    const editorStage = {
+      qrOptions,
+      elements,
+      canvasBg,
+      logoFileId,
+      canvasBgFileId,
+      stageSize,
+    };
     await updateQRRecord(id, data, blob, editorStage);
 
     showToast({ message: "Đã lưu thay đổi!" });

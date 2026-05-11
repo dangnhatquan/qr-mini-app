@@ -1,9 +1,10 @@
+import { EditorStage } from "../editorStore";
 import { File } from "@/types/file";
 import { StageProps } from "react-konva";
 
 export interface Card {
   id: string;
-  editorStage: StageProps;
+  editorStage: EditorStage;
   previewImage: File;
   isPasswordProtected: boolean;
 }

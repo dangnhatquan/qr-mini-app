@@ -90,7 +90,7 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
         justifyContent="center"
         className="gap-2"
       >
-        <div className="relative w-full aspect-[350/450] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
+        <div className="relative w-full h-auto bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
           {selectedQR?.previewImage?.path ? (
             <img
               src={getFullUrl(selectedQR.previewImage.path)}

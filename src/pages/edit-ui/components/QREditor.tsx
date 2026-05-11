@@ -34,8 +34,11 @@ export const QREditor = ({ customTabs, onSave, selectedQR }: IQREditorProps) => 
       customTabs={customTabs}
       onSave={onSave}
       canvasBg={canvasBg}
+      canvasBgFileId={selectedQR?.editorStage?.canvasBgFileId}
       qrOptions={qrOptions}
       elements={elements}
+      stageSize={selectedQR?.editorStage?.stageSize}
+      logoFileId={selectedQR?.editorStage?.logoFileId}
     />
   );
 };

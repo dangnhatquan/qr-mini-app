@@ -1,10 +1,10 @@
-import { BankingQRData, EQRCategory, QrCode, WifiQRData } from "@/store";
+import { BankingQRData, EQRCategory, QrCode, WifiQRData, EditorStage } from "@/store";
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
 import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 import { getSystemInfo } from "zmp-sdk/apis";
-import { StageProps } from "react-konva";
+
 import Konva from "konva";
 import { CanvasElement, CanvasElementType } from "@/store";
 import QRCodeStyling from "qr-code-styling";
@@ -67,10 +67,11 @@ export const generateDynamicLink = (
 export const isRemoteImage = (imageSrc?: string) =>
   imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
 
-export const cleanUpBase64 = (editorStage: StageProps) => {
+export const cleanUpBase64 = (editorStage: EditorStage) => {
   return {
     ...editorStage,
-    elements: editorStage.elements?.map((el) => ({
+    stageSize: editorStage.stageSize,
+    elements: (editorStage.elements as any[])?.map((el: any) => ({
       ...el,
       src: isRemoteImage(el.src) ? el.src : "",
     })),
@@ -107,7 +108,7 @@ export const getQRPayload = (data: IQRFormValues, id?: string): string => {
   }
 };
 
-export const generateQRBlob = async (text: string, editorStage?: StageProps): Promise<Blob> => {
+export const generateQRBlob = async (text: string, editorStage?: EditorStage): Promise<Blob> => {
   const stageData = editorStage || DEFAULT_EDITOR_STAGE;
 
   const qrCode = new QRCodeStyling({
@@ -136,23 +137,26 @@ export const generateQRBlob = async (text: string, editorStage?: StageProps): Pr
   });
 
   const container = document.createElement("div");
+  const stageWidth = stageData.stageSize?.width || 350;
+  const stageHeight = stageData.stageSize?.height || 450;
+
   const stage = new Konva.Stage({
     container,
-    width: 350,
-    height: 450,
+    width: stageWidth,
+    height: stageHeight,
   });
 
   const layer = new Konva.Layer();
   const group = new Konva.Group({
     clipX: 0,
     clipY: 0,
-    clipWidth: 350,
-    clipHeight: 450,
+    clipWidth: stageWidth,
+    clipHeight: stageHeight,
   });
 
   const bgRect = new Konva.Rect({
-    width: 350,
-    height: 450,
+    width: stageWidth,
+    height: stageHeight,
     fill: stageData.canvasBg || DEFAULT_EDITOR_STAGE.canvasBg,
     cornerRadius: 8,
   });

@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Page, Box, Button, Text, Spinner, Modal } from "zmp-ui";
 import { IconTrash, IconGridDots, IconPlus, IconRefresh } from "@tabler/icons-react";
 import { showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { createRoute } from "@/utils/routes";
 import { QrCode } from "@/store";
 import "./styles.scss";
@@ -22,6 +24,12 @@ const MyQRsPage: React.FC = () => {
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QrCode | null>(null);
 
   const [isInitialRender, setIsInitialRender] = useState(true);
+  const [animatingQR, setAnimatingQR] = useState<QrCode | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const cloneRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const originalRectRef = useRef<DOMRect | null>(null);
+  useGSAP({ scope: container });
 
   const { isFetching, removeQRRecord, qrCodeRecords: qrs, fetchQRRecords } = useQRStore();
   const { fetchBanks } = useBankStore();
@@ -50,7 +58,6 @@ const MyQRsPage: React.FC = () => {
       const cardElement = document.getElementById(`qr-card-wrapper-${cardId}`);
       if (cardElement) {
         cardElement.classList.add("card-delete");
-        // Wait for animation duration (0.5s)
         setTimeout(async () => {
           await removeQRRecord(cardId);
           showToast({ message: "Xoá mã QR thành công" });
@@ -72,15 +79,115 @@ const MyQRsPage: React.FC = () => {
     setModalVisible(true);
   };
 
-  const handleCardClick = async (qr: QrCode) => {
-    if (expandedId !== qr.id) {
-      setExpandedId(qr.id);
-      setSelectedQR(qr);
-    } else {
-      setExpandedId(null);
-      setSelectedQR(null);
+  const handleCardClick = (qr: QrCode) => {
+    if (isFocused || animatingQR) return;
+    const originalCard = document.getElementById(`qr-card-wrapper-${qr.id}`);
+    if (originalCard) {
+      originalRectRef.current = originalCard.getBoundingClientRect();
+      gsap.set(originalCard, { opacity: 0, pointerEvents: "none" });
     }
+    setAnimatingQR(qr);
+    setIsFocused(true);
   };
+
+  useGSAP(() => {
+    if (!animatingQR || !isFocused) return;
+
+    const originalCard = document.getElementById(`qr-card-wrapper-${animatingQR.id}`);
+    if (!originalCard || !cloneRef.current || !originalRectRef.current) return;
+
+    const CARD_HEIGHT = 250.94;
+    const rect = originalRectRef.current;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const cardPadding = 16;
+    const centeredWidth = Math.min(rect.width, viewportW - cardPadding * 2);
+    const centeredX = (viewportW - centeredWidth) / 2;
+    const centeredY = (viewportH - CARD_HEIGHT) / 2;
+
+    gsap.set(cloneRef.current, {
+      x: rect.left,
+      y: rect.top,
+      width: rect.width,
+      height: CARD_HEIGHT,
+      opacity: 1,
+      scale: 1,
+      display: "block",
+    });
+
+    const tl = gsap.timeline();
+
+    tl.to(
+      cloneRef.current,
+      {
+        y: -CARD_HEIGHT - 40,
+        duration: 0.33,
+        ease: "power3.in",
+      },
+      0,
+    );
+
+    tl.set(overlayRef.current, { display: "block", opacity: 0 }).to(overlayRef.current, {
+      opacity: 1,
+      duration: 0.22,
+      ease: "power2.out",
+    });
+
+    tl.set(cloneRef.current, {
+      y: -CARD_HEIGHT - 40,
+      x: centeredX,
+      width: centeredWidth,
+      opacity: 1,
+    });
+    tl.to(cloneRef.current, {
+      y: centeredY,
+      duration: 0.42,
+      ease: "back.out(1.4)",
+    });
+  }, [animatingQR, isFocused]);
+
+  const handleCloseFocus = useCallback(() => {
+    if (!animatingQR) return;
+    const originalCard = document.getElementById(`qr-card-wrapper-${animatingQR.id}`);
+    const clone = cloneRef.current;
+    const overlay = overlayRef.current;
+    const CARD_HEIGHT = 250.94;
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        if (clone) gsap.set(clone, { display: "none" });
+        if (overlay) gsap.set(overlay, { display: "none", opacity: 0 });
+        if (originalCard) gsap.set(originalCard, { clearProps: "opacity,pointerEvents" });
+        setIsFocused(false);
+        setAnimatingQR(null);
+        originalRectRef.current = null;
+      },
+    });
+
+    tl.to(clone, {
+      y: -CARD_HEIGHT - 40,
+      duration: 0.25,
+      ease: "power3.in",
+    });
+
+    tl.to(overlay, {
+      opacity: 0,
+      duration: 0.22,
+      ease: "power2.out",
+    });
+
+    if (originalCard) {
+      tl.to(
+        originalCard,
+        {
+          opacity: 1,
+          duration: 0.22,
+          ease: "power2.out",
+        },
+        "<",
+      );
+    }
+  }, [animatingQR]);
 
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
 
@@ -105,6 +212,32 @@ const MyQRsPage: React.FC = () => {
     <Page className=" bg-[#F8FAFC] relative overflow-x-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-30 -mr-32 -mt-32" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-100 rounded-full blur-3xl opacity-20 -ml-48 -mb-48" />
+
+      {/* Animation Overlay */}
+      <div
+        ref={overlayRef}
+        className="fixed inset-0 bg-black/80 z-[9998] hidden opacity-0 backdrop-blur-sm"
+        onClick={handleCloseFocus}
+      />
+
+      {/* Animating Clone */}
+      {animatingQR && (
+        <div
+          ref={cloneRef}
+          className="fixed top-0 left-0 z-[9999]"
+          style={{ willChange: "transform, opacity", display: "none" }}
+        >
+          <div
+            className="pointer-events-auto cursor-pointer"
+            onClick={() => {
+              setSelectedQR(animatingQR);
+            }}
+            style={{ height: "250.94px" }}
+          >
+            <QRCard qr={animatingQR} onClick={() => {}} onMoreClick={() => {}} />
+          </div>
+        </div>
+      )}
 
       <div
         className="mt-10 relative min-h-screen flex flex-col overflow-x-hidden"

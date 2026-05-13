@@ -4,6 +4,7 @@ import { IconChevronLeft } from "@tabler/icons-react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IQRFormValues, qrFormSchema } from "@/utils/schemas/qr";
+import { InputFormField } from "@/components/form-fields/input-field";
 import { RadioFormField } from "@/components/form-fields/radio-field";
 import { SelectFormField } from "@/components/form-fields/select-field";
 import { QR_TYPES, STATIC_CATEGORIES, DYNAMIC_CATEGORIES } from "./constants";
@@ -59,6 +60,7 @@ const CreatePage: React.FC = () => {
   } = useForm<IQRFormValues>({
     resolver: zodResolver(qrFormSchema),
     defaultValues: savedFormState ?? {
+      name: "",
       qrType: EQRType.STATIC,
       category: EQRCategory.WIFI,
       wifiData: { ssid: "", password: "", security: DEFAULT_WIFI_SECURITY },
@@ -85,6 +87,7 @@ const CreatePage: React.FC = () => {
           hasFetchedRef.current = id;
           if (!savedFormState) {
             reset({
+              name: qr.name || "",
               qrType: qr.type as EQRType,
               category: qr.category as EQRCategory,
               wifiData: qr.payload?.wifiData,
@@ -231,6 +234,12 @@ const CreatePage: React.FC = () => {
 
       <Box p={4} className="content">
         <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
+          <InputFormField
+            name="name"
+            control={control}
+            label="Tên gợi nhớ (Không bắt buộc)"
+            placeholder="Ví dụ: Wifi Nhà, Ngân hàng cá nhân..."
+          />
           {!isEdit && (
             <>
               <RadioFormField

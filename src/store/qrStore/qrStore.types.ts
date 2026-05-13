@@ -60,6 +60,7 @@ export interface GreetingQRData {
 
 export interface QrCode {
   id: string;
+  name?: string;
   userId: number;
   type: string;
   category: string;

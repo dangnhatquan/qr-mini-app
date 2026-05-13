@@ -23,6 +23,7 @@ export const qrService = {
   async createQR(data: IQRFormValues) {
     if (data.qrType === EQRType.DYNAMIC) {
       const createPayload = {
+        name: data.name,
         qrType: data.qrType,
         category: data.category,
         wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
@@ -100,6 +101,7 @@ export const qrService = {
     });
 
     const payload: Record<string, unknown> = {
+      name: data.name,
       qrType: data.qrType,
       category: data.category,
       previewImageId: file.id,

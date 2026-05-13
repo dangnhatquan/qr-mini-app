@@ -16,6 +16,7 @@ export const generateWifiPayload = (ssid: string, password: string, security: st
 
 export const buildQRCreatePayload = (data: IQRFormValues, file: { id: string }) => {
   return {
+    name: data.name,
     qrType: data.qrType,
     category: data.category,
     previewImageId: file.id,
@@ -61,7 +62,7 @@ export const generateDynamicLink = (
     page = "greetings";
   }
 
-  return `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`;
+  return `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=${page}/${id}`;
 };
 
 export const isRemoteImage = (imageSrc?: string) =>

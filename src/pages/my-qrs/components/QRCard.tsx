@@ -22,6 +22,7 @@ export const QRCard: React.FC<QRCardProps> = ({ qr, onClick, onMoreClick }) => {
   const qrText = useMemo(() => generateQRPayload(qr), [qr]);
 
   const detailText = useMemo(() => {
+    if (qr.name) return qr.name;
     if (!payload) return "Chưa có nội dung";
     switch (category) {
       case EQRCategory.BANKING: {
@@ -41,7 +42,7 @@ export const QRCard: React.FC<QRCardProps> = ({ qr, onClick, onMoreClick }) => {
       default:
         return "";
     }
-  }, [category, payload, banks]);
+  }, [category, payload, banks, qr.name]);
 
   const getBgColor = () => {
     switch (category) {

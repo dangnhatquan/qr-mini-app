@@ -37,6 +37,7 @@ export const greetingCardSchema = z.object({
 
 export const qrFormSchema = z
   .object({
+    name: z.string().optional(),
     qrType: z.nativeEnum(EQRType),
     category: z.nativeEnum(EQRCategory),
     wifiData: z.any().optional(),

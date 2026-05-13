@@ -7,6 +7,7 @@ import { myQrsRoute } from "@/utils/routes";
 import { IconDownload, IconLock } from "@tabler/icons-react";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { getFullUrl } from "@/utils/axios";
+import { PreviewImage } from "../my-qrs/components/PreviewImage";
 
 const GreetingDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -161,10 +162,13 @@ const GreetingDetailPage: React.FC = () => {
       <Box p={4} className="h-full flex flex-col justify-center items-center gap-4">
         {card ? (
           <Box className="w-full">
-            <CardRenderer
-              elements={card.editorStage?.elements || []}
-              canvasBg={card.editorStage?.canvasBg || "#ffffff"}
-            />
+            {card?.previewImage?.path ? (
+              <PreviewImage src={getFullUrl(card.previewImage.path)} />
+            ) : (
+              <Box className="w-full aspect-[350/450] bg-gray-100 rounded-xl flex items-center justify-center">
+                <Text className="text-gray-400">Thiệp chưa được tạo</Text>
+              </Box>
+            )}
           </Box>
         ) : (
           <Box className="w-full aspect-[350/450] bg-white rounded-xl shadow-lg flex items-center justify-center flex-col gap-4">

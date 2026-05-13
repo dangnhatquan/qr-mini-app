@@ -13,6 +13,7 @@ import { Divider } from "@/components/divider";
 import { openShareSheet, saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { createRoute } from "@/utils/routes";
 import { getCategoryLabel } from "@/utils/helpers/qr";
+import { PreviewImage } from "./PreviewImage";
 
 export interface IQRModalProps {
   selectedQR?: QrCode | null;
@@ -90,13 +91,9 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
         justifyContent="center"
         className="gap-2"
       >
-        <div className="relative w-full h-auto bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden relative">
+        <div className="relative w-full h-auto min-h-[300px] bg-gray-50 rounded-2xl border border-gray-100 shadow-inner flex items-center justify-center overflow-hidden">
           {selectedQR?.previewImage?.path ? (
-            <img
-              src={getFullUrl(selectedQR.previewImage.path)}
-              alt="QR Code"
-              className="w-full h-full object-contain"
-            />
+            <PreviewImage src={getFullUrl(selectedQR.previewImage.path)} />
           ) : (
             <div className="w-full h-full animate-pulse flex flex-col items-center justify-center gap-4">
               <IconGridDots size={48} className="text-gray-200" />
@@ -105,14 +102,14 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
           )}
           {selectedQR?.type === "dynamic" && (
             <div
-              className="absolute right-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl"
+              className="absolute right-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl z-20"
               onClick={handleView}
             >
               <IconEye size={20} className="text-gray-800 cursor-pointer" />
             </div>
           )}
           <div
-            className="absolute left-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl"
+            className="absolute left-2 bottom-2 cursor-pointer bg-white rounded-full p-3 shadow-xl z-20"
             onClick={handleEdit}
           >
             <IconPalette size={20} className="text-gray-800 cursor-pointer" />

@@ -6,3 +6,4 @@ export const editRoute = "/edit-ui/:id";
 export const vcardDetailRoute = "/vcards/:id";
 export const greetingDetailRoute = "/greetings/:id";
 export const cardEditorRoute = "/card-editor";
+export const uiKitRoute = "/ui-kit";

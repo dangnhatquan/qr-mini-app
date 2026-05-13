@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (page) {
           const targetPath = page.startsWith("/") ? page : `/${page}`;
           navigate(targetPath, { replace: true });
-        } else {
+        } else if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
           navigate(myQrsRoute, { replace: true });
         }
       })

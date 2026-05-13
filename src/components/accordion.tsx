@@ -5,8 +5,8 @@ import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 export interface IAccordionProps {
   title: string;
   children: React.ReactNode;
-  isOpen: boolean;
-  onClick: () => void;
+  isOpen?: boolean;
+  onClick?: () => void;
 }
 
 export const Accordion = ({ title, children, isOpen, onClick }: IAccordionProps) => {

@@ -9,6 +9,7 @@ import EditUIPage from "@/pages/edit-ui";
 import VCardDetailPage from "@/pages/vcard-detail";
 import CardEditorPage from "@/pages/card-editor";
 import GreetingDetailPage from "@/pages/greeting-detail";
+import UIKitPage from "@/pages/ui-kit";
 import { AuthProvider } from "@/contexts";
 import {
   createRoute,
@@ -18,6 +19,7 @@ import {
   vcardDetailRoute,
   cardEditorRoute,
   greetingDetailRoute,
+  uiKitRoute,
 } from "@/utils/routes";
 
 const Layout = () => {
@@ -34,6 +36,7 @@ const Layout = () => {
               <Route path={vcardDetailRoute} element={<VCardDetailPage />} />
               <Route path={greetingDetailRoute} element={<GreetingDetailPage />} />
               <Route path={cardEditorRoute} element={<CardEditorPage />} />
+              <Route path={uiKitRoute} element={<UIKitPage />} />
             </AnimationRoutes>
           </AuthProvider>
         </ZMPRouter>

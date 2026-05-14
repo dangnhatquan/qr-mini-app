@@ -9,11 +9,22 @@ export const ImageElement = ({
   isSelected,
   onSelect,
   onChange,
+  enabledAnchors = [
+    "top-left",
+    "top-center",
+    "top-right",
+    "middle-right",
+    "middle-left",
+    "bottom-left",
+    "bottom-center",
+    "bottom-right",
+  ],
 }: {
   imageProps: CanvasElement;
   isSelected?: boolean;
   onSelect?: () => void;
   onChange?: (newProps: CanvasElement) => void;
+  enabledAnchors?: string[];
 }) => {
   const displaySrc = imageProps.src;
   const [img] = useImage(displaySrc || "", "anonymous");
@@ -64,6 +75,7 @@ export const ImageElement = ({
       {isSelected && (
         <Transformer
           ref={trRef}
+          enabledAnchors={enabledAnchors}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 5 || newBox.height < 5) {
               return oldBox;

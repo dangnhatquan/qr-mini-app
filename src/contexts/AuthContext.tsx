@@ -22,14 +22,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setString("access_token", res.token);
         setString("refresh_token", res.refreshToken);
 
-        const params = new URLSearchParams(window.location.search);
-        const page = params.get("page");
+        const path = window.location.pathname;
 
-        if (page) {
-          const targetPath = page.startsWith("/") ? page : `/${page}`;
-          navigate(targetPath, { replace: true });
-        } else if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
-          navigate(myQrsRoute, { replace: true });
+        if (path) {
+          if (path === "/") {
+            navigate(myQrsRoute, { replace: true });
+          } else {
+            navigate(path, { replace: true });
+          }
         }
       })
       .catch(console.error);

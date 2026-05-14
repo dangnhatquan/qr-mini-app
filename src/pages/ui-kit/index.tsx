@@ -336,8 +336,8 @@ const UIKitPage: React.FC = () => {
                     <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl" />
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <Text className="font-extrabold text-xl uppercase tracking-tighter mb-2 leading-none">
-                          MB Bank
+                        <Text className="font-extrabold text-xl uppercase tracking-tighter mb-2 leading-1">
+                          VCB
                         </Text>
                         <div className="flex gap-2">
                           <span className="text-[8px] px-2 py-1 rounded-full bg-white/20 border border-white/30 uppercase font-bold">
@@ -366,7 +366,7 @@ const UIKitPage: React.FC = () => {
                     <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl" />
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <Text className="font-extrabold text-xl uppercase tracking-tighter mb-2 leading-none">
+                        <Text className="font-extrabold text-xl uppercase tracking-tighter mb-2 leading-1">
                           Home Wifi
                         </Text>
                         <div className="flex gap-2">

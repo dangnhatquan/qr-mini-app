@@ -72,7 +72,7 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
     if (!selectedQR) return;
     handleToggleModal?.();
     if (selectedQR.category === EQRCategory.GREETING) {
-      navigate(`/greetings/${selectedQR.id}`);
+      navigate(`/greetings/${selectedQR.id}/review`);
     } else {
       navigate(`/vcards/${selectedQR.id}`);
     }
@@ -115,20 +115,29 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
             <IconPalette size={20} className="text-gray-800 cursor-pointer" />
           </div>
         </div>
-        <div className="flex justify-between items-center w-full mt-6 border py-2 px-4 rounded-xl">
-          <div className="flex justify-center items-center gap-2 text-sm" onClick={handleDownload}>
-            <IconDownload size={12} className="text-gray-800" /> Tải xuống
+        <div className="flex justify-between items-center w-full border py-2 px-4 rounded-xl">
+          <div
+            className="flex w-full  justify-center items-center gap-2 text-sm"
+            onClick={handleDownload}
+          >
+            <IconDownload size={20} className="text-gray-800" />
           </div>
           <Divider direction="vertical" />
-          <div className="flex justify-center items-center gap-2 text-sm" onClick={handleEditInfo}>
-            <IconEdit size={12} className="text-gray-800" /> Thông tin
+          <div
+            className="flex w-full justify-center items-center gap-2 text-sm"
+            onClick={handleEditInfo}
+          >
+            <IconEdit size={20} className="text-gray-800" />
           </div>
           <Divider direction="vertical" />
-          <div className="flex justify-center items-center gap-2  text-sm" onClick={handleShare}>
-            <IconShare size={12} className="text-gray-800" /> Chia sẻ
+          <div
+            className="flex  w-full justify-center items-center gap-2  text-sm"
+            onClick={handleShare}
+          >
+            <IconShare size={20} className="text-gray-800" />
           </div>
         </div>
-        <Button className="mt-6" size="small" fullWidth onClick={handleToggleModal} type="neutral">
+        <Button size="small" fullWidth onClick={handleToggleModal} type="neutral">
           Đóng
         </Button>
       </Box>

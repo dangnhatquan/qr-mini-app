@@ -10,6 +10,15 @@ export interface PullToRefreshOptions {
   qrs: QrCode[];
 }
 
+interface PtrState {
+  y: number;
+  val: number;
+  isPulling: boolean;
+  startX: number;
+  startY: number;
+  isCancelled: boolean;
+}
+
 export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions) => {
   const touchStart = useRef<{ x: number; y: number; val: number; currentVal?: number } | null>(
     null,
@@ -17,7 +26,7 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
   const [isDragging, setIsDragging] = useState(false);
   const [swipeState, setSwipeState] = useState<{ [id: string]: number }>({});
 
-  const ptrStart = useRef<{ y: number; val: number; isPulling: boolean } | null>(null);
+  const ptrStart = useRef<PtrState | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent, id: string) => {
     const initialOffset = swipeState[id] || 0;
@@ -83,38 +92,52 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
         startX: e.touches[0].clientX,
         startY: e.touches[0].clientY,
         isCancelled: false,
-      } as any;
+      };
     }
   };
 
   const handlePtrMove = (e: React.TouchEvent) => {
-    if (!ptrStart.current || isFetching || (ptrStart.current as any).isCancelled) return;
+    if (!ptrStart.current || isFetching || ptrStart.current.isCancelled) return;
 
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
-    const diffX = currentX - (ptrStart.current as any).startX;
-    const diffY = currentY - (ptrStart.current as any).startY;
+    const diffX = currentX - ptrStart.current.startX;
+    const diffY = currentY - ptrStart.current.startY;
 
-    if (!ptrStart.current.isPulling && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 5) {
-      (ptrStart.current as any).isCancelled = true;
+    if (!ptrStart.current.isPulling && Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 15) {
+      ptrStart.current.isCancelled = true;
       return;
     }
 
-    if (!ptrStart.current.isPulling && diffY < 10) return;
+    if (!ptrStart.current.isPulling && diffY < 30) return;
 
     if (diffY > 0) {
       ptrStart.current.isPulling = true;
-      let val = (diffY - 10) * 0.4;
-      if (val > 80) val = 80;
+
+      const damping = 180;
+      let val = damping * Math.log1p((diffY - 30) / damping);
+
+      if (val > 140) val = 140;
       ptrStart.current.val = val;
 
       const ptrEl = document.getElementById("ptr-wrapper");
-      if (ptrEl) ptrEl.style.transform = `translate3d(0, ${val}px, 0)`;
+      if (ptrEl) {
+        ptrEl.style.transform = `translate3d(0, ${val}px, 0)`;
+        ptrEl.style.transition = "none";
+        ptrEl.style.willChange = "transform";
+      }
 
       const spinnerEl = document.getElementById("ptr-spinner");
       if (spinnerEl) {
-        spinnerEl.style.transform = `translate3d(0, ${val - 40}px, 0) rotate(${val * 5}deg)`;
-        spinnerEl.style.opacity = `${val / 80}`;
+        const rotation = val * 6;
+        const scale = Math.min(0.5 + (val / 100) * 0.5, 1.2);
+        const opacity = Math.min(val / 70, 1);
+
+        const isReady = val >= 100;
+        spinnerEl.style.color = isReady ? "#2563eb" : "#94a3b8";
+        spinnerEl.style.transform = `translate3d(0, ${val - 45}px, 0) rotate(${rotation}deg) scale(${scale})`;
+        spinnerEl.style.opacity = `${opacity}`;
+        spinnerEl.style.transition = "color 0.2s ease";
       }
     }
   };
@@ -128,37 +151,49 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
     const ptrEl = document.getElementById("ptr-wrapper");
     const spinnerEl = document.getElementById("ptr-spinner");
 
-    if (val >= 60) {
+    const snapEasing = "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)";
+
+    if (val >= 100) {
       if (ptrEl) {
-        ptrEl.style.transition = "transform 0.3s ease-out";
-        ptrEl.style.transform = `translate3d(0, 60px, 0)`;
+        ptrEl.style.transition = snapEasing;
+        ptrEl.style.transform = `translate3d(0, 70px, 0)`;
       }
       if (spinnerEl) {
-        spinnerEl.style.transition = "all 0.3s ease-out";
-        spinnerEl.style.transform = `translate3d(0, 20px, 0) rotate(360deg)`;
+        spinnerEl.style.transition = "all 0.4s cubic-bezier(0.19, 1, 0.22, 1)";
+        spinnerEl.style.transform = `translate3d(0, 30px, 0) rotate(720deg) scale(1)`;
         spinnerEl.style.opacity = `1`;
+        spinnerEl.style.color = "#2563eb";
         spinnerEl.classList.add("animate-spin");
       }
 
-      await onRefresh();
-      showToast({ message: "Đã làm mới danh sách" });
+      try {
+        await onRefresh();
+        showToast({ message: "Đã làm mới danh sách" });
+      } catch (err) {
+        console.error(err);
+      }
     }
 
     if (ptrEl) {
-      ptrEl.style.transition = "transform 0.3s ease-out";
+      ptrEl.style.transition = snapEasing;
       ptrEl.style.transform = `translate3d(0, 0, 0)`;
     }
     if (spinnerEl) {
-      spinnerEl.style.transition = "all 0.3s ease-out";
-      spinnerEl.style.transform = `translate3d(0, -40px, 0)`;
+      spinnerEl.style.transition = "all 0.5s cubic-bezier(0.19, 1, 0.22, 1)";
+      spinnerEl.style.transform = `translate3d(0, -45px, 0) scale(0.5)`;
       spinnerEl.style.opacity = `0`;
       spinnerEl.classList.remove("animate-spin");
     }
 
     setTimeout(() => {
-      if (ptrEl) ptrEl.style.transition = "";
-      if (spinnerEl) spinnerEl.style.transition = "";
-    }, 300);
+      if (ptrEl) {
+        ptrEl.style.transition = "";
+        ptrEl.style.willChange = "auto";
+      }
+      if (spinnerEl) {
+        spinnerEl.style.transition = "";
+      }
+    }, 500);
 
     ptrStart.current = null;
   };

@@ -36,7 +36,7 @@ export const StackedQRList: React.FC<StackedQRListProps> = ({
   const expandedIndex = expandedId ? qrs.findIndex((q) => q.id === expandedId) : -1;
 
   return (
-    <Box p={4} className="pb-48">
+    <Box p={4}>
       {qrs.map((qr, index) => (
         <div
           key={qr.id}
@@ -56,8 +56,7 @@ export const StackedQRList: React.FC<StackedQRListProps> = ({
         >
           {/* Swipe Action Background */}
           <div
-            className="absolute inset-0 bg-red-500 rounded-3xl flex items-center justify-end pr-8 text-white shadow-inner"
-            style={{ zIndex: 0 }}
+            className="absolute inset-0 bg-red-500 rounded-3xl flex items-center justify-end pr-8 text-white shadow-inner z-0"
             onClick={() => onDeleteConfirm(qr)}
           >
             <div className="flex flex-col items-center gap-1">

@@ -62,7 +62,7 @@ export const generateDynamicLink = (
     page = "greetings";
   }
 
-  return `https://zalo.me/s/${ZALO_APP_ID}/?env=DEVELOPMENT&version=${version}&page=${page}/${id}`;
+  return `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`;
 };
 
 export const isRemoteImage = (imageSrc?: string) =>
@@ -72,7 +72,7 @@ export const cleanUpBase64 = (editorStage: EditorStage) => {
   return {
     ...editorStage,
     stageSize: editorStage.stageSize,
-    elements: (editorStage.elements as any[])?.map((el: any) => ({
+    elements: (editorStage.elements as CanvasElement[])?.map((el: CanvasElement) => ({
       ...el,
       src: isRemoteImage(el.src) ? el.src : "",
     })),
@@ -175,7 +175,7 @@ export const generateQRBlob = async (text: string, editorStage?: EditorStage): P
         img.onload = () => resolve(img);
         img.onerror = reject;
         img.crossOrigin = "Anonymous";
-        img.src = el.src;
+        img.src = el.src ?? "";
       });
 
       const newKonvaImage = new Konva.Image({

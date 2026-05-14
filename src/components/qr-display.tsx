@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import QRCodeStyling from "qr-code-styling";
-import { DEFAULT_QR_STYLE } from "@/utils/constants/qr";
+import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
 
 interface QRDisplayProps {
   data: string;
@@ -9,31 +9,53 @@ interface QRDisplayProps {
 }
 
 export const QRDisplay: React.FC<QRDisplayProps> = ({ data, size = 80, className }) => {
-  const qrRef = useRef<HTMLDivElement>(null);
-  const qrCodeRef = useRef<QRCodeStyling | null>(null);
+  const [qrImageUrl, setQrImageUrl] = useState<string>("");
 
   useEffect(() => {
-    if (!qrCodeRef.current) {
-      qrCodeRef.current = new QRCodeStyling({
-        ...DEFAULT_QR_STYLE,
-        width: size,
-        height: size,
-        data: data,
-        margin: 0,
-      });
-    } else {
-      qrCodeRef.current.update({
-        data: data,
-        width: size,
-        height: size,
-      });
-    }
+    const generateQR = async () => {
+      try {
+        const qrCode = new QRCodeStyling({
+          ...DEFAULT_EDITOR_STAGE.qrOptions,
+          width: size * 4,
+          height: size * 4,
+          data: data,
+          margin: 0,
+        });
 
-    if (qrRef.current) {
-      qrRef.current.innerHTML = "";
-      qrCodeRef.current.append(qrRef.current);
+        const raw = await qrCode.getRawData("webp");
+        if (!raw) throw new Error("Failed to generate QR blob");
+
+        const rawBlob =
+          raw instanceof Blob ? raw : new Blob([raw as BlobPart], { type: "image/webp" });
+
+        const imgUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(rawBlob);
+        });
+
+        setQrImageUrl(imgUrl);
+      } catch (error) {
+        console.error("QRDisplay Error:", error);
+      }
+    };
+
+    if (data) {
+      generateQR();
     }
   }, [data, size]);
 
-  return <div ref={qrRef} className={className} />;
+  return (
+    <div
+      className={`flex items-center justify-center overflow-hidden bg-white ${className}`}
+      style={{ width: size, height: size }}
+    >
+      {qrImageUrl ? (
+        <img src={qrImageUrl} alt="QR Code" className="w-full h-full object-contain" />
+      ) : (
+        <div className="w-full h-full animate-pulse bg-gray-50" />
+      )}
+    </div>
+  );
 };

@@ -1,4 +1,5 @@
 import { COLOR } from "@/pages/edit-ui/utils/constants";
+import { CanvasElement } from "@/store";
 import { EQRCategory, EQRType, EWifiSecurity } from "@/store/qrStore/qrStore.types";
 import { Options } from "qr-code-styling";
 
@@ -56,7 +57,7 @@ export const DEFAULT_EDITOR_STAGE = {
       width: 200,
       height: 200,
       rotation: 0,
-    },
+    } as CanvasElement,
   ],
   canvasBg: COLOR.WHITE.color,
   stageSize: { width: 350, height: 450 },

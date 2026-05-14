@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Page, Box, Button, Text, Spinner, Modal } from "zmp-ui";
-import { IconGridDots, IconPlus, IconRefresh } from "@tabler/icons-react";
+import { Page, Box, Text, Spinner, Modal } from "zmp-ui";
+import { IconGridDots, IconPlus } from "@tabler/icons-react";
 import { showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
 import { createRoute } from "@/utils/routes";
@@ -74,9 +74,6 @@ const MyQRsPage: React.FC = () => {
     swipeState,
     setSwipeState,
     isDragging,
-    handlePtrStart,
-    handlePtrMove,
-    handlePtrEnd,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
@@ -88,46 +85,25 @@ const MyQRsPage: React.FC = () => {
   });
 
   return (
-    <Page className=" bg-[#F8FAFC] relative overflow-x-hidden">
-      {/* Background Orbs */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-30 -mr-32 -mt-32" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-100 rounded-full blur-3xl opacity-20 -ml-48 -mb-48" />
-
-      {/* Focus Card Layer */}
+    <Page className="bg-[#F8FAFC] relative overflow-x-hidden overflow-y-scroll min-h-[calc(100vh-136px)] overscroll-y-contain">
       <QRFocusView
         qr={focusedQR}
         isOpen={isFocusOpen}
         onClose={closeFocus}
         onMoreClick={handleMoreClick}
       />
-
       <div
-        className="mt-10 relative min-h-screen flex flex-col overflow-x-hidden"
-        id="ptr-wrapper"
-        onTouchStart={handlePtrStart}
-        onTouchMove={handlePtrMove}
-        onTouchEnd={handlePtrEnd}
+        className="pt-10 relative min-h-screen flex flex-col overflow-x-hidden"
+        id="page-content-wrapper"
       >
         <Box p={6} className="pb-2" id="page-header">
-          <Text className="text-4xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+          <Text className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
             QR của tôi
           </Text>
           <Text className="text-gray-400 text-sm font-medium mt-1 uppercase tracking-widest">
             {qrs.length} mã QR đã lưu
           </Text>
         </Box>
-
-        {/* Pull to Refresh Spinner */}
-        <div
-          className="absolute top-0 left-0 right-0 h-16 flex items-center justify-center -translate-y-full pointer-events-none"
-          style={{ zIndex: 100 }}
-        >
-          <IconRefresh
-            id="ptr-spinner"
-            className="text-blue-500 text-2xl animate-spin"
-            style={{ opacity: 0 }}
-          />
-        </div>
 
         {isFetching ? (
           <Box flex justifyContent="center" alignItems="center" className="flex-1">
@@ -178,21 +154,12 @@ const MyQRsPage: React.FC = () => {
         )}
       </div>
 
-      <Box
-        p={6}
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-10 z-50 rounded-t-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.05)]"
+      <div
+        className="fixed z-50 flex bg-blue-500 items-center justify-center bottom-6 right-4 rounded-full w-12 h-12 shadow-xl shadow-blue-200 font-bold text-lg active:scale-95 transition-transform"
+        onClick={() => navigate(createRoute)}
       >
-        <Button
-          fullWidth
-          size="large"
-          type="highlight"
-          className="rounded-2xl shadow-xl shadow-blue-200 font-bold text-lg active:scale-95 transition-transform"
-          onClick={() => navigate(createRoute)}
-          prefixIcon={<IconPlus size={24} />}
-        >
-          Tạo mã QR mới
-        </Button>
-      </Box>
+        <IconPlus size={24} className="text-white" />
+      </div>
 
       <QRModal
         selectedQR={selectedQR}

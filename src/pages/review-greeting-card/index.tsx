@@ -8,7 +8,7 @@ import { saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { getFullUrl } from "@/utils/axios";
 import { PreviewImage } from "../my-qrs/components/PreviewImage";
 
-const GreetingDetailPage: React.FC = () => {
+const ReviewGreetingDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
@@ -16,7 +16,7 @@ const GreetingDetailPage: React.FC = () => {
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const { selectedQR, isFetchingSelectedQR, fetchQRDetail } = useQRStore();
-  const { card, isFetching, fetchCard, error: cardError } = useCardStore();
+  const { card, isFetching, fetchCard } = useCardStore();
 
   const isAuthorized = !!(card && card.editorStage);
   const isLoading = isFetching || isFetchingSelectedQR;
@@ -26,15 +26,6 @@ const GreetingDetailPage: React.FC = () => {
       fetchQRDetail(id);
     }
   }, [id, fetchQRDetail]);
-
-  useEffect(() => {
-    const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
-    if (greetingData?.cardId && !card && !cardError && !isFetching) {
-      fetchCard(greetingData.cardId).catch(() => {
-        // Expected if password protected
-      });
-    }
-  }, [selectedQR, card, cardError, isFetching, fetchCard]);
 
   const handleDownload = async () => {
     if (!card) return;
@@ -123,7 +114,6 @@ const GreetingDetailPage: React.FC = () => {
   if (!isAuthorized) {
     return (
       <Page className="bg-white">
-        <Header title="Yêu cầu mật khẩu" />
         <Box p={6} className="h-full flex flex-col justify-center items-center pt-10">
           <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6">
             <IconLock />
@@ -132,6 +122,7 @@ const GreetingDetailPage: React.FC = () => {
             Vui lòng nhập mật khẩu để xem thiệp điện tử: <br />
             <span className="font-bold text-gray-800">{greetingData.eventName}</span>
           </Text>
+
           <Box className="w-full mb-6">
             <Input
               type="password"
@@ -141,6 +132,7 @@ const GreetingDetailPage: React.FC = () => {
               className="text-center text-lg"
             />
           </Box>
+
           <Button fullWidth onClick={handleAuthorize} size="large">
             Mở thiệp
           </Button>
@@ -151,10 +143,6 @@ const GreetingDetailPage: React.FC = () => {
 
   return (
     <Page className="relative bg-gray-100 overflow-y-auto pb-10">
-      <Header
-        title={greetingData.eventName}
-        onBackClick={() => navigate(myQrsRoute, { direction: "backward" })}
-      />
       <Box p={4} className="h-full flex flex-col justify-center items-center gap-4">
         {card ? (
           <Box className="w-full">
@@ -171,7 +159,17 @@ const GreetingDetailPage: React.FC = () => {
             <Text className="text-gray-400">Thiệp chưa được tạo</Text>
           </Box>
         )}
+
         <div className="fixed bottom-4 right-4 flex gap-4">
+          <Button
+            variant="primary"
+            onClick={() => navigate(myQrsRoute, { direction: "backward" })}
+            size="large"
+            className="px-6"
+          >
+            Tạo thiệp ngay
+          </Button>
+
           <Button icon={<IconDownload />} onClick={handleDownload} size="large" />
         </div>
       </Box>
@@ -179,4 +177,4 @@ const GreetingDetailPage: React.FC = () => {
   );
 };
 
-export default GreetingDetailPage;
+export default ReviewGreetingDetailPage;

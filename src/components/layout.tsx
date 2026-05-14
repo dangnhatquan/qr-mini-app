@@ -20,7 +20,9 @@ import {
   cardEditorRoute,
   greetingDetailRoute,
   uiKitRoute,
+  reviewGreetingDetailRoute,
 } from "@/utils/routes";
+import ReviewGreetingDetailPage from "@/pages/review-greeting-card";
 
 const Layout = () => {
   return (
@@ -34,7 +36,8 @@ const Layout = () => {
               <Route path={myQrsRoute} element={<MyQRsPage />} />
               <Route path={editRoute} element={<EditUIPage />} />
               <Route path={vcardDetailRoute} element={<VCardDetailPage />} />
-              <Route path={greetingDetailRoute} element={<GreetingDetailPage />} />
+              <Route path={reviewGreetingDetailRoute} element={<GreetingDetailPage />} />
+              <Route path={greetingDetailRoute} element={<ReviewGreetingDetailPage />} />
               <Route path={cardEditorRoute} element={<CardEditorPage />} />
               <Route path={uiKitRoute} element={<UIKitPage />} />
             </AnimationRoutes>

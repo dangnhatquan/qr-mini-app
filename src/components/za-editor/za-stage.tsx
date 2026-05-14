@@ -100,6 +100,22 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
                 return a.originalIndex - b.originalIndex;
               })
               .map(({ el, originalIndex: i }) => {
+                if (el.id === "qr-main") {
+                  return (
+                    <ImageElement
+                      enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
+                      key={el.id}
+                      imageProps={el}
+                      isSelected={el.id === selectedId}
+                      onSelect={() => setSelectedId(el.id)}
+                      onChange={(newProps: CanvasElement) => {
+                        const newEls = [...elements];
+                        newEls[i] = newProps;
+                        setElements(newEls);
+                      }}
+                    />
+                  );
+                }
                 if (el.type === CanvasElementType.IMAGE) {
                   return (
                     <ImageElement
@@ -142,7 +158,6 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
         </Box>
       )}
 
-      {/* Float buttons*/}
       <div
         className={`absolute left-0 right-0 px-4 flex justify-between items-center pointer-events-none z-40 ${isDragging ? "" : "transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"}`}
         style={{
@@ -164,11 +179,8 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
               className="bg-red-500 flex items-center justify-center w-10 h-10 !rounded-full cursor-pointer"
               onClick={async () => {
                 const elementToDelete = elements.find((el) => el.id === selectedId);
-                console.log("🗑️ Deleting element:", selectedId, "FileId:", elementToDelete?.fileId);
                 if (elementToDelete?.fileId) {
                   await deleteFile(elementToDelete.fileId);
-                } else {
-                  console.log("⚠️ No FileId found for this element. Skipping S3 deletion.");
                 }
                 setElements(elements.filter((el) => el.id !== selectedId));
                 setSelectedId(null);

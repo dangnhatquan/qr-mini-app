@@ -102,7 +102,16 @@ const EditUIPage: FC = () => {
       ...selectedQR.payload,
     };
 
-    const { qrOptions, elements, canvasBg, logoFileId, canvasBgFileId, blob, stageSize } = outputs;
+    const {
+      qrOptions,
+      elements,
+      canvasBg,
+      logoFileId,
+      canvasBgFileId,
+      blob,
+      stageSize,
+      sessionId,
+    } = outputs;
     const editorStage = {
       qrOptions,
       elements,
@@ -111,7 +120,7 @@ const EditUIPage: FC = () => {
       canvasBgFileId,
       stageSize,
     };
-    await updateQRRecord(id, data, blob, editorStage);
+    await updateQRRecord(id, data, blob, editorStage, sessionId);
 
     showToast({ message: "Đã lưu thay đổi!" });
     navigate(-1);

@@ -20,6 +20,9 @@ interface IUploadFormFieldProps<T extends FieldValues> {
   control: Control<T>;
   helperText?: string;
   setValue: UseFormSetValue<T>;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
 }
 export const UploadFormField = ({
   name,

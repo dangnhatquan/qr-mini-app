@@ -106,6 +106,7 @@ export interface QRStore {
     data: IQRFormValues,
     blob?: Blob,
     editorStage?: EditorStage,
+    sessionId?: string,
     callback?: () => void,
   ) => Promise<void>;
 }

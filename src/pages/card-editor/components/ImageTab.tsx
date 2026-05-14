@@ -8,7 +8,7 @@ import { useKonvaEditor } from "@/pages/edit-ui/context/KonvaEditorContext";
 import { CanvasElement, CanvasElementType } from "@/store";
 
 export const ImageTab = () => {
-  const { elements, setElements, setSelectedId } = useKonvaEditor();
+  const { elements, setElements, setSelectedId, sessionId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
   const handleAddImage = async (url: string, fileId: string, width = 100, height = 100) => {
@@ -41,7 +41,7 @@ export const ImageTab = () => {
             setUploading(true);
             const response = await fetch(path);
             const blob = await response.blob();
-            const file = await uploadFile(blob);
+            const file = await uploadFile(blob, sessionId);
             const url = getFullUrl(file.path);
             const { width, height } = await getImageDimensions(blob);
             handleAddImage(url, file.id, width, height);

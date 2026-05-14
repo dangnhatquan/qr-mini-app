@@ -8,7 +8,7 @@ import { getFullUrl } from "@/utils/axios";
 import { STICKERS } from "../utils/constants";
 
 export const StickerTab = () => {
-  const { elements, setElements, setSelectedId } = useKonvaEditor();
+  const { elements, setElements, setSelectedId, sessionId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
   const handleAddSticker = async (url: string, fileId?: string, width = 100, height = 100) => {
@@ -44,7 +44,7 @@ export const StickerTab = () => {
             setUploading(true);
             const response = await fetch(path);
             const blob = await response.blob();
-            const file = await uploadFile(blob);
+            const file = await uploadFile(blob, sessionId);
             const url = getFullUrl(file.path);
             const { width, height } = await getImageDimensions(blob);
             handleAddSticker(url, file.id, width, height);

@@ -3,27 +3,19 @@ import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
-import { getImageDimensions, uploadFile, deleteFile } from "@/utils/helpers/image";
+import { uploadFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
 import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH } from "../utils/constants";
 
 export const TemplateTab = () => {
-  const { elements, setElements, setSelectedId, stageSize } = useKonvaEditor();
+  const { elements, setElements, setSelectedId, stageSize, sessionId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
   const handleAddTemplate = async (url: string, fileId?: string) => {
     const id = `template-${Date.now()}`;
 
-    const oldTemplates = elements.filter((el) => el.id.startsWith("template-"));
-    for (const old of oldTemplates) {
-      if (old.fileId) {
-        await deleteFile(old.fileId);
-      }
-    }
-
     const filteredElements = elements.filter((el) => !el.id.startsWith("template-"));
 
-    // Add as background (prepend to elements)
     setElements([
       {
         id,
@@ -51,7 +43,7 @@ export const TemplateTab = () => {
             setUploading(true);
             const response = await fetch(path);
             const blob = await response.blob();
-            const file = await uploadFile(blob);
+            const file = await uploadFile(blob, sessionId);
             const url = getFullUrl(file.path);
             handleAddTemplate(url, file.id);
             showToast({ message: "Đã thêm Template" });
@@ -93,12 +85,6 @@ export const TemplateTab = () => {
           <Box
             className="w-full aspect-[35/45] flex flex-col justify-center items-center border-2 border-red-100 rounded-xl bg-red-50 hover:bg-red-100 transition-colors cursor-pointer group"
             onClick={async () => {
-              const oldTemplates = elements.filter((el) => el.id.startsWith("template-"));
-              for (const old of oldTemplates) {
-                if (old.fileId) {
-                  await deleteFile(old.fileId);
-                }
-              }
               setElements(elements.filter((el) => !el.id.startsWith("template-")));
               setSelectedId(null);
               showToast({ message: "Đã xoá Template" });

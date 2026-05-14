@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useNavigate } from "zmp-ui";
 import { myQrsRoute } from "@/utils/routes";
-import { setString } from "@/utils/storage";
+import { storage } from "@/utils/storage";
 
 export const AuthContext = createContext<{ user: User | null }>({
   user: null,
@@ -19,8 +19,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((res) => {
         setUser(res.user);
 
-        setString("access_token", res.token);
-        setString("refresh_token", res.refreshToken);
+        storage.setItem("access_token", res.token);
+        storage.setItem("refresh_token", res.refreshToken);
 
         const path = window.location.pathname;
 

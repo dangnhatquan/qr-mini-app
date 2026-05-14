@@ -42,6 +42,7 @@ export const useEditor = () => {
     setIsRendering,
 
     setStageSize,
+    sessionId,
   } = useKonvaEditor();
 
   const qrCode = useMemo(() => new QRCodeStyling(qrOptions), [qrOptions]);
@@ -165,6 +166,7 @@ export const useEditor = () => {
             logoFileId,
             stageSize,
             blob,
+            sessionId,
           });
         } catch {
           showToast({ message: "Lỗi khi lưu!" });

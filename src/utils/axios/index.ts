@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders, AxiosInstance, AxiosRequestConfig } from "axios";
-import { getString } from "../storage";
+import { storage } from "../storage";
 
 const PUBLIC_API_URL = import.meta.env.VITE_PUBLIC_API_URL;
 
@@ -14,7 +14,7 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = getString("access_token");
+  const token = storage.getItem("access_token");
   if (token) {
     if (!config.headers) {
       config.headers = new AxiosHeaders();

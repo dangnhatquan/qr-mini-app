@@ -13,7 +13,7 @@ import {
   IconPlus,
   IconGiftCard,
 } from "@tabler/icons-react";
-import { getString, removeItem } from "@/utils/storage";
+import { storage } from "@/utils/storage";
 
 interface GreetingFormProps {
   control: Control<IQRFormValues>;
@@ -64,10 +64,10 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
   const previewImageUrl = preview.id === savedCardId ? preview.url : null;
 
   const handleVisibilityChange = useRef(() => {
-    const pending = getString("pendingCardId");
+    const pending = storage.getItem("pendingCardId");
     if (pending) {
       setValue("greetingData.cardId", pending);
-      removeItem("pendingCardId");
+      storage.removeItem("pendingCardId");
     }
   });
 

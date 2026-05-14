@@ -71,5 +71,8 @@ export const useEditorStore = create<KonvaEditorStore>((set) => {
 
     initialCanvasBg: "",
     setInitialCanvasBg: createSetter("initialCanvasBg"),
+
+    sessionId: null,
+    setsessionId: createSetter("sessionId"),
   };
 });

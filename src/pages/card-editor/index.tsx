@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { showToast } from "zmp-sdk/apis";
-import { setString } from "@/utils/storage";
+import { storage } from "@/utils/storage";
 import { CardEditor } from "./components/CardEditor";
 import {
   IconAspectRatio,
@@ -79,23 +79,28 @@ const CardEditorPage: React.FC = () => {
   ];
 
   const handleSave = async (outputs: EditorOutputs) => {
-    const { elements, canvasBg, logoFileId, canvasBgFileId, blob, stageSize } = outputs;
+    const { elements, canvasBg, logoFileId, canvasBgFileId, blob, stageSize, sessionId } = outputs;
     const editorStage = { elements, canvasBg, logoFileId, canvasBgFileId, stageSize };
 
     try {
       if (!blob) throw new Error("No blob provided");
-      const previewFile = await uploadFile(blob);
+      const previewFile = await uploadFile(blob, sessionId);
 
       let savedId: string;
       if (initialCardId) {
-        const updated = await cardService.updateCard(initialCardId, editorStage, previewFile.id);
+        const updated = await cardService.updateCard(
+          initialCardId,
+          editorStage,
+          previewFile.id,
+          sessionId,
+        );
         savedId = updated.id;
       } else {
-        const created = await cardService.createCard(editorStage, previewFile.id);
+        const created = await cardService.createCard(editorStage, previewFile.id, sessionId);
         savedId = created.id;
       }
 
-      setString("pendingCardId", savedId);
+      storage.setItem("pendingCardId", savedId);
       showToast({ message: "Thiệp đã được lưu!" });
       navigate(-1);
     } catch (error) {

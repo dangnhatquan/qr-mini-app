@@ -1,5 +1,5 @@
 import request, { getFullUrl } from "../axios";
-import { getPresignedUrl, filesResource } from "@/resources";
+import { filesResource, getPresignedUrl } from "@/resources";
 
 export const resizeImage = (
   base64: string,
@@ -71,11 +71,16 @@ export const preloadImage = async (
   }
 };
 
-export const uploadFile = async (blob: Blob | File): Promise<{ id: string; path: string }> => {
+export const uploadFile = async (
+  blob: Blob | File,
+  sessionId?: string,
+): Promise<{ id: string; path: string }> => {
+  const url = sessionId ? `${getPresignedUrl}?sessionId=${sessionId}` : getPresignedUrl;
+
   const uploadInfo = await request.get<{
     file: { id: string; path: string };
     uploadSignedUrl: string;
-  }>(getPresignedUrl);
+  }>(url);
 
   const { uploadSignedUrl, file } = uploadInfo;
 

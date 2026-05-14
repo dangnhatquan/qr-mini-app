@@ -17,8 +17,8 @@ import { qrService } from "@/services/qr";
 import { cardService } from "@/services/card";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { myQrsRoute } from "@/utils/routes";
-import { getString, removeItem, setString } from "@/utils/storage";
 import { DEFAULT_BANK_ID, DEFAULT_MAX_ATTEMPTS, DEFAULT_WIFI_SECURITY } from "@/utils/constants/qr";
+import { storage } from "@/utils/storage";
 
 const CreatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,11 +32,13 @@ const CreatePage: React.FC = () => {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const pendingNavRef = useRef<() => void>(() => navigate(myQrsRoute));
 
+  const sessionId = crypto.randomUUID();
+
   const FORM_STATE_KEY = "createFormState";
 
   const savedFormState = React.useMemo(() => {
     try {
-      const raw = getString(FORM_STATE_KEY);
+      const raw = storage.getItem(FORM_STATE_KEY);
       if (raw) return JSON.parse(raw) as IQRFormValues;
     } catch (error) {
       console.error(error);
@@ -46,7 +48,7 @@ const CreatePage: React.FC = () => {
 
   useEffect(() => {
     if (savedFormState) {
-      removeItem(FORM_STATE_KEY);
+      storage.removeItem(FORM_STATE_KEY);
     }
   }, [savedFormState]);
 
@@ -118,7 +120,7 @@ const CreatePage: React.FC = () => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (isEdit) return; // Disable auto-switching category when editing
+    if (isEdit) return;
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
@@ -171,14 +173,14 @@ const CreatePage: React.FC = () => {
     try {
       setLoading(true);
       if (isEdit && id) {
-        await qrService.updateQR(id, data);
+        await qrService.updateQR(id, data, undefined, undefined, sessionId);
         openSnackbar({
           type: "success",
           text: "Cập nhật mã QR thành công!",
           duration: 2000,
         });
       } else {
-        await qrService.createQR(data);
+        await qrService.createQR(data, sessionId);
         openSnackbar({
           type: "success",
           text: "Tạo mã QR thành công!",
@@ -276,7 +278,7 @@ const CreatePage: React.FC = () => {
                 setValue={setValue}
                 greetingData={greetingData}
                 onBeforeEditorOpen={() => {
-                  setString(FORM_STATE_KEY, JSON.stringify(getValues()));
+                  storage.setItem(FORM_STATE_KEY, JSON.stringify(getValues()));
                 }}
               />
             )}

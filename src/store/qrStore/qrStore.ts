@@ -50,9 +50,10 @@ export const useQRStore = create<QRStore>((set) => ({
     data: IQRFormValues,
     blob?: Blob,
     editorStage?: EditorStage,
+    sessionId?: string,
     callback?: () => void,
   ) => {
-    await qrService.updateQR(id, data, blob, editorStage);
+    await qrService.updateQR(id, data, blob, editorStage, sessionId);
     set((state) => ({
       qrCodeRecords: state.qrCodeRecords.map((qr) =>
         qr.id === id ? { ...qr, editorStage: editorStage || qr.editorStage } : qr,

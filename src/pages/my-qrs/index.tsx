@@ -42,22 +42,22 @@ const MyQRsPage: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (!deleteConfirmQR) return;
-    const cardId = deleteConfirmQR.id;
+    const qrId = deleteConfirmQR.id;
     try {
       setDeleteConfirmQR(null);
       setSwipeState({});
-      const cardElement = document.getElementById(`qr-card-wrapper-${cardId}`);
+      const cardElement = document.getElementById(`qr-card-wrapper-${qrId}`);
       if (cardElement) {
         cardElement.classList.add("card-delete");
         setTimeout(async () => {
-          await removeQRRecord(cardId);
+          await removeQRRecord(qrId);
           showToast({ message: "Xoá mã QR thành công" });
-          if (expandedId === cardId) setExpandedId(null);
+          if (expandedId === qrId) setExpandedId(null);
         }, 500);
       } else {
-        await removeQRRecord(cardId);
+        await removeQRRecord(qrId);
         showToast({ message: "Xoá mã QR thành công" });
-        if (expandedId === cardId) setExpandedId(null);
+        if (expandedId === qrId) setExpandedId(null);
       }
     } catch (error) {
       console.error(error);

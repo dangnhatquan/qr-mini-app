@@ -12,13 +12,20 @@ import {
 } from "../utils/constants";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
 import { Options } from "qr-code-styling";
-import { uploadFile, deleteFile } from "@/utils/helpers/image";
+import { uploadFile } from "@/utils/helpers/image";
 import { useState } from "react";
 import { getFullUrl } from "@/utils/axios";
 
 export const StylingTab = () => {
-  const { openSection, setOpenSection, qrOptions, setQrOptions, logoFileId, setLogoFileId } =
-    useKonvaEditor();
+  const {
+    openSection,
+    setOpenSection,
+    qrOptions,
+    setQrOptions,
+    logoFileId,
+    setLogoFileId,
+    sessionId,
+  } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
   const updateQrOption = (category: keyof Options, key: string, value: string | number) => {
@@ -43,11 +50,7 @@ export const StylingTab = () => {
 
         const response = await fetch(finalPath);
         const blob = await response.blob();
-        const file = await uploadFile(blob);
-
-        if (logoFileId) {
-          await deleteFile(logoFileId);
-        }
+        const file = await uploadFile(blob, sessionId);
 
         setQrOptions((prev) => ({
           ...prev,
@@ -72,12 +75,7 @@ export const StylingTab = () => {
         const path = filePaths[0];
         const response = await fetch(path);
         const blob = await response.blob();
-        const file = await uploadFile(blob);
-
-        console.log("🖼️ New logo uploaded. Previous LogoFileId:", logoFileId);
-        if (logoFileId) {
-          await deleteFile(logoFileId);
-        }
+        const file = await uploadFile(blob, sessionId);
 
         setQrOptions((prev) => ({
           ...prev,
@@ -249,9 +247,6 @@ export const StylingTab = () => {
               variant="secondary"
               onClick={async () => {
                 console.log("🗑️ Deleting logo. LogoFileId:", logoFileId);
-                if (logoFileId) {
-                  await deleteFile(logoFileId);
-                }
                 setQrOptions((prev) => ({ ...prev, image: "" }));
                 setLogoFileId(null);
               }}

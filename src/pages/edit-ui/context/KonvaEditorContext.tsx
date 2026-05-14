@@ -47,6 +47,7 @@ interface KonvaEditorContextType {
   initialElements?: CanvasElement[] | null;
   initialCanvasBg?: string;
   initialStageSize?: { width: number; height: number };
+  sessionId: string;
 }
 
 const KonvaEditorContext = createContext<KonvaEditorContextType | undefined>(undefined);
@@ -72,6 +73,7 @@ export const KonvaEditorProvider: React.FC<{
 
   const stageRef = useRef<Konva.Stage | null>(null);
   const mainGroupRef = useRef<Konva.Group | null>(null);
+  const sessionId = crypto.randomUUID();
 
   const [qrOptions, setQrOptions] = useState<Partial<Options>>(
     initialQrOptions ?? DEFAULT_QR_STYLE,
@@ -135,6 +137,7 @@ export const KonvaEditorProvider: React.FC<{
     initialElements,
     initialCanvasBg,
     initialStageSize,
+    sessionId,
   };
 
   const [prevInitialCanvasBg, setPrevInitialCanvasBg] = useState(initialCanvasBg);

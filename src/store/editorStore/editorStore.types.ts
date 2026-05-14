@@ -36,6 +36,7 @@ export interface EditorStage {
 
 export interface EditorOutputs extends EditorStage {
   blob: Blob;
+  sessionId: string;
 }
 
 export interface KonvaEditorStore {
@@ -81,4 +82,7 @@ export interface KonvaEditorStore {
   setInitialElements: React.Dispatch<React.SetStateAction<CanvasElement[] | null>>;
   initialCanvasBg: string;
   setInitialCanvasBg: React.Dispatch<React.SetStateAction<string>>;
+
+  sessionId: string | null;
+  setsessionId: React.Dispatch<React.SetStateAction<string | null>>;
 }

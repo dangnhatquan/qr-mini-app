@@ -11,22 +11,15 @@ import {
   ERROR_CORRECTION_LEVELS,
 } from "../utils/constants";
 import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
-import { Options } from "qr-code-styling";
+import { ErrorCorrectionLevel, Options } from "qr-code-styling";
 import { uploadFile } from "@/utils/helpers/image";
 import { useState } from "react";
 import { getFullUrl } from "@/utils/axios";
 
 export const StylingTab = () => {
-  const {
-    openSection,
-    setOpenSection,
-    qrOptions,
-    setQrOptions,
-    logoFileId,
-    setLogoFileId,
-    sessionId,
-  } = useKonvaEditor();
+  const { qrOptions, setQrOptions, logoFileId, setLogoFileId, sessionId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>("dots");
 
   const updateQrOption = (category: keyof Options, key: string, value: string | number) => {
     setQrOptions((prev: Options) => ({
@@ -246,7 +239,7 @@ export const StylingTab = () => {
               type="danger"
               variant="secondary"
               onClick={async () => {
-                console.log("🗑️ Deleting logo. LogoFileId:", logoFileId);
+                console.warn("🗑️ Deleting logo. LogoFileId:", logoFileId);
                 setQrOptions((prev) => ({ ...prev, image: "" }));
                 setLogoFileId(null);
               }}
@@ -283,7 +276,10 @@ export const StylingTab = () => {
               onClick={() =>
                 setQrOptions((prev) => ({
                   ...prev,
-                  qrOptions: { ...prev.qrOptions, errorCorrectionLevel: level.value as any },
+                  qrOptions: {
+                    ...prev.qrOptions,
+                    errorCorrectionLevel: level.value as ErrorCorrectionLevel,
+                  },
                 }))
               }
               className={`px-3 py-2 rounded-lg border text-xs text-center cursor-pointer font-medium transition-all ${

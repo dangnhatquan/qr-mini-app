@@ -15,7 +15,7 @@ const VCardDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchQRDetail(id as string);
-  }, [id]);
+  }, [id, fetchQRDetail]);
 
   if (isFetchingSelectedQR) {
     return (
@@ -146,7 +146,7 @@ const VCardDetailPage: React.FC = () => {
         <Box className="mb-8">
           <Box flex alignItems="center" justifyContent="space-between">
             <Box>
-              <Text size="xLarge" className="font-bold text-blue-500 text-2xl mb-1">
+              <Text size="xLarge" className="font-bold text-blue-primary text-2xl mb-1">
                 {vcardData.fullName || "N/A"}
               </Text>
               <Text className="text-gray-500 font-medium text-base">
@@ -159,7 +159,7 @@ const VCardDetailPage: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-3">
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
+            className="bg-primary p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleEmail}
           >
             <div
@@ -178,7 +178,7 @@ const VCardDetailPage: React.FC = () => {
           </Box>
 
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
+            className="bg-primary p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleCall}
           >
             <div
@@ -195,7 +195,7 @@ const VCardDetailPage: React.FC = () => {
           </Box>
 
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
+            className="bg-primary p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleWebsite}
           >
             <div
@@ -214,7 +214,7 @@ const VCardDetailPage: React.FC = () => {
           </Box>
 
           <Box
-            className="bg-blue-500 p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
+            className="bg-primary p-4 rounded-xl shadow-md cursor-pointer active:opacity-80 transition-opacity relative group"
             onClick={handleWebsite}
           >
             <div

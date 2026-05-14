@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { QRCardUI } from "./QRCardUI";
 import { QrCode } from "@/store";
 import { QR_CARD_ANIMATION_CLOSE_DELAY } from "@/utils/constants/qr";
-import { IconDownload, IconDotsVertical, IconX } from "@tabler/icons-react";
+import { IconDownload, IconDotsVertical, IconTrash } from "@tabler/icons-react";
 import { toPng } from "html-to-image";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { Button } from "zmp-ui";
@@ -12,9 +12,16 @@ interface QRFocusViewProps {
   isOpen: boolean;
   onClose: () => void;
   onMoreClick: (qr: QrCode) => void;
+  onDelete: (qr: QrCode) => void;
 }
 
-export const QRFocusView: React.FC<QRFocusViewProps> = ({ qr, isOpen, onClose, onMoreClick }) => {
+export const QRFocusView: React.FC<QRFocusViewProps> = ({
+  qr,
+  isOpen,
+  onClose,
+  onMoreClick,
+  onDelete,
+}) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -77,8 +84,8 @@ export const QRFocusView: React.FC<QRFocusViewProps> = ({ qr, isOpen, onClose, o
           transition: `transform ${QR_CARD_ANIMATION_CLOSE_DELAY}ms cubic-bezier(0.16, 1, 0.3, 1)`,
         }}
       >
-        <div ref={cardRef} className="w-[calc(100vw-48px)]  aspect-[1.586/1] flex flex-col gap-2">
-          {qr && <QRCardUI qr={qr} showMore={false} />}
+        <div ref={cardRef} className="w-[calc(100vw-48px)] max-w-[400px]  flex flex-col gap-2">
+          <div className="aspect-[1.586/1]">{qr && <QRCardUI qr={qr} showMore={false} />}</div>
           <div className="w-full flex justify-between gap-2">
             <Button
               onClick={() => {
@@ -95,8 +102,10 @@ export const QRFocusView: React.FC<QRFocusViewProps> = ({ qr, isOpen, onClose, o
               className="bg-white/10 w-full hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white rounded-2xl py-8 h-auto font-bold flex flex-col items-center gap-1 transition-all active:scale-95"
             />
             <Button
-              onClick={onClose}
-              icon={<IconX size={24} />}
+              onClick={() => {
+                if (qr) onDelete(qr);
+              }}
+              icon={<IconTrash size={24} />}
               className="bg-white/10 w-full hover:bg-white/20 backdrop-blur-xl border border-white/20 text-white rounded-2xl py-8 h-auto font-bold flex flex-col items-center gap-1 transition-all active:scale-95"
             />
           </div>

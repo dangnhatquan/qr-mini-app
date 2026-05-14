@@ -79,7 +79,7 @@ const UIKitPage: React.FC = () => {
                 Brand Colors
               </Text.Title>
               <Box className="grid grid-cols-2 gap-3 mb-6">
-                <ColorBox color="bg-blue-600" label="Primary" hex="#2563eb" />
+                <ColorBox color="bg-primary" label="Primary" hex="#2563eb" />
                 <ColorBox
                   color="bg-blue-100"
                   label="Primary Light"

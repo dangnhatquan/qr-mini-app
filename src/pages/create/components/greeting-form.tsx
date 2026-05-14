@@ -134,7 +134,7 @@ export const GreetingForm: React.FC<GreetingFormProps> = ({
                 <button
                   type="button"
                   onClick={handleOpenEditor}
-                  className="text-xs text-blue-500 font-semibold underline"
+                  className="text-xs text-blue-primary font-semibold underline"
                 >
                   Chỉnh sửa
                 </button>

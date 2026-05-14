@@ -21,7 +21,7 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
 
   if (isFetching) {
     return (
-      <Box className="w-full h-screen flex items-center justify-center">
+      <Box className="w-full h-[398px] flex items-center justify-center">
         <Spinner />
       </Box>
     );
@@ -37,6 +37,8 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
         options={banks.map((bank) => ({
           value: bank.bin || bank.code || bank.id.toString(), // prefer BIN for VietQR
           label: bank.shortName || bank.name,
+          description: bank.name,
+          image: bank.logo,
         }))}
         defaultValue={DEFAULT_BANK_ID}
         required

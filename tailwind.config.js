@@ -1,3 +1,5 @@
+import { colors } from "zaui-tokens";
+
 /* eslint-env node */
 module.exports = {
   darkMode: ["selector", '[zaui-theme="dark"]'],
@@ -7,6 +9,15 @@ module.exports = {
   },
   theme: {
     extend: {
+      colors: {
+        primary: "var(--primary-color)",
+        "primary-light": "var(--primary-light)",
+        secondary: "var(--secondary-color)",
+        background: "var(--background-color)",
+        surface: "var(--surface-color)",
+        main: "var(--text-main)",
+        muted: "var(--text-muted)",
+      },
       fontFamily: {
         mono: ["Roboto Mono", "monospace"],
       },

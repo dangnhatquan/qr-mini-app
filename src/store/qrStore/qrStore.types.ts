@@ -85,8 +85,6 @@ export interface PreviewImage {
   deletedAt: string | null;
 }
 
-// Using EditorStage from editorStore.types.ts
-
 export interface QRStore {
   qrCodeRecords: QrCode[];
   isFetching: boolean;

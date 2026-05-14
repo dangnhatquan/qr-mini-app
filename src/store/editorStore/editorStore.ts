@@ -51,9 +51,6 @@ export const useEditorStore = create<KonvaEditorStore>((set) => {
     stagePos: { x: 0, y: 0 },
     setStagePos: createSetter("stagePos"),
 
-    openSection: null,
-    setOpenSection: createSetter("openSection"),
-
     isCollapsed: false,
     setIsCollapsed: createSetter("isCollapsed"),
 

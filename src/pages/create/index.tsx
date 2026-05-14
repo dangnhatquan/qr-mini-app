@@ -239,7 +239,7 @@ const CreatePage: React.FC = () => {
           <InputFormField
             name="name"
             control={control}
-            label="Tên gợi nhớ (Không bắt buộc)"
+            label="Tên gợi nhớ"
             placeholder="Ví dụ: Wifi Nhà, Ngân hàng cá nhân..."
           />
           {!isEdit && (

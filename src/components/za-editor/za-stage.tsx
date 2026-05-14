@@ -1,7 +1,7 @@
 import { ImageElement } from "@/components/za-editor/qr-element";
 import { TextElement } from "@/components/za-editor/text-element";
-import { CanvasElement, CanvasElementType } from "@/store";
-import { IconFocusCentered, IconTrash } from "@tabler/icons-react";
+import { CanvasElement, CanvasElementType, EditorOutputs } from "@/store";
+import { IconCheck, IconFocusCentered, IconRotate, IconTrash } from "@tabler/icons-react";
 import { Group, Layer, Rect, Stage } from "react-konva";
 import { Box } from "zmp-ui";
 import { useEditor } from "./hooks/useEditor";
@@ -9,9 +9,10 @@ import { FC } from "react";
 
 export interface IZaStageProps {
   toolbarHeight: number;
+  onSave?: (outputs: EditorOutputs) => void;
 }
 
-export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
+export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight, onSave }) => {
   const {
     translateY,
     canvasBg,
@@ -33,7 +34,17 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
     handleTouchEndZoom,
     handleResetView,
     handleWheel,
+    handleSave,
+    handleDiscard,
   } = useEditor();
+
+  const handleSaveClick = () => {
+    handleSave(onSave!);
+  };
+
+  const handleResetClick = () => {
+    handleDiscard();
+  };
 
   return (
     <Box className="flex-1 flex flex-col items-center justify-center bg-[#d1d5db] overflow-hidden relative">
@@ -158,21 +169,28 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
       )}
 
       <div
-        className={`absolute left-0 right-0 px-4 flex justify-between items-center pointer-events-none z-40 ${isDragging ? "" : "transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"}`}
+        className={`absolute left-0 right-0 px-4 flex justify-between items-end pointer-events-none z-40 ${isDragging ? "" : "transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"}`}
         style={{
           bottom: `${toolbarHeight - translateY + 16}px`,
         }}
       >
-        <div className="flex gap-3 pointer-events-auto">
+        <div className="flex flex-col justify-end gap-3 pointer-events-auto">
+          <div
+            onClick={handleResetClick}
+            id="reset-button"
+            className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-10 h-10 flex items-center justify-center p-0"
+          >
+            <IconRotate className="text-black font-bold" size={20} />
+          </div>
           <div
             onClick={handleResetView}
-            className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-12 h-12 flex items-center justify-center p-0"
+            className="cursor-pointer bg-white shadow-xl border border-gray-100 !rounded-full w-10 h-10 flex items-center justify-center p-0"
           >
             <IconFocusCentered />
           </div>
         </div>
 
-        <div className="flex gap-3 pointer-events-auto">
+        <div className="flex flex-col justify-end  gap-3 pointer-events-auto">
           {selectedId && selectedId !== "qr-main" && (
             <div
               className="bg-red-500 flex items-center justify-center w-10 h-10 !rounded-full cursor-pointer"
@@ -184,6 +202,13 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight }) => {
               <IconTrash className="text-white font-bold" size={20} />
             </div>
           )}
+          <div
+            onClick={handleSaveClick}
+            id="save-button"
+            className="cursor-pointer bg-primary text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
+          >
+            <IconCheck className="font-bold" size={20} />
+          </div>
         </div>
       </div>
     </Box>

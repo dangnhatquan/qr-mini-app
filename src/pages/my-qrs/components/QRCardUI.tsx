@@ -63,7 +63,7 @@ export const QRCardUI: React.FC<QRCardUIProps> = ({ qr, showMore = true, onMoreC
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
 
       <div className="flex justify-between items-start relative z-10">
-        <Box className="flex-1 mr-4">
+        <Box className="">
           <Text className="font-extrabold text-2xl uppercase tracking-tighter text-white line-clamp-1 mb-3 leading-1 drop-shadow-md">
             {detailText}
           </Text>
@@ -78,7 +78,7 @@ export const QRCardUI: React.FC<QRCardUIProps> = ({ qr, showMore = true, onMoreC
         </Box>
         {showMore && onMoreClick && (
           <div
-            className="w-12 h-12 -mr-3 -mb-3 flex items-center justify-center cursor-pointer active:scale-90 transition-transform bg-white/10 backdrop-blur-sm rounded-full border border-white/10"
+            className="w-12 h-12 flex items-center justify-center cursor-pointer active:scale-90 transition-transform bg-white/10 backdrop-blur-sm rounded-full border border-white/10"
             onClick={onMoreClick}
           >
             <div className="flex space-x-1.5">

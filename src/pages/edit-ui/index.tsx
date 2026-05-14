@@ -6,6 +6,7 @@ import {
   IconTexture,
   IconTypography,
   IconAspectRatio,
+  IconPolaroid,
 } from "@tabler/icons-react";
 import { StylingTab } from "./components/StylingTab";
 import { LayoutTab } from "./components/LayoutTab";
@@ -18,6 +19,7 @@ import { showToast } from "zmp-sdk/apis";
 import { QREditor } from "./components/QREditor";
 import { TemplateTab } from "./components/TemplateTab";
 import { SizeTab } from "./components/SizeTab";
+import { ImageTab } from "../card-editor/components/ImageTab";
 
 const EditUIPage: FC = () => {
   const { id } = useParams();
@@ -42,6 +44,16 @@ const EditUIPage: FC = () => {
       content: <StylingTab />,
     },
     {
+      key: "size",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconAspectRatio className="w-5 h-5" />
+          Kích thước
+        </div>
+      ),
+      content: <SizeTab />,
+    },
+    {
       key: "template",
       label: (
         <div className="flex items-center justify-center gap-2">
@@ -61,16 +73,7 @@ const EditUIPage: FC = () => {
       ),
       content: <LayoutTab />,
     },
-    {
-      key: "text",
-      label: (
-        <div className="flex items-center justify-center gap-2">
-          <IconTypography className="w-5 h-5" />
-          Chữ
-        </div>
-      ),
-      content: <TextTab />,
-    },
+
     {
       key: "stickers",
       label: (
@@ -82,14 +85,24 @@ const EditUIPage: FC = () => {
       content: <StickerTab />,
     },
     {
-      key: "size",
+      key: "image",
       label: (
         <div className="flex items-center justify-center gap-2">
-          <IconAspectRatio className="w-5 h-5" />
-          Kích thước
+          <IconPolaroid className="w-5 h-5" />
+          Hình ảnh
         </div>
       ),
-      content: <SizeTab />,
+      content: <ImageTab />,
+    },
+    {
+      key: "text",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconTypography className="w-5 h-5" />
+          Chữ
+        </div>
+      ),
+      content: <TextTab />,
     },
   ];
 

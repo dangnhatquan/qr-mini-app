@@ -33,8 +33,6 @@ interface KonvaEditorContextType {
   setStageScale: React.Dispatch<React.SetStateAction<number>>;
   stagePos: { x: number; y: number };
   setStagePos: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
-  openSection: string | null;
-  setOpenSection: React.Dispatch<React.SetStateAction<string | null>>;
 
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;

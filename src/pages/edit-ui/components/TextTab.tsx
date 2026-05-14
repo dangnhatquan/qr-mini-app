@@ -30,7 +30,10 @@ export const TextTab = () => {
   return (
     <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
       <div className="mb-4">
-        <Button variant="secondary" onClick={handleAddText} prefixIcon={<IconPlus />} fullWidth>
+        <div className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">
+          Thêm chữ
+        </div>
+        <Button variant="secondary" onClick={handleAddText} prefixIcon={<IconPlus />}>
           Thêm Chữ
         </Button>
       </div>

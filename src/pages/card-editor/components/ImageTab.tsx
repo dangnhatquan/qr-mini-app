@@ -58,19 +58,20 @@ export const ImageTab = () => {
   };
 
   return (
-    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
-      <div className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">
-        Thêm hình ảnh vào thiệp
+    <Box p={4} className="flex justify-start overflow-y-auto pb-20">
+      <div className="w-full">
+        <div className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-semibold">
+          Thêm hình ảnh
+        </div>
+        <Button
+          variant="secondary"
+          prefixIcon={<IconUpload />}
+          onClick={handleUploadImage}
+          loading={uploading}
+        >
+          Tải ảnh từ thiết bị
+        </Button>
       </div>
-      <Button
-        variant="secondary"
-        fullWidth
-        prefixIcon={<IconUpload />}
-        onClick={handleUploadImage}
-        loading={uploading}
-      >
-        Tải ảnh từ thiết bị
-      </Button>
     </Box>
   );
 };

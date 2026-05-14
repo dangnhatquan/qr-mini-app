@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Text, Input, Button } from "zmp-ui";
 import { useEditor } from "@/components/za-editor/hooks/useEditor";
 import { FRAME_RATIOS } from "../utils/constants";
@@ -93,7 +93,7 @@ export const SizeTab = () => {
         <div
           onClick={handleApplyCustom}
           id="save-button"
-          className="mb-1 cursor-pointer bg-blue-500 text-white shadow-xl !rounded-full !w-8 h-8 flex items-center justify-center p-0"
+          className="mb-1 cursor-pointer bg-primary text-white shadow-xl !rounded-full !w-8 h-8 flex items-center justify-center p-0"
         >
           <IconCheck className="font-bold" size={20} />
         </div>

@@ -1,6 +1,6 @@
 import { EQRCategory, QrCode } from "@/store";
 import { getFullUrl } from "@/utils/axios";
-import { Box, Button, Modal, useNavigate } from "zmp-ui";
+import { Box, Modal, useNavigate } from "zmp-ui";
 import {
   IconDownload,
   IconEdit,
@@ -80,6 +80,8 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
 
   return (
     <Modal
+      maskClosable
+      onClose={handleToggleModal}
       visible={modalVisible}
       title={selectedQR ? `${getCategoryLabel(selectedQR.category)}` : "Chi tiết mã QR"}
       verticalActions
@@ -137,9 +139,6 @@ export const QRModal = ({ modalVisible, onToggle, selectedQR }: IQRModalProps) =
             <IconShare size={20} className="text-gray-800" />
           </div>
         </div>
-        <Button size="small" fullWidth onClick={handleToggleModal} type="neutral">
-          Đóng
-        </Button>
       </Box>
     </Modal>
   );

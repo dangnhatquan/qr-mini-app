@@ -5,6 +5,7 @@ import { storage } from "@/utils/storage";
 import { CardEditor } from "./components/CardEditor";
 import {
   IconAspectRatio,
+  IconPhoto,
   IconPolaroid,
   IconSticker,
   IconTexture,
@@ -19,6 +20,7 @@ import { LayoutTab } from "../edit-ui/components/LayoutTab";
 import { TextTab } from "../edit-ui/components/TextTab";
 import { ImageTab } from "./components/ImageTab";
 import { SizeTab } from "../edit-ui/components/SizeTab";
+import { TemplateTab } from "../edit-ui/components/TemplateTab";
 
 const CardEditorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -26,6 +28,26 @@ const CardEditorPage: React.FC = () => {
   const navigate = useNavigate();
 
   const customTabs = [
+    {
+      key: "size",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconAspectRatio className="w-5 h-5" />
+          Kích thước
+        </div>
+      ),
+      content: <SizeTab />,
+    },
+    {
+      key: "template",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconPhoto className="w-5 h-5" />
+          Template
+        </div>
+      ),
+      content: <TemplateTab />,
+    },
     {
       key: "layout",
       label: (
@@ -35,26 +57,6 @@ const CardEditorPage: React.FC = () => {
         </div>
       ),
       content: <LayoutTab />,
-    },
-    {
-      key: "text",
-      label: (
-        <div className="flex items-center justify-center gap-2">
-          <IconTypography className="w-5 h-5" />
-          Chữ
-        </div>
-      ),
-      content: <TextTab />,
-    },
-    {
-      key: "image",
-      label: (
-        <div className="flex items-center justify-center gap-2">
-          <IconPolaroid className="w-5 h-5" />
-          Hình ảnh
-        </div>
-      ),
-      content: <ImageTab />,
     },
     {
       key: "stickers",
@@ -67,14 +69,24 @@ const CardEditorPage: React.FC = () => {
       content: <StickerTab />,
     },
     {
-      key: "size",
+      key: "image",
       label: (
         <div className="flex items-center justify-center gap-2">
-          <IconAspectRatio className="w-5 h-5" />
-          Kích thước
+          <IconPolaroid className="w-5 h-5" />
+          Hình ảnh
         </div>
       ),
-      content: <SizeTab />,
+      content: <ImageTab />,
+    },
+    {
+      key: "text",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconTypography className="w-5 h-5" />
+          Chữ
+        </div>
+      ),
+      content: <TextTab />,
     },
   ];
 

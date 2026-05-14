@@ -32,7 +32,7 @@ export const ZaOverlay = ({ onDiscard, onSave }: IZaOverlayProps) => {
         <div
           onClick={handleSaveClick}
           id="save-button"
-          className="cursor-pointer bg-blue-500 text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
+          className="cursor-pointer bg-primary text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
         >
           <IconCheck className="font-bold" size={20} />
         </div>

@@ -136,7 +136,7 @@ export const BACKGROUND_COLORS = [
   COLOR.BLACK,
 ];
 
-export const STICKERS = [
+export const ZAPY_STICKERS = [
   `${PUBLIC_API_URL}/api/v1/files/serve/961361ea-890a-4bdd-ae75-b7dc47fcd054`,
   `${PUBLIC_API_URL}/api/v1/files/serve/9b56f4db-1c3d-48ab-aaf1-831ba760ce2c`,
   `${PUBLIC_API_URL}/api/v1/files/serve/9e28893d-e2d6-4774-8604-499fb45bfc83`,
@@ -150,6 +150,13 @@ export const STICKERS = [
   `${PUBLIC_API_URL}/api/v1/files/serve/d62f4173-ef6c-46bb-94b3-fa73f0bf1655`,
   `${PUBLIC_API_URL}/api/v1/files/serve/4f952945-d9e8-4180-8582-ffb5a7730f0c`,
   `${PUBLIC_API_URL}/api/v1/files/serve/7dc65d82-9eb5-4180-929a-940c48f8105b`,
+];
+
+export const STICKERS = [
+  {
+    name: "Zapy Vô tri",
+    stickers: ZAPY_STICKERS,
+  },
 ];
 
 export const ERROR_CORRECTION_LEVELS = [

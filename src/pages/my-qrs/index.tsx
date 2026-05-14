@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Page, Box, Text, Spinner, Modal } from "zmp-ui";
+import { Page, Box, Text, Spinner, Modal, Button } from "zmp-ui";
 import { IconGridDots, IconPlus } from "@tabler/icons-react";
 import { showToast } from "zmp-sdk/apis";
 import { useNavigate } from "react-router-dom";
@@ -91,15 +91,17 @@ const MyQRsPage: React.FC = () => {
         isOpen={isFocusOpen}
         onClose={closeFocus}
         onMoreClick={handleMoreClick}
+        onDelete={(qr) => {
+          setDeleteConfirmQR(qr);
+          closeFocus();
+        }}
       />
       <div
         className="pt-10 relative min-h-screen flex flex-col overflow-x-hidden"
         id="page-content-wrapper"
       >
         <Box p={6} className="pb-2" id="page-header">
-          <Text className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
-            QR của tôi
-          </Text>
+          <Text className="text-3xl font-black text-primary">QR của tôi</Text>
           <Text className="text-gray-400 text-sm font-medium mt-1 uppercase tracking-widest">
             {qrs.length} mã QR đã lưu
           </Text>
@@ -154,12 +156,18 @@ const MyQRsPage: React.FC = () => {
         )}
       </div>
 
-      <div
-        className="fixed z-50 flex bg-blue-500 items-center justify-center bottom-6 right-4 rounded-full w-12 h-12 shadow-xl shadow-blue-200 font-bold text-lg active:scale-95 transition-transform"
+      {/* <div
+        className="fixed z-50 flex bg-primary items-center justify-center bottom-6 right-4 rounded-full w-12 h-12 font-bold text-lg active:scale-95 transition-transform"
         onClick={() => navigate(createRoute)}
       >
         <IconPlus size={24} className="text-white" />
-      </div>
+      </div> */}
+
+      <Button
+        className="fixed z-50 flex bg-primary items-center justify-center bottom-6 right-4 rounded-full w-12 h-12 font-bold text-lg active:scale-95 transition-transform"
+        onClick={() => navigate(createRoute)}
+        icon={<IconPlus size={24} className="text-white" />}
+      ></Button>
 
       <QRModal
         selectedQR={selectedQR}

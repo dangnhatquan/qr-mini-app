@@ -4,7 +4,7 @@ import { EQRCategory, EQRType, EWifiSecurity } from "@/store/qrStore/qrStore.typ
 import { Options } from "qr-code-styling";
 
 export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
-export const DEFAULT_BANK_ID = "970422";
+export const DEFAULT_BANK_ID = "970436";
 export const DEFAULT_MAX_ATTEMPTS = 5;
 
 export const DEFAULT_QR_FORM_VALUES = {

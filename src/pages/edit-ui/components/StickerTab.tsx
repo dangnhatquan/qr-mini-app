@@ -12,7 +12,6 @@ export const StickerTab = () => {
   const [uploading, setUploading] = useState(false);
 
   const handleAddSticker = async (url: string, fileId?: string, width = 100, height = 100) => {
-    // eslint-disable-next-line react-hooks/purity
     const id = `sticker-${Date.now()}`;
 
     const ratio = width / height;
@@ -62,30 +61,39 @@ export const StickerTab = () => {
   };
 
   return (
-    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
-      <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
+    <Box p={4} className="overflow-y-auto pb-20">
+      <div className="text-xs text-gray-500 mb-4 uppercase tracking-wider font-semibold">
         Kho nhãn dán
       </div>
-      <div className="grid grid-cols-4 gap-4 pb-4">
-        {STICKERS.map((s) => (
-          <img
-            key={s}
-            src={getFullUrl(s)}
-            className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
-            onClick={() => handleAddSticker(s)}
-          />
+      <div className="flex justify-start items-center mb-4">
+        <Button
+          variant="secondary"
+          fullWidth
+          icon={<IconPlus />}
+          onClick={handleUploadSticker}
+          loading={uploading}
+        >
+          Tải Sticker lên
+        </Button>
+      </div>
+      <div>
+        {STICKERS.map((set) => (
+          <div key={set.name}>
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
+              {set.name}
+            </div>
+            <div className="grid grid-cols-4 xl:grid-cols-6 2xl:grid-cols-10 gap-4 pb-4">
+              {set.stickers.map((s) => (
+                <img
+                  key={s}
+                  src={getFullUrl(s)}
+                  className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
+                  onClick={() => handleAddSticker(s)}
+                />
+              ))}
+            </div>
+          </div>
         ))}
-        <div className="w-full aspect-square flex justify-center items-center">
-          <Button
-            variant="secondary"
-            fullWidth
-            icon={<IconPlus />}
-            onClick={handleUploadSticker}
-            loading={uploading}
-          >
-            Tải Sticker lên
-          </Button>
-        </div>
       </div>
     </Box>
   );

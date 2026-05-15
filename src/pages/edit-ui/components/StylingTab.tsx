@@ -1,6 +1,6 @@
 import { Accordion } from "@/components/accordion";
 import { Box, Button, Input } from "zmp-ui";
-import { IconUser, IconPlus } from "@tabler/icons-react";
+import { IconUser, IconPlus, IconLoader } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import {
   BACKGROUND_COLORS,
@@ -10,15 +10,17 @@ import {
   DOT_TYPES,
   ERROR_CORRECTION_LEVELS,
 } from "../utils/constants";
-import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
-import { Options } from "qr-code-styling";
+import { chooseImage, getUserInfo } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
+import { ErrorCorrectionLevel, Options } from "qr-code-styling";
 import { uploadFile } from "@/utils/helpers/image";
 import { useState } from "react";
-import { getFullUrl } from "@/utils/axios";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
 
 export const StylingTab = () => {
-  const { openSection, setOpenSection, qrOptions, setQrOptions } = useKonvaEditor();
+  const { qrOptions, setQrOptions, logoFileId, setLogoFileId, sessionId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>("dots");
 
   const updateQrOption = (category: keyof Options, key: string, value: string | number) => {
     setQrOptions((prev: Options) => ({
@@ -42,17 +44,18 @@ export const StylingTab = () => {
 
         const response = await fetch(finalPath);
         const blob = await response.blob();
-        const file = await uploadFile(blob);
+        const file = await uploadFile(blob, sessionId);
 
         setQrOptions((prev) => ({
           ...prev,
           image: getFullUrl(file.path),
         }));
-        showToast({ message: "Đã thêm Avatar" });
+        setLogoFileId(file.id);
+        openSnackbar({ text: "Đã thêm Avatar", type: "success" });
       }
     } catch (_err) {
       console.error("Use avatar error:", _err);
-      showToast({ message: "Lỗi lấy thông tin" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi lấy thông tin"), type: "error" });
     } finally {
       setUploading(false);
     }
@@ -66,24 +69,25 @@ export const StylingTab = () => {
         const path = filePaths[0];
         const response = await fetch(path);
         const blob = await response.blob();
-        const file = await uploadFile(blob);
+        const file = await uploadFile(blob, sessionId);
 
         setQrOptions((prev) => ({
           ...prev,
           image: getFullUrl(file.path),
         }));
-        showToast({ message: "Đã thêm Logo" });
+        setLogoFileId(file.id);
+        openSnackbar({ text: "Đã thêm Logo", type: "success" });
       }
     } catch (_err) {
       console.error("Upload logo error:", _err);
-      showToast({ message: "Lỗi tải ảnh" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi tải ảnh"), type: "error" });
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <Box className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+    <Box className="overflow-y-auto pb-20">
       <Accordion
         title="Tùy chỉnh điểm ảnh"
         isOpen={openSection === "dots"}
@@ -216,26 +220,35 @@ export const StylingTab = () => {
         onClick={() => setOpenSection(openSection === "image" ? null : "image")}
       >
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" onClick={handleUseAvatar} prefixIcon={<IconUser />}>
-              Dùng Avatar
-            </Button>
-            <Button
-              variant="secondary"
-              fullWidth
-              prefixIcon={<IconPlus />}
-              onClick={handleUploadLogo}
-              loading={uploading}
-            >
-              Tải Logo lên
-            </Button>
-          </div>
+          {uploading ? (
+            <div className="w-full flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="secondary" onClick={handleUseAvatar} prefixIcon={<IconUser />}>
+                Dùng Avatar
+              </Button>
+              <Button
+                variant="secondary"
+                fullWidth
+                prefixIcon={<IconPlus />}
+                onClick={handleUploadLogo}
+              >
+                Tải Logo lên
+              </Button>
+            </div>
+          )}
           {qrOptions.image && (
             <Button
               size="small"
               type="danger"
               variant="secondary"
-              onClick={() => setQrOptions((prev) => ({ ...prev, image: "" }))}
+              onClick={async () => {
+                console.warn("🗑️ Deleting logo. LogoFileId:", logoFileId);
+                setQrOptions((prev) => ({ ...prev, image: "" }));
+                setLogoFileId(null);
+              }}
             >
               Xoá Logo
             </Button>
@@ -269,7 +282,10 @@ export const StylingTab = () => {
               onClick={() =>
                 setQrOptions((prev) => ({
                   ...prev,
-                  qrOptions: { ...prev.qrOptions, errorCorrectionLevel: level.value as any },
+                  qrOptions: {
+                    ...prev.qrOptions,
+                    errorCorrectionLevel: level.value as ErrorCorrectionLevel,
+                  },
                 }))
               }
               className={`px-3 py-2 rounded-lg border text-xs text-center cursor-pointer font-medium transition-all ${

@@ -2,28 +2,32 @@ import { Box, Button } from "zmp-ui";
 import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
-import { chooseImage, showToast } from "zmp-sdk/apis";
-import { uploadFile } from "@/utils/helpers/image";
-import { getFullUrl } from "@/utils/axios";
+import { chooseImage } from "zmp-sdk/apis";
+import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
+import { openSnackbar } from "@/utils/snackbar";
 import { STICKERS } from "../utils/constants";
 
 export const StickerTab = () => {
-  const { elements, setElements, setSelectedId } = useKonvaEditor();
+  const { elements, setElements, setSelectedId, sessionId } = useKonvaEditor();
   const [uploading, setUploading] = useState(false);
 
-  const handleAddSticker = (url: string) => {
-    // eslint-disable-next-line react-hooks/purity
-    const id = `sticker-${Date.now().toString()}`;
+  const handleAddSticker = async (url: string, fileId?: string, width = 100, height = 100) => {
+    const id = `sticker-${Date.now()}`;
+
+    const ratio = width / height;
+
     setElements([
       ...elements,
       {
         id,
         type: "image",
         src: url,
-        x: 100,
-        y: 100,
-        width: 80,
-        height: 80,
+        fileId,
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100 / ratio,
         rotation: 0,
       },
     ]);
@@ -40,12 +44,14 @@ export const StickerTab = () => {
             setUploading(true);
             const response = await fetch(path);
             const blob = await response.blob();
-            const file = await uploadFile(blob);
-            handleAddSticker(getFullUrl(file.path));
-            showToast({ message: "Đã thêm Sticker" });
+            const file = await uploadFile(blob, sessionId);
+            const url = getFullUrl(file.path);
+            const { width, height } = await getImageDimensions(blob);
+            handleAddSticker(url, file.id, width, height);
+            openSnackbar({ text: "Đã thêm Sticker", type: "success" });
           } catch (err) {
             console.error("Upload sticker error:", err);
-            showToast({ message: "Lỗi tải Sticker" });
+            openSnackbar({ text: getErrorMessage(err, "Lỗi tải Sticker"), type: "error" });
           } finally {
             setUploading(false);
           }
@@ -56,30 +62,39 @@ export const StickerTab = () => {
   };
 
   return (
-    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
-      <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
+    <Box p={4} className="overflow-y-auto pb-20">
+      <div className="text-xs text-gray-500 mb-4 uppercase tracking-wider font-semibold">
         Kho nhãn dán
       </div>
-      <div className="grid grid-cols-4 gap-4 pb-4">
-        {STICKERS.map((s) => (
-          <img
-            key={s}
-            src={getFullUrl(s)}
-            className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
-            onClick={() => handleAddSticker(s)}
-          />
+      <div className="flex justify-start items-center mb-4">
+        <Button
+          variant="secondary"
+          fullWidth
+          icon={<IconPlus />}
+          onClick={handleUploadSticker}
+          loading={uploading}
+        >
+          Tải Sticker lên
+        </Button>
+      </div>
+      <div>
+        {STICKERS.map((set) => (
+          <div key={set.name}>
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
+              {set.name}
+            </div>
+            <div className="grid grid-cols-4 xl:grid-cols-6 2xl:grid-cols-10 gap-4 pb-4">
+              {set.stickers.map((s) => (
+                <img
+                  key={s}
+                  src={getFullUrl(s)}
+                  className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
+                  onClick={() => handleAddSticker(s)}
+                />
+              ))}
+            </div>
+          </div>
         ))}
-        <div className="w-full aspect-square flex justify-center items-center">
-          <Button
-            variant="secondary"
-            fullWidth
-            icon={<IconPlus />}
-            onClick={handleUploadSticker}
-            loading={uploading}
-          >
-            Tải Sticker lên
-          </Button>
-        </div>
       </div>
     </Box>
   );

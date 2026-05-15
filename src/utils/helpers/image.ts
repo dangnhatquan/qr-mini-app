@@ -1,5 +1,5 @@
 import request, { getFullUrl } from "../axios";
-import { getPresignedUrl } from "@/resources";
+import { filesResource, getPresignedUrl } from "@/resources";
 
 export const resizeImage = (
   base64: string,
@@ -71,17 +71,49 @@ export const preloadImage = async (
   }
 };
 
-export const uploadFile = async (blob: Blob | File): Promise<{ id: string; path: string }> => {
-  const uploadInfo = await request.get<{
+export const uploadFile = async (
+  blob: Blob | File,
+  sessionId?: string,
+): Promise<{ id: string; path: string }> => {
+  const response = await request.get<{
     file: { id: string; path: string };
     uploadSignedUrl: string;
-  }>(getPresignedUrl);
+  }>(getPresignedUrl, {
+    params: {
+      sessionId,
+      fileSize: blob.size,
+    },
+  });
 
-  const { uploadSignedUrl, file } = uploadInfo;
+  const { uploadSignedUrl, file } = response.data;
 
   await request.put(uploadSignedUrl, blob, {
     headers: { "Content-Type": blob.type || "image/png" },
   });
 
   return file;
+};
+
+export const getImageDimensions = (blob: Blob) => {
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = URL.createObjectURL(blob);
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = reject;
+  });
+};
+
+export const deleteFile = async (fileId?: string | null): Promise<void> => {
+  if (!fileId) {
+    console.info("⚠️ deleteFile called without ID. Skipping.");
+    return;
+  }
+  console.info("🚀 Attempting to delete file from S3. ID:", fileId);
+  try {
+    const response = await request.delete(`${filesResource}/${fileId}`);
+    console.info("✅ File deleted successfully:", fileId, response.data);
+  } catch (error) {
+    console.error("❌ deleteFile error for ID:", fileId, error);
+  }
 };

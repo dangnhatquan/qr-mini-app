@@ -1,187 +1,51 @@
-import { getPresignedUrl, qrRecordResource } from "@/resources";
-import { EQRCategory, EQRType, QrCode } from "@/types/qr";
+import { qrRecordResource } from "@/resources";
 import request from "@/utils/axios";
-import { ZALO_APP_LINK } from "@/utils/constants/common";
 import { DEFAULT_EDITOR_STAGE } from "@/utils/constants/qr";
-import Konva from "konva";
 import {
   buildQRCreatePayload,
   cleanUpBase64,
   generateDynamicLink,
-  generateVietQRPayload,
-  generateWifiPayload,
+  generateQRBlob,
+  getQRPayload,
 } from "@/utils/helpers/qr";
 import { IQRFormValues } from "@/utils/schemas/qr";
-import QRCodeStyling from "qr-code-styling";
 import { ZALO_APP_DEV_VERSION } from "@/api";
-import { StageProps } from "react-konva";
-import { CanvasElement, CanvasElementType } from "@/types/editor";
+
 import { uploadFile } from "@/utils/helpers/image";
-
-export const getQRPayload = (data: IQRFormValues, id?: string): string => {
-  switch (data.category) {
-    case EQRCategory.BANKING: {
-      const { bankId, accountNo, amount, description } = data.bankingData!;
-      return generateVietQRPayload({
-        bankId,
-        accountNumber: accountNo,
-        amount,
-        description,
-      });
-    }
-
-    case EQRCategory.WIFI: {
-      const { ssid, password, security } = data.wifiData!;
-      return generateWifiPayload(ssid, password, security);
-    }
-
-    case EQRCategory.VCARD:
-    case EQRCategory.GREETING: {
-      const finalVersion = ZALO_APP_DEV_VERSION;
-      return generateDynamicLink(finalVersion, id!, data.category, undefined);
-    }
-
-    default: {
-      return ZALO_APP_LINK;
-    }
-  }
-};
-
-export const generateQRBlob = async (text: string, editorStage?: StageProps): Promise<Blob> => {
-  const stageData = editorStage || DEFAULT_EDITOR_STAGE;
-
-  const qrCode = new QRCodeStyling({
-    ...(stageData.qrOptions || DEFAULT_EDITOR_STAGE.qrOptions),
-    data: text,
-  });
-
-  const raw = await qrCode.getRawData("webp");
-  if (!raw) throw new Error("Failed to generate QR blob");
-
-  const rawBlob = raw instanceof Blob ? raw : new Blob([raw as BlobPart], { type: "image/webp" });
-
-  const imgUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(rawBlob);
-  });
-
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.crossOrigin = "Anonymous";
-    img.src = imgUrl;
-  });
-
-  const container = document.createElement("div");
-  const stage = new Konva.Stage({
-    container,
-    width: 350,
-    height: 450,
-  });
-
-  const layer = new Konva.Layer();
-  const group = new Konva.Group({
-    clipX: 0,
-    clipY: 0,
-    clipWidth: 350,
-    clipHeight: 450,
-  });
-
-  const bgRect = new Konva.Rect({
-    width: 350,
-    height: 450,
-    fill: stageData.canvasBg || DEFAULT_EDITOR_STAGE.canvasBg,
-    cornerRadius: 8,
-  });
-  group.add(bgRect);
-
-  const qrEl = (stageData.elements || DEFAULT_EDITOR_STAGE.elements).find(
-    (e: CanvasElement) => e.id === "qr-main",
-  );
-
-  const otherElements = (stageData.elements || []).filter((e: CanvasElement) => e.id !== "qr-main");
-  for (const el of otherElements) {
-    if (el.type === CanvasElementType.IMAGE && el.src) {
-      const imageElement = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.crossOrigin = "Anonymous";
-        img.src = el.src;
-      });
-      const newKonvaImage = new Konva.Image({
-        image: imageElement,
-        x: el.x,
-        y: el.y,
-        width: el.width,
-        height: el.height,
-        rotation: el.rotation,
-      });
-      group.add(newKonvaImage);
-    } else if (el.type === CanvasElementType.TEXT) {
-      const konvaText = new Konva.Text({
-        text: el.text,
-        x: el.x,
-        y: el.y,
-        fontSize: el.fontSize,
-        fill: el.fill,
-        width: el.width,
-        align: el.align,
-        rotation: el.rotation,
-      });
-      group.add(konvaText);
-    }
-  }
-
-  if (qrEl) {
-    const konvaImg = new Konva.Image({
-      image,
-      x: qrEl.x,
-      y: qrEl.y,
-      width: qrEl.width,
-      height: qrEl.height,
-      rotation: qrEl.rotation,
-    });
-    group.add(konvaImg);
-  }
-
-  layer.add(group);
-  stage.add(layer);
-
-  const dataURL = stage.toDataURL({ pixelRatio: 3, mimeType: "image/webp" });
-
-  stage.destroy();
-
-  const res = await fetch(dataURL);
-  return await res.blob();
-};
+import { EQRCategory, EQRType, QrCode, EditorStage } from "@/store";
 
 export const qrService = {
   async getMyQRs() {
-    return await request.get<QrCode[]>(qrRecordResource);
+    const response = await request.get<QrCode[]>(qrRecordResource);
+    return response.data;
   },
 
-  async createQR(data: IQRFormValues) {
+  async createQR(data: IQRFormValues, sessionId?: string) {
     if (data.qrType === EQRType.DYNAMIC) {
       const createPayload = {
+        name: data.name,
         qrType: data.qrType,
         category: data.category,
         wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
         bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
         vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
-        greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
+        greetingData:
+          data.category === EQRCategory.GREETING
+            ? {
+                ...data.greetingData,
+                isPasswordProtected: !!data.greetingData?.password,
+                hasPassword: !!data.greetingData?.password,
+              }
+            : undefined,
       };
 
       const qrResponse = await request.post<{
         id: string;
         slug: string;
         shortUrl: string;
-      }>(qrRecordResource, createPayload);
+      }>(qrRecordResource, { ...createPayload, sessionId });
 
-      const { id, shortUrl } = qrResponse;
+      const { id, shortUrl } = qrResponse.data;
 
       const finalVersion = ZALO_APP_DEV_VERSION;
 
@@ -189,73 +53,84 @@ export const qrService = {
 
       const blob = await generateQRBlob(finalUrl);
 
-      const file = await uploadFile(blob);
+      const file = await uploadFile(blob, sessionId);
 
       const updatePayload = {
         editorStage: DEFAULT_EDITOR_STAGE,
         previewImageId: file.id,
       };
 
-      return await request.patch(`${qrRecordResource}/${id}`, updatePayload);
+      const response = await request.patch(`${qrRecordResource}/${id}`, {
+        ...updatePayload,
+        sessionId,
+      });
+      return response.data;
     }
 
     const payloadString = getQRPayload(data);
     const blob = await generateQRBlob(payloadString);
 
-    const file = await uploadFile(blob);
+    const file = await uploadFile(blob, sessionId);
 
     const payload = buildQRCreatePayload(data, file);
 
-    const response = await request.post(qrRecordResource, payload);
+    const response = await request.post(qrRecordResource, { ...payload, sessionId });
 
-    return response;
+    return response.data;
   },
 
   async getQRDetail(id: string) {
-    return await request.get<QrCode>(`${qrRecordResource}/${id}`);
+    const response = await request.get<QrCode>(`${qrRecordResource}/${id}`);
+    return response.data;
   },
 
-  async updateQR(id: string, data: IQRFormValues, customBlob?: Blob, editorStage?: StageProps) {
-    let finalEditorStage = editorStage;
-    if (!finalEditorStage) {
-      const existing = await this.getQRDetail(id);
-      finalEditorStage = existing.editorStage;
-    }
+  async updateQR(
+    id: string,
+    data: IQRFormValues,
+    customBlob?: Blob,
+    editorStage?: EditorStage,
+    sessionId?: string,
+  ) {
+    const existing = await this.getQRDetail(id);
+
+    let finalEditorStage = editorStage || existing.editorStage;
 
     const payloadString = getQRPayload(data, id);
     const blob = customBlob || (await generateQRBlob(payloadString, finalEditorStage));
 
-    const uploadInfo = await request.get<{
-      file: { id: string; path: string };
-      uploadSignedUrl: string;
-    }>(getPresignedUrl);
+    const file = await uploadFile(blob, sessionId);
 
-    const { uploadSignedUrl, file } = uploadInfo;
-
-    await request.put(uploadSignedUrl, blob, {
-      headers: { "Content-Type": "image/webp" },
-    });
-
-    const payload: any = {
+    const payload: Record<string, unknown> = {
+      name: data.name,
       qrType: data.qrType,
       category: data.category,
       previewImageId: file.id,
       wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
       bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
       vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
-      greetingData: data.category === EQRCategory.GREETING ? data.greetingData : undefined,
+      greetingData:
+        data.category === EQRCategory.GREETING
+          ? {
+              ...data.greetingData,
+              isPasswordProtected: !!data.greetingData?.password,
+              hasPassword: !!data.greetingData?.password,
+            }
+          : undefined,
     };
 
     if (editorStage) {
       payload.editorStage = cleanUpBase64(editorStage);
     }
 
-    const response = await request.patch(`${qrRecordResource}/${id}`, payload);
-
-    return response;
+    const response = await request.patch(`${qrRecordResource}/${id}`, {
+      ...payload,
+      sessionId,
+    });
+    return response.data;
   },
 
   async deleteQR(id: string) {
-    return await request.delete(`${qrRecordResource}/${id}`);
+    const response = await request.delete(`${qrRecordResource}/${id}`);
+    return response.data;
   },
 };

@@ -1,3 +1,6 @@
+import { IQRFormValues } from "@/utils/schemas/qr";
+import { EditorStage } from "../editorStore";
+
 export enum EQRType {
   STATIC = "static",
   DYNAMIC = "dynamic",
@@ -15,10 +18,6 @@ export enum EWifiSecurity {
   WEP = "WEP",
   NONE = "None",
 }
-
-export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
-export const DEFAULT_BANK_ID = "970422";
-export const DEFAULT_MAX_ATTEMPTS = 5;
 
 export interface IQRBackendPayload {
   wifiData?: WifiQRData;
@@ -61,6 +60,7 @@ export interface GreetingQRData {
 
 export interface QrCode {
   id: string;
+  name?: string;
   userId: number;
   type: string;
   category: string;
@@ -85,7 +85,26 @@ export interface PreviewImage {
   deletedAt: string | null;
 }
 
-export interface EditorStage {
-  dots: string;
-  color: string;
+export interface QRStore {
+  qrCodeRecords: QrCode[];
+  isFetching: boolean;
+  error: string | null;
+
+  selectedQR: QrCode | null;
+  isFetchingSelectedQR: boolean;
+  errorSelectedQR: string | null;
+
+  setSelectedQR: (qr: QrCode) => void;
+  fetchQRRecords: () => Promise<void>;
+  fetchQRDetail: (id: string) => Promise<void>;
+  removeQRRecord: (id: string, callback?: () => void) => Promise<void>;
+
+  updateQRRecord: (
+    id: string,
+    data: IQRFormValues,
+    blob?: Blob,
+    editorStage?: EditorStage,
+    sessionId?: string,
+    callback?: () => void,
+  ) => Promise<void>;
 }

@@ -1,5 +1,5 @@
-import { getFullUrl } from "@/utils/axios";
-import { uploadFile } from "@/utils/helpers/image";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
+import { uploadFile, deleteFile } from "@/utils/helpers/image";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { get } from "radash";
 import { useState } from "react";
@@ -11,7 +11,8 @@ import {
   Path,
   UseFormSetValue,
 } from "react-hook-form";
-import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
+import { chooseImage, getUserInfo } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 import { Avatar, Button, Spinner } from "zmp-ui";
 import { IconUserCircle } from "@tabler/icons-react";
 
@@ -20,6 +21,9 @@ interface IUploadFormFieldProps<T extends FieldValues> {
   control: Control<T>;
   helperText?: string;
   setValue: UseFormSetValue<T>;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
 }
 export const UploadFormField = ({
   name,
@@ -39,12 +43,18 @@ export const UploadFormField = ({
         const blob = await response.blob();
         const file = await uploadFile(blob);
 
-        setValue(name, file.path);
-        showToast({ message: "Đã thêm Avatar" });
+        const currentFileId = get(control._formValues, `${name}FileId`) as string | null;
+        if (currentFileId) {
+          await deleteFile(currentFileId);
+        }
+
+        setValue(name, file.path as any);
+        setValue(`${name}FileId` as any, file.id as any);
+        openSnackbar({ text: "Đã thêm Avatar", type: "success" });
       }
     } catch (_err) {
       console.error("Upload avatar error:", _err);
-      showToast({ message: "Lỗi tải ảnh" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi tải ảnh"), type: "error" });
     } finally {
       setUploading(false);
     }
@@ -64,12 +74,18 @@ export const UploadFormField = ({
         const blob = await response.blob();
         const file = await uploadFile(blob);
 
-        setValue(name, file.path);
-        showToast({ message: "Đã thêm Avatar" });
+        const currentFileId = get(control._formValues, `${name}FileId`) as string | null;
+        if (currentFileId) {
+          await deleteFile(currentFileId);
+        }
+
+        setValue(name, file.path as any);
+        setValue(`${name}FileId` as any, file.id as any);
+        openSnackbar({ text: "Đã thêm Avatar", type: "success" });
       }
     } catch (_err) {
       console.error("Use avatar error:", _err);
-      showToast({ message: "Lỗi lấy thông tin" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi lấy thông tin"), type: "error" });
     } finally {
       setUploading(false);
     }

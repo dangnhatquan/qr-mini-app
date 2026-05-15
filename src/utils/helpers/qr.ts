@@ -1,70 +1,13 @@
-import { BankingQRData, EQRCategory, QrCode, WifiQRData } from "@/types/qr";
+import { BankingQRData, EQRCategory, QrCode, WifiQRData, EditorStage } from "@/store";
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
 import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
-import { StageProps } from "react-konva";
 
-function crc16(data: string): string {
-  let crc = 0xffff;
-  for (let i = 0; i < data.length; i++) {
-    crc ^= data.charCodeAt(i) << 8;
-    for (let j = 0; j < 8; j++) {
-      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
-    }
-  }
-  return (crc & 0xffff).toString(16).toUpperCase().padStart(4, "0");
-}
-
-export function generateVietQRPayload({
-  bankId,
-  accountNumber,
-  amount,
-  merchantName = "N/A",
-  merchantCity = "VIETNAM",
-  description = "",
-}: {
-  bankId: string;
-  accountNumber: string;
-  amount?: string;
-  merchantName?: string;
-  merchantCity?: string;
-  description?: string;
-}) {
-  if (!bankId) throw new Error("Bank BIN không được để trống");
-  if (!accountNumber) throw new Error("Số tài khoản không được để trống");
-
-  const tlv = (id: string, value: string) => {
-    const v = String(value);
-    const len = v.length.toString().padStart(2, "0");
-    return `${id}${len}${v}`;
-  };
-
-  const consumerInfo = tlv("00", bankId) + tlv("01", accountNumber);
-  const napasProvider = tlv("00", "A000000727") + tlv("01", consumerInfo) + tlv("02", "QRIBFTTC");
-
-  let payload = "";
-  payload += tlv("00", "01");
-  payload += tlv("01", "11");
-  payload += tlv("38", napasProvider);
-  payload += tlv("53", "704");
-  if (amount) {
-    payload += tlv("54", amount);
-    payload = payload.replace(tlv("01", "11"), tlv("01", "12"));
-  }
-  payload += tlv("58", "VN");
-  payload += tlv("59", merchantName);
-  payload += tlv("60", merchantCity);
-
-  if (description) {
-    const addData = tlv("08", removeVietnameseTones(description));
-    payload += tlv("62", addData);
-  }
-
-  payload += "6304";
-  const crcValue = crc16(payload);
-  return payload + crcValue;
-}
+import Konva from "konva";
+import { CanvasElement, CanvasElementType } from "@/store";
+import QRCodeStyling from "qr-code-styling";
+import { generateVietQRPayload } from "./viet-qr";
 
 export const generateWifiPayload = (ssid: string, password: string, security: string) => {
   return `WIFI:S:${ssid};T:${security};P:${password};;`;
@@ -72,6 +15,7 @@ export const generateWifiPayload = (ssid: string, password: string, security: st
 
 export const buildQRCreatePayload = (data: IQRFormValues, file: { id: string }) => {
   return {
+    name: data.name,
     qrType: data.qrType,
     category: data.category,
     previewImageId: file.id,
@@ -126,20 +70,169 @@ export const generateDynamicLink = (
 export const isRemoteImage = (imageSrc?: string) =>
   imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
 
-export const cleanUpBase64 = (editorStage: StageProps) => {
+export const cleanUpBase64 = (editorStage: EditorStage) => {
   return {
     ...editorStage,
-    elements: editorStage.elements?.map((el) => ({
+    stageSize: editorStage.stageSize,
+    elements: (editorStage.elements as CanvasElement[])?.map((el: CanvasElement) => ({
       ...el,
       src: isRemoteImage(el.src) ? el.src : "",
     })),
   };
 };
 
-export const removeVietnameseTones = (str: string) => {
-  return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D");
+export const getQRPayload = (data: IQRFormValues, id?: string): string => {
+  switch (data.category) {
+    case EQRCategory.BANKING: {
+      const { bankId, accountNo, amount, description } = data.bankingData!;
+      return generateVietQRPayload({
+        bankId,
+        accountNumber: accountNo,
+        amount,
+        description,
+      });
+    }
+
+    case EQRCategory.WIFI: {
+      const { ssid, password, security } = data.wifiData!;
+      return generateWifiPayload(ssid, password, security);
+    }
+
+    case EQRCategory.VCARD:
+    case EQRCategory.GREETING: {
+      const finalVersion = ZALO_APP_DEV_VERSION;
+      return generateDynamicLink(finalVersion, id!, data.category, undefined);
+    }
+
+    default: {
+      return ZALO_APP_LINK;
+    }
+  }
+};
+
+export const generateQRBlob = async (text: string, editorStage?: EditorStage): Promise<Blob> => {
+  const stageData = editorStage || DEFAULT_EDITOR_STAGE;
+
+  const qrCode = new QRCodeStyling({
+    ...(stageData.qrOptions || DEFAULT_EDITOR_STAGE.qrOptions),
+    data: text,
+  });
+
+  const raw = await qrCode.getRawData("webp");
+  if (!raw) throw new Error("Failed to generate QR blob");
+
+  const rawBlob = raw instanceof Blob ? raw : new Blob([raw as BlobPart], { type: "image/webp" });
+
+  const imgUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(rawBlob);
+  });
+
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.crossOrigin = "Anonymous";
+    img.src = imgUrl;
+  });
+
+  const container = document.createElement("div");
+  const stageWidth = stageData.stageSize?.width || 350;
+  const stageHeight = stageData.stageSize?.height || 450;
+
+  const stage = new Konva.Stage({
+    container,
+    width: stageWidth,
+    height: stageHeight,
+  });
+
+  const layer = new Konva.Layer();
+  const group = new Konva.Group({
+    clipX: 0,
+    clipY: 0,
+    clipWidth: stageWidth,
+    clipHeight: stageHeight,
+  });
+
+  const bgRect = new Konva.Rect({
+    width: stageWidth,
+    height: stageHeight,
+    fill: stageData.canvasBg || DEFAULT_EDITOR_STAGE.canvasBg,
+    cornerRadius: 8,
+  });
+  group.add(bgRect);
+
+  const qrEl = (stageData.elements || DEFAULT_EDITOR_STAGE.elements).find(
+    (e: CanvasElement) => e.id === "qr-main",
+  );
+
+  const otherElements = (stageData.elements || []).filter((e: CanvasElement) => e.id !== "qr-main");
+  for (const el of otherElements) {
+    if (el.type === CanvasElementType.IMAGE && el.src) {
+      const imageElement = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.crossOrigin = "Anonymous";
+        img.src = el.src ?? "";
+      });
+
+      const newKonvaImage = new Konva.Image({
+        image: imageElement,
+        x: el.x,
+        y: el.y,
+        width: imageElement.width,
+        height: imageElement.height,
+        rotation: el.rotation,
+      });
+
+      group.add(newKonvaImage);
+    } else if (el.type === CanvasElementType.TEXT) {
+      const konvaText = new Konva.Text({
+        text: el.text,
+        x: el.x,
+        y: el.y,
+        fontSize: el.fontSize,
+        fill: el.fill,
+        width: el.width,
+        align: el.align,
+        rotation: el.rotation,
+      });
+      group.add(konvaText);
+    }
+  }
+
+  if (qrEl) {
+    const konvaImg = new Konva.Image({
+      image,
+      x: qrEl.x,
+      y: qrEl.y,
+      width: qrEl.width,
+      height: qrEl.height,
+      rotation: qrEl.rotation,
+    });
+    group.add(konvaImg);
+  }
+
+  layer.add(group);
+  stage.add(layer);
+
+  const dataURL = stage.toDataURL({ pixelRatio: 3, mimeType: "image/webp" });
+
+  stage.destroy();
+
+  const res = await fetch(dataURL);
+  return await res.blob();
+};
+
+export const getCategoryLabel = (cat: string) => {
+  const labels: Record<string, string> = {
+    wifi: "QR Wifi",
+    banking: "QR Chuyển khoản",
+    vcard: "Danh thiếp điện tử",
+    greeting: "Thiệp điện tử",
+  };
+  return labels[cat] || cat;
 };

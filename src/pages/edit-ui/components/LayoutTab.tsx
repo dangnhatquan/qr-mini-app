@@ -3,13 +3,12 @@ import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { BACKGROUND_COLORS } from "../utils/constants";
 
 export const LayoutTab = () => {
-  const { canvasBg, setCanvasBg, elements, setElements, selectedId, setSelectedId } =
-    useKonvaEditor();
+  const { canvasBg, setCanvasBg } = useKonvaEditor();
 
   return (
-    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+    <Box p={4} className="overflow-y-auto pb-20">
       <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Màu nền khung hình</div>
-      <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+      <div className="flex gap-3 flex-wrap w-full">
         {BACKGROUND_COLORS.map((t) => (
           <div
             key={t.color}

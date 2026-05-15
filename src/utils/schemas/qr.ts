@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EQRType, EQRCategory, EWifiSecurity } from "@/types/qr";
+import { EQRType, EQRCategory, EWifiSecurity } from "@/store";
 
 export const wifiSchema = z.object({
   ssid: z.string().min(1, "Vui lòng nhập tên Wifi"),
@@ -24,6 +24,7 @@ export const vcardSchema = z.object({
   website: z.string().url("Website không hợp lệ").optional().or(z.literal("")),
   socialLinks: z.string().optional(),
   avatar: z.string().optional(),
+  avatarFileId: z.string().optional(),
 });
 
 export const greetingCardSchema = z.object({
@@ -36,6 +37,7 @@ export const greetingCardSchema = z.object({
 
 export const qrFormSchema = z
   .object({
+    name: z.string().optional(),
     qrType: z.nativeEnum(EQRType),
     category: z.nativeEnum(EQRCategory),
     wifiData: z.any().optional(),

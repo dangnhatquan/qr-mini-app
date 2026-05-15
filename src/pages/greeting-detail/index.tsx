@@ -1,27 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Page, Box, Text, Button, Spinner, Header, Input, useSnackbar, useNavigate } from "zmp-ui";
-import { qrService } from "@/services/qr";
-import { cardService } from "@/services/card";
-import { QrCode, GreetingQRData } from "@/types/qr";
-import { CardRenderer } from "./components/CardRenderer";
+import { GreetingQRData, useCardStore, useQRStore } from "@/store";
 import { myQrsRoute } from "@/utils/routes";
-import { IconDownload, IconLoader, IconLock } from "@tabler/icons-react";
+import { IconDownload, IconLock } from "@tabler/icons-react";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
-import { Card } from "@/types/card";
 import { getFullUrl } from "@/utils/axios";
+import { PreviewImage } from "../my-qrs/components/PreviewImage";
 
 const GreetingDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
-  const [qr, setQr] = useState<QrCode | null>(null);
-  const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
+  const { selectedQR, isFetchingSelectedQR, fetchQRDetail } = useQRStore();
+  const { card, isFetching, fetchCard, error: cardError } = useCardStore();
+
+  const isAuthorized = !!(card && card.editorStage);
+  const isLoading = isFetching || isFetchingSelectedQR;
+
+  useEffect(() => {
+    if (id) {
+      fetchQRDetail(id);
+    }
+  }, [id, fetchQRDetail]);
+
+  useEffect(() => {
+    const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
+    if (greetingData?.cardId && !card && !cardError && !isFetching) {
+      fetchCard(greetingData.cardId).catch(() => {
+        // Expected if password protected
+      });
+    }
+  }, [selectedQR, card, cardError, isFetching, fetchCard]);
 
   const handleDownload = async () => {
     if (!card) return;
@@ -36,50 +49,16 @@ const GreetingDetailPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchDetail = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        const data = await qrService.getQRDetail(id);
-        setQr(data);
-
-        const greetingData = data.payload?.greetingData as GreetingQRData;
-
-        if (!greetingData?.password) {
-          setIsAuthorized(true);
-          if (greetingData?.cardId) {
-            const cardData = await cardService.getCard(greetingData.cardId);
-            setCard(cardData);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch Greeting detail:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetail();
-  }, [id]);
-
   const handleAuthorize = async () => {
-    if (!qr) return;
-    const greetingData = qr.payload?.greetingData as GreetingQRData;
+    const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
+    if (!greetingData?.cardId) return;
 
-    if (password === greetingData.password) {
-      setIsAuthorized(true);
-      if (greetingData.cardId) {
-        try {
-          const cardData = await cardService.getCard(greetingData.cardId);
-          setCard(cardData);
-        } catch (e) {
-          console.error("Failed to fetch card content:", e);
-        }
-      }
-    } else {
+    try {
+      await fetchCard(greetingData.cardId, password);
+    } catch {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
-      const max = greetingData.maxAttempts || 5;
+      const max = 5;
 
       if (newAttempts >= max) {
         setIsLocked(true);
@@ -98,7 +77,7 @@ const GreetingDetailPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Page className="flex items-center justify-center bg-gray-50">
         <Spinner />
@@ -106,7 +85,7 @@ const GreetingDetailPage: React.FC = () => {
     );
   }
 
-  if (!qr || !qr.payload?.greetingData) {
+  if (!selectedQR || !selectedQR?.payload?.greetingData) {
     return (
       <Page className="bg-gray-50">
         <Header title="Chi tiết QR" />
@@ -117,7 +96,7 @@ const GreetingDetailPage: React.FC = () => {
     );
   }
 
-  const greetingData = qr.payload.greetingData as GreetingQRData;
+  const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
 
   if (isLocked) {
     return (
@@ -153,7 +132,6 @@ const GreetingDetailPage: React.FC = () => {
             Vui lòng nhập mật khẩu để xem thiệp điện tử: <br />
             <span className="font-bold text-gray-800">{greetingData.eventName}</span>
           </Text>
-
           <Box className="w-full mb-6">
             <Input
               type="password"
@@ -163,7 +141,6 @@ const GreetingDetailPage: React.FC = () => {
               className="text-center text-lg"
             />
           </Box>
-
           <Button fullWidth onClick={handleAuthorize} size="large">
             Mở thiệp
           </Button>
@@ -173,29 +150,30 @@ const GreetingDetailPage: React.FC = () => {
   }
 
   return (
-    <Page className="bg-gray-100 overflow-y-auto pb-10">
+    <Page className="relative bg-gray-100 overflow-y-auto pb-10">
       <Header
         title={greetingData.eventName}
         onBackClick={() => navigate(myQrsRoute, { direction: "backward" })}
       />
-
       <Box p={4} className="h-full flex flex-col justify-center items-center gap-4">
         {card ? (
           <Box className="w-full">
-            <CardRenderer
-              elements={card.editorStage?.elements || []}
-              canvasBg={card.editorStage?.canvasBg || "#ffffff"}
-            />
+            {card?.previewImage?.path ? (
+              <PreviewImage src={getFullUrl(card.previewImage.path)} />
+            ) : (
+              <Box className="w-full aspect-[350/450] bg-gray-100 rounded-xl flex items-center justify-center">
+                <Text className="text-gray-400">Thiệp chưa được tạo</Text>
+              </Box>
+            )}
           </Box>
         ) : (
           <Box className="w-full aspect-[350/450] bg-white rounded-xl shadow-lg flex items-center justify-center flex-col gap-4">
             <Text className="text-gray-400">Thiệp chưa được tạo</Text>
           </Box>
         )}
-
-        <Button prefixIcon={<IconDownload />} onClick={handleDownload} fullWidth size="medium">
-          Tải thiệp xuống
-        </Button>
+        <div className="fixed bottom-6 right-4 flex gap-4">
+          <Button icon={<IconDownload />} onClick={handleDownload} size="large" />
+        </div>
       </Box>
     </Page>
   );

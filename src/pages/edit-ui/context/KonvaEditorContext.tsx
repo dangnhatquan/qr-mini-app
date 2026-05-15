@@ -3,14 +3,15 @@ import { Options } from "qr-code-styling";
 import { COLOR, STYLE_SECTION } from "../utils/constants";
 import Konva from "konva";
 import { DEFAULT_QR_STYLE } from "@/utils/constants/qr";
-import { CanvasElement } from "@/types/editor";
+import { CanvasElement } from "@/store";
 
 interface KonvaEditorContextType {
   stageRef: React.MutableRefObject<Konva.Stage | null>;
   mainGroupRef: React.MutableRefObject<Konva.Group | null>;
+  lastDistRef: React.MutableRefObject<number>;
 
-  qrOptions: Options;
-  setQrOptions: React.Dispatch<React.SetStateAction<Options>>;
+  qrOptions: Partial<Options>;
+  setQrOptions: React.Dispatch<React.SetStateAction<Partial<Options>>>;
   qrImageSrc: string;
   setQrImageSrc: React.Dispatch<React.SetStateAction<string>>;
   isRendering: boolean;
@@ -22,13 +23,16 @@ interface KonvaEditorContextType {
   setSelectedId: React.Dispatch<React.SetStateAction<string | null>>;
   canvasBg: string;
   setCanvasBg: React.Dispatch<React.SetStateAction<string>>;
+  canvasBgFileId: string | null;
+  setCanvasBgFileId: React.Dispatch<React.SetStateAction<string | null>>;
+  logoFileId: string | null;
+  setLogoFileId: React.Dispatch<React.SetStateAction<string | null>>;
   stageSize: { width: number; height: number };
+  setStageSize: React.Dispatch<React.SetStateAction<{ width: number; height: number }>>;
   stageScale: number;
   setStageScale: React.Dispatch<React.SetStateAction<number>>;
   stagePos: { x: number; y: number };
   setStagePos: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
-  openSection: string | null;
-  setOpenSection: React.Dispatch<React.SetStateAction<string | null>>;
 
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,29 +41,53 @@ interface KonvaEditorContextType {
   isDragging: boolean;
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
 
-  initialOptions: Options | null;
-  setInitialOptions: React.Dispatch<React.SetStateAction<Options | null>>;
-  initialElements: CanvasElement[] | null;
-  setInitialElements: React.Dispatch<React.SetStateAction<CanvasElement[] | null>>;
-  initialCanvasBg: string;
-  setInitialCanvasBg: React.Dispatch<React.SetStateAction<string>>;
+  initialQrOptions?: Partial<Options> | null;
+  initialElements?: CanvasElement[] | null;
+  initialCanvasBg?: string;
+  initialStageSize?: { width: number; height: number };
+  sessionId: string;
 }
 
 const KonvaEditorContext = createContext<KonvaEditorContextType | undefined>(undefined);
 
-export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const KonvaEditorProvider: React.FC<{
+  children: React.ReactNode;
+  initialCanvasBg?: string;
+  initialQrOptions?: Partial<Options>;
+  initialElements?: CanvasElement[];
+  initialStageSize?: { width: number; height: number };
+  initialLogoFileId?: string | null;
+  initialCanvasBgFileId?: string | null;
+}> = ({
+  children,
+  initialCanvasBg,
+  initialQrOptions,
+  initialElements,
+  initialStageSize,
+  initialLogoFileId,
+  initialCanvasBgFileId,
+}) => {
+  const lastDistRef = useRef(0);
+
   const stageRef = useRef<Konva.Stage | null>(null);
   const mainGroupRef = useRef<Konva.Group | null>(null);
+  const sessionId = crypto.randomUUID();
 
-  const [qrOptions, setQrOptions] = useState<Options>(DEFAULT_QR_STYLE);
+  const [qrOptions, setQrOptions] = useState<Partial<Options>>(
+    initialQrOptions ?? DEFAULT_QR_STYLE,
+  );
 
   const [qrImageSrc, setQrImageSrc] = useState<string>("");
   const [isRendering, setIsRendering] = useState(false);
 
-  const [elements, setElements] = useState<CanvasElement[]>([]);
+  const [elements, setElements] = useState<CanvasElement[]>(initialElements ?? []);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [canvasBg, setCanvasBg] = useState(COLOR.WHITE.color);
-  const [stageSize] = useState({ width: 350, height: 450 });
+  const [canvasBg, setCanvasBg] = useState(initialCanvasBg ?? COLOR.WHITE.color);
+  const [canvasBgFileId, setCanvasBgFileId] = useState<string | null>(
+    initialCanvasBgFileId ?? null,
+  );
+  const [logoFileId, setLogoFileId] = useState<string | null>(initialLogoFileId ?? null);
+  const [stageSize, setStageSize] = useState(initialStageSize ?? { width: 350, height: 450 });
   const [stageScale, setStageScale] = useState(1);
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
   const [openSection, setOpenSection] = useState<string | null>(STYLE_SECTION.DOTS);
@@ -68,13 +96,11 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  const [initialOptions, setInitialOptions] = useState<Options | null>(null);
-  const [initialElements, setInitialElements] = useState<CanvasElement[] | null>(null);
-  const [initialCanvasBg, setInitialCanvasBg] = useState("");
-
   const value = {
     stageRef,
     mainGroupRef,
+    lastDistRef,
+
     qrOptions,
     setQrOptions,
     qrImageSrc,
@@ -87,7 +113,12 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setSelectedId,
     canvasBg,
     setCanvasBg,
+    canvasBgFileId,
+    setCanvasBgFileId,
+    logoFileId,
+    setLogoFileId,
     stageSize,
+    setStageSize,
     stageScale,
     setStageScale,
     stagePos,
@@ -100,13 +131,41 @@ export const KonvaEditorProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setTranslateY,
     isDragging,
     setIsDragging,
-    initialOptions,
-    setInitialOptions,
+    initialQrOptions,
     initialElements,
-    setInitialElements,
     initialCanvasBg,
-    setInitialCanvasBg,
+    initialStageSize,
+    sessionId,
   };
+
+  const [prevInitialCanvasBg, setPrevInitialCanvasBg] = useState(initialCanvasBg);
+  const [prevInitialQrOptions, setPrevInitialQrOptions] = useState(initialQrOptions);
+  const [prevInitialElements, setPrevInitialElements] = useState(initialElements);
+  const [prevInitialStageSize, setPrevInitialStageSize] = useState(initialStageSize);
+
+  if (initialCanvasBg !== prevInitialCanvasBg) {
+    setCanvasBg(initialCanvasBg ?? COLOR.WHITE.color);
+    setPrevInitialCanvasBg(initialCanvasBg);
+  }
+
+  if (initialQrOptions !== prevInitialQrOptions) {
+    setQrOptions(initialQrOptions ?? DEFAULT_QR_STYLE);
+    setPrevInitialQrOptions(initialQrOptions);
+  }
+
+  if (initialElements !== prevInitialElements) {
+    setElements(initialElements ?? []);
+    setPrevInitialElements(initialElements);
+  }
+
+  if (
+    initialStageSize &&
+    (initialStageSize.width !== prevInitialStageSize?.width ||
+      initialStageSize.height !== prevInitialStageSize?.height)
+  ) {
+    setStageSize(initialStageSize);
+    setPrevInitialStageSize(initialStageSize);
+  }
 
   return <KonvaEditorContext.Provider value={value}>{children}</KonvaEditorContext.Provider>;
 };

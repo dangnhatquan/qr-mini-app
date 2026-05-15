@@ -2,18 +2,29 @@ import { useEffect, useRef } from "react";
 import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
-import { CanvasElement } from "@/types/editor";
+import { CanvasElement } from "@/store";
 
-export const URLImage = ({
+export const ImageElement = ({
   imageProps,
   isSelected,
   onSelect,
   onChange,
+  enabledAnchors = [
+    "top-left",
+    "top-center",
+    "top-right",
+    "middle-right",
+    "middle-left",
+    "bottom-left",
+    "bottom-center",
+    "bottom-right",
+  ],
 }: {
   imageProps: CanvasElement;
-  isSelected: boolean;
-  onSelect: () => void;
-  onChange: (newProps: CanvasElement) => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  onChange?: (newProps: CanvasElement) => void;
+  enabledAnchors?: string[];
 }) => {
   const displaySrc = imageProps.src;
   const [img] = useImage(displaySrc || "", "anonymous");
@@ -37,7 +48,7 @@ export const URLImage = ({
         onTap={onSelect}
         draggable
         onDragEnd={(e) => {
-          onChange({
+          onChange?.({
             ...imageProps,
             x: e.target.x(),
             y: e.target.y(),
@@ -50,7 +61,7 @@ export const URLImage = ({
             const scaleY = node.scaleY();
             node.scaleX(1);
             node.scaleY(1);
-            onChange({
+            onChange?.({
               ...imageProps,
               x: node.x(),
               y: node.y(),
@@ -64,6 +75,7 @@ export const URLImage = ({
       {isSelected && (
         <Transformer
           ref={trRef}
+          enabledAnchors={enabledAnchors}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 5 || newBox.height < 5) {
               return oldBox;

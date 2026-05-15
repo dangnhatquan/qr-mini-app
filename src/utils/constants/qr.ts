@@ -1,6 +1,11 @@
-import { COLOR, COLORS } from "@/pages/edit-ui/utils/constants";
-import { DEFAULT_BANK_ID, DEFAULT_WIFI_SECURITY, EQRCategory, EQRType } from "@/types/qr";
+import { COLOR } from "@/pages/edit-ui/utils/constants";
+import { CanvasElement } from "@/store";
+import { EQRCategory, EQRType, EWifiSecurity } from "@/store/qrStore/qrStore.types";
 import { Options } from "qr-code-styling";
+
+export const DEFAULT_WIFI_SECURITY = EWifiSecurity.WPA;
+export const DEFAULT_BANK_ID = "970436";
+export const DEFAULT_MAX_ATTEMPTS = 5;
 
 export const DEFAULT_QR_FORM_VALUES = {
   qrType: EQRType.STATIC,
@@ -47,12 +52,15 @@ export const DEFAULT_EDITOR_STAGE = {
       id: "qr-main",
       type: "image",
       src: "",
-      x: 25,
-      y: 75,
-      width: 300,
-      height: 300,
+      x: 75,
+      y: 125,
+      width: 200,
+      height: 200,
       rotation: 0,
-    },
+    } as CanvasElement,
   ],
   canvasBg: COLOR.WHITE.color,
+  stageSize: { width: 350, height: 450 },
 };
+
+export const QR_CARD_ANIMATION_CLOSE_DELAY = 300;

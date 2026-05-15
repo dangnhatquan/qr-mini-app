@@ -4,6 +4,7 @@ import { IconChevronLeft } from "@tabler/icons-react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IQRFormValues, qrFormSchema } from "@/utils/schemas/qr";
+import { InputFormField } from "@/components/form-fields/input-field";
 import { RadioFormField } from "@/components/form-fields/radio-field";
 import { SelectFormField } from "@/components/form-fields/select-field";
 import { QR_TYPES, STATIC_CATEGORIES, DYNAMIC_CATEGORIES } from "./constants";
@@ -11,18 +12,13 @@ import { WifiForm } from "./components/wifi-form";
 import { BankingForm } from "./components/banking-form";
 import { VCardForm } from "./components/vcard-form";
 import { GreetingForm } from "./components/greeting-form";
-import {
-  EQRType,
-  EQRCategory,
-  DEFAULT_BANK_ID,
-  DEFAULT_WIFI_SECURITY,
-  DEFAULT_MAX_ATTEMPTS,
-} from "@/types/qr";
+import { EQRType, EQRCategory } from "@/store";
 import { qrService } from "@/services/qr";
 import { cardService } from "@/services/card";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { myQrsRoute } from "@/utils/routes";
-import { getString, removeItem, setString } from "@/utils/storage";
+import { DEFAULT_BANK_ID, DEFAULT_MAX_ATTEMPTS, DEFAULT_WIFI_SECURITY } from "@/utils/constants/qr";
+import { storage } from "@/utils/storage";
 
 const CreatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,11 +32,13 @@ const CreatePage: React.FC = () => {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const pendingNavRef = useRef<() => void>(() => navigate(myQrsRoute));
 
+  const sessionId = crypto.randomUUID();
+
   const FORM_STATE_KEY = "createFormState";
 
   const savedFormState = React.useMemo(() => {
     try {
-      const raw = getString(FORM_STATE_KEY);
+      const raw = storage.getItem(FORM_STATE_KEY);
       if (raw) return JSON.parse(raw) as IQRFormValues;
     } catch (error) {
       console.error(error);
@@ -50,9 +48,12 @@ const CreatePage: React.FC = () => {
 
   useEffect(() => {
     if (savedFormState) {
-      removeItem(FORM_STATE_KEY);
+      storage.removeItem(FORM_STATE_KEY);
     }
   }, [savedFormState]);
+
+  const qrTypeFromUrl = searchParams.get("type") as EQRType;
+  const categoryFromUrl = searchParams.get("category") as EQRCategory;
 
   const {
     control,
@@ -64,8 +65,9 @@ const CreatePage: React.FC = () => {
   } = useForm<IQRFormValues>({
     resolver: zodResolver(qrFormSchema),
     defaultValues: savedFormState ?? {
-      qrType: EQRType.STATIC,
-      category: EQRCategory.WIFI,
+      name: "",
+      qrType: qrTypeFromUrl || EQRType.STATIC,
+      category: categoryFromUrl || EQRCategory.WIFI,
       wifiData: { ssid: "", password: "", security: DEFAULT_WIFI_SECURITY },
       bankingData: { bankId: DEFAULT_BANK_ID, accountNo: "", accountName: "" },
       vcardData: { fullName: "", phone: "" },
@@ -90,6 +92,7 @@ const CreatePage: React.FC = () => {
           hasFetchedRef.current = id;
           if (!savedFormState) {
             reset({
+              name: qr.name || "",
               qrType: qr.type as EQRType,
               category: qr.category as EQRCategory,
               wifiData: qr.payload?.wifiData,
@@ -120,7 +123,7 @@ const CreatePage: React.FC = () => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (isEdit) return; // Disable auto-switching category when editing
+    if (isEdit) return;
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
@@ -173,14 +176,14 @@ const CreatePage: React.FC = () => {
     try {
       setLoading(true);
       if (isEdit && id) {
-        await qrService.updateQR(id, data);
+        await qrService.updateQR(id, data, undefined, undefined, sessionId);
         openSnackbar({
           type: "success",
           text: "Cập nhật mã QR thành công!",
           duration: 2000,
         });
       } else {
-        await qrService.createQR(data);
+        await qrService.createQR(data, sessionId);
         openSnackbar({
           type: "success",
           text: "Tạo mã QR thành công!",
@@ -188,7 +191,7 @@ const CreatePage: React.FC = () => {
         });
       }
 
-      setTimeout(() => navigate(myQrsRoute), 1500);
+      setTimeout(() => navigate(myQrsRoute), 0);
     } catch (error) {
       console.error("Failed to save QR:", error);
       openSnackbar({
@@ -236,6 +239,12 @@ const CreatePage: React.FC = () => {
 
       <Box p={4} className="content">
         <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
+          <InputFormField
+            name="name"
+            control={control}
+            label="Tên gợi nhớ"
+            placeholder="Ví dụ: Wifi Nhà, Ngân hàng cá nhân..."
+          />
           {!isEdit && (
             <>
               <RadioFormField
@@ -245,7 +254,6 @@ const CreatePage: React.FC = () => {
                 options={QR_TYPES}
                 required
               />
-
               <SelectFormField
                 name="category"
                 control={control}
@@ -272,7 +280,7 @@ const CreatePage: React.FC = () => {
                 setValue={setValue}
                 greetingData={greetingData}
                 onBeforeEditorOpen={() => {
-                  setString(FORM_STATE_KEY, JSON.stringify(getValues()));
+                  storage.setItem(FORM_STATE_KEY, JSON.stringify(getValues()));
                 }}
               />
             )}

@@ -1,12 +1,157 @@
-import React from "react";
-import { KonvaEditorProvider } from "./context/KonvaEditorContext";
+import React, { FC, useEffect } from "react";
+import {
+  IconPhoto,
+  IconQrcode,
+  IconSticker,
+  IconTexture,
+  IconTypography,
+  IconAspectRatio,
+  IconPolaroid,
+} from "@tabler/icons-react";
+import { StylingTab } from "./components/StylingTab";
+import { LayoutTab } from "./components/LayoutTab";
+import { TextTab } from "./components/TextTab";
+import { StickerTab } from "./components/StickerTab";
+import { Header, Page, Spinner, useNavigate, useParams } from "zmp-ui";
+import { IQRFormValues } from "@/utils/schemas/qr";
+import { EditorOutputs, EQRCategory, EQRType, useQRStore } from "@/store";
+import { openSnackbar } from "@/utils/snackbar";
 import { QREditor } from "./components/QREditor";
+import { TemplateTab } from "./components/TemplateTab";
+import { SizeTab } from "./components/SizeTab";
+import { ImageTab } from "../card-editor/components/ImageTab";
 
-const EditUIPage: React.FC = () => {
+const EditUIPage: FC = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { selectedQR, isFetchingSelectedQR, fetchQRDetail, updateQRRecord } = useQRStore();
+
+  useEffect(() => {
+    if (id) {
+      fetchQRDetail(id);
+    }
+  }, [id, fetchQRDetail]);
+
+  const customTabs = [
+    {
+      key: "qr",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconQrcode className="w-5 h-5" />
+          Thiết kế QR
+        </div>
+      ),
+      content: <StylingTab />,
+    },
+    {
+      key: "size",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconAspectRatio className="w-5 h-5" />
+          Kích thước
+        </div>
+      ),
+      content: <SizeTab />,
+    },
+    {
+      key: "template",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconPhoto className="w-5 h-5" />
+          Template
+        </div>
+      ),
+      content: <TemplateTab />,
+    },
+    {
+      key: "layout",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconTexture className="w-5 h-5" />
+          Bố cục
+        </div>
+      ),
+      content: <LayoutTab />,
+    },
+
+    {
+      key: "stickers",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconSticker className="w-5 h-5" />
+          Stickers
+        </div>
+      ),
+      content: <StickerTab />,
+    },
+    {
+      key: "image",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconPolaroid className="w-5 h-5" />
+          Hình ảnh
+        </div>
+      ),
+      content: <ImageTab />,
+    },
+    {
+      key: "text",
+      label: (
+        <div className="flex items-center justify-center gap-2">
+          <IconTypography className="w-5 h-5" />
+          Chữ
+        </div>
+      ),
+      content: <TextTab />,
+    },
+  ];
+
+  const handleSave = async (outputs: EditorOutputs) => {
+    if (!selectedQR || !id) return;
+
+    const data: IQRFormValues = {
+      qrType: selectedQR.type as EQRType,
+      category: selectedQR.category as EQRCategory,
+      ...selectedQR.payload,
+    };
+
+    const {
+      qrOptions,
+      elements,
+      canvasBg,
+      logoFileId,
+      canvasBgFileId,
+      blob,
+      stageSize,
+      sessionId,
+    } = outputs;
+    const editorStage = {
+      qrOptions,
+      elements,
+      canvasBg,
+      logoFileId,
+      canvasBgFileId,
+      stageSize,
+    };
+    await updateQRRecord(id, data, blob, editorStage, sessionId);
+
+    openSnackbar({ text: "Đã lưu thay đổi!", type: "success" });
+    navigate(-1);
+  };
+
+  if (isFetchingSelectedQR) {
+    return (
+      <Page className="flex items-center justify-center bg-gray-50">
+        <Spinner />
+      </Page>
+    );
+  }
+
   return (
-    <KonvaEditorProvider>
-      <QREditor />
-    </KonvaEditorProvider>
+    <Page>
+      <Header title="Tuỳ chỉnh giao diện" />
+      <QREditor onSave={handleSave} customTabs={customTabs} selectedQR={selectedQR} />
+    </Page>
   );
 };
 

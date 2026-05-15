@@ -1,5 +1,27 @@
+:root {
+  --primary-color: #006af5;
+  --primary-light: #dbeafe;
+  --secondary-color: #475569;
+  --background-color: #f8fafc;
+  --surface-color: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+[zaui-theme="dark"] {
+  --primary-color: #006af5;
+  --primary-light: #1e3a8a;
+  --secondary-color: #94a3b8;
+  --background-color: #0f172a;
+  --surface-color: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
 .page {
   padding: 16px 16px 96px 16px;
+  background-color: var(--background-color);
+  color: var(--text-main);
 }
 
 .content {
@@ -9,11 +31,16 @@
 
 .section-container {
   padding: 16px;
-  background: #ffffff;
+  background: var(--surface-color);
   border-radius: 8px;
   margin-bottom: 24px;
 }
 
 .zaui-list-item {
   cursor: pointer;
+}
+
+.zaui-snackbar-container,
+.zaui-snackbar {
+  z-index: 10000 !important;
 }

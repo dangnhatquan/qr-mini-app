@@ -1,7 +1,16 @@
 import { ImageElement } from "@/components/za-editor/qr-element";
 import { TextElement } from "@/components/za-editor/text-element";
 import { CanvasElement, CanvasElementType, EditorOutputs } from "@/store";
-import { IconCheck, IconFocusCentered, IconRotate, IconTrash } from "@tabler/icons-react";
+import {
+  IconArrowBarToDown,
+  IconArrowBarToUp,
+  IconCheck,
+  IconFocusCentered,
+  IconRotate,
+  IconStackBack,
+  IconStackFront,
+  IconTrash,
+} from "@tabler/icons-react";
 import { Group, Layer, Rect, Stage } from "react-konva";
 import { Box } from "zmp-ui";
 import { useEditor } from "./hooks/useEditor";
@@ -33,9 +42,12 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight, onSave }) => {
     handleTouchZoom,
     handleTouchEndZoom,
     handleResetView,
+
     handleWheel,
     handleSave,
     handleDiscard,
+    handleMoveToFront,
+    handleMoveToBack,
   } = useEditor();
 
   const handleSaveClick = () => {
@@ -102,62 +114,55 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight, onSave }) => {
               shadowOpacity={0.3}
               cornerRadius={8}
             />
-            {elements
-              .map((el, originalIndex) => ({ el, originalIndex }))
-              .sort((a, b) => {
-                if (a.el.id === "qr-main") return 1;
-                if (b.el.id === "qr-main") return -1;
-                return a.originalIndex - b.originalIndex;
-              })
-              .map(({ el, originalIndex: i }) => {
-                if (el.id === "qr-main") {
-                  return (
-                    <ImageElement
-                      enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
-                      key={el.id}
-                      imageProps={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => setSelectedId(el.id)}
-                      onChange={(newProps: CanvasElement) => {
-                        const newEls = [...elements];
-                        newEls[i] = newProps;
-                        setElements(newEls);
-                      }}
-                    />
-                  );
-                }
-                if (el.type === CanvasElementType.IMAGE) {
-                  return (
-                    <ImageElement
-                      key={el.id}
-                      imageProps={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => setSelectedId(el.id)}
-                      onChange={(newProps: CanvasElement) => {
-                        const newEls = [...elements];
-                        newEls[i] = newProps;
-                        setElements(newEls);
-                      }}
-                    />
-                  );
-                }
-                if (el.type === "text") {
-                  return (
-                    <TextElement
-                      key={el.id}
-                      textProps={el}
-                      isSelected={el.id === selectedId}
-                      onSelect={() => setSelectedId(el.id)}
-                      onChange={(newProps: CanvasElement) => {
-                        const newEls = [...elements];
-                        newEls[i] = newProps;
-                        setElements(newEls);
-                      }}
-                    />
-                  );
-                }
-                return null;
-              })}
+            {elements.map((el, i) => {
+              if (el.id === "qr-main") {
+                return (
+                  <ImageElement
+                    enabledAnchors={["top-left", "top-right", "bottom-left", "bottom-right"]}
+                    key={el.id}
+                    imageProps={el}
+                    isSelected={el.id === selectedId}
+                    onSelect={() => setSelectedId(el.id)}
+                    onChange={(newProps: CanvasElement) => {
+                      const newEls = [...elements];
+                      newEls[i] = newProps;
+                      setElements(newEls);
+                    }}
+                  />
+                );
+              }
+              if (el.type === CanvasElementType.IMAGE) {
+                return (
+                  <ImageElement
+                    key={el.id}
+                    imageProps={el}
+                    isSelected={el.id === selectedId}
+                    onSelect={() => setSelectedId(el.id)}
+                    onChange={(newProps: CanvasElement) => {
+                      const newEls = [...elements];
+                      newEls[i] = newProps;
+                      setElements(newEls);
+                    }}
+                  />
+                );
+              }
+              if (el.type === "text") {
+                return (
+                  <TextElement
+                    key={el.id}
+                    textProps={el}
+                    isSelected={el.id === selectedId}
+                    onSelect={() => setSelectedId(el.id)}
+                    onChange={(newProps: CanvasElement) => {
+                      const newEls = [...elements];
+                      newEls[i] = newProps;
+                      setElements(newEls);
+                    }}
+                  />
+                );
+              }
+              return null;
+            })}
           </Group>
         </Layer>
       </Stage>
@@ -167,6 +172,17 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight, onSave }) => {
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </Box>
       )}
+
+      <div
+        className={`absolute left-0 right-0 px-4 flex justify-center pointer-events-none z-40 ${isDragging ? "" : "transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"}`}
+        style={{
+          bottom: `${toolbarHeight - translateY + 68}px`,
+        }}
+      >
+        {selectedId && selectedId !== "qr-main" && (
+          <div className="flex gap-2 pointer-events-auto"></div>
+        )}
+      </div>
 
       <div
         className={`absolute left-0 right-0 px-4 flex justify-between items-end pointer-events-none z-40 ${isDragging ? "" : "transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"}`}
@@ -200,6 +216,22 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight, onSave }) => {
               }}
             >
               <IconTrash className="text-white font-bold" size={20} />
+            </div>
+          )}
+          {selectedId && (
+            <div
+              onClick={handleMoveToFront}
+              className="cursor-pointer bg-white text-gray-600 shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
+            >
+              <IconStackFront size={18} />
+            </div>
+          )}
+          {selectedId && (
+            <div
+              onClick={handleMoveToBack}
+              className="cursor-pointer bg-white text-white shadow-xl !rounded-full w-10 h-10 flex items-center justify-center p-0"
+            >
+              <IconStackBack size={18} className="text-gray-600" />
             </div>
           )}
           <div

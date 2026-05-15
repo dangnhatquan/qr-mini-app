@@ -152,10 +152,36 @@ export const ZAPY_STICKERS = [
   `${PUBLIC_API_URL}/api/v1/files/serve/7dc65d82-9eb5-4180-929a-940c48f8105b`,
 ];
 
+export const BU_MAT_NGAO = [
+  `${PUBLIC_API_URL}/api/v1/files/serve/99d08c8a-489f-4fc7-82e7-b482cf9e11be`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/10805214-d5fa-4f17-beaa-4b9a7756177e`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/8a829015-4fb4-40d9-85c0-f4e440fe9c84`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/afe722c5-2e2a-46da-848d-243a12b48df9`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/2af5b132-9082-4d2b-a0a5-0aa004dbc257`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/2e51103b-400f-465b-b769-e1c3ec2ef363`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/f06a79a7-c072-401e-9ed4-f6a36af4d799`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/229794b6-c345-469f-b4f2-31b218272b46`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/a83f676d-019b-4f59-90fc-805e07cae70b`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/f5053a00-abbc-44f7-9c7f-89770be5f877`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/e5b217cd-d2a7-4db0-ae0a-fd0f8086eba1`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/d13c9e07-50d4-4881-920c-56fd575700f0`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/e7720ccc-f9d8-4aa9-ac6d-fae8bc24612b`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b308e74d-3c4b-4bb7-b44a-bd1a51d409e8`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/be8a8b8e-dd95-44d5-b2be-64592b2148ab`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/199e229a-b377-419e-843d-826151fa181a`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/82340215-0c43-4eb8-9803-aea88e3f2a71`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/7c1e78d9-7439-4754-8de9-5b69e2e3c385`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/334c7218-fef8-4547-b788-2a4512d56d80`,
+];
+
 export const STICKERS = [
   {
     name: "Zapy Vô tri",
     stickers: ZAPY_STICKERS,
+  },
+  {
+    name: "Bư Mặt Ngào",
+    stickers: BU_MAT_NGAO,
   },
 ];
 

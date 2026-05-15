@@ -179,20 +179,45 @@ export const useEditor = () => {
 
   const handleDiscard = () => {
     if (initialQrOptions) {
-      setQrOptions(initialQrOptions);
+      setQrOptions({ ...initialQrOptions });
     } else {
-      setQrOptions(DEFAULT_EDITOR_STAGE.qrOptions);
+      setQrOptions({ ...DEFAULT_EDITOR_STAGE.qrOptions });
     }
+
     if (initialElements) {
-      setElements(initialElements);
+      setElements([...initialElements]);
     } else {
-      setElements(DEFAULT_EDITOR_STAGE.elements);
+      setElements([...DEFAULT_EDITOR_STAGE.elements]);
     }
+
     setCanvasBg(initialCanvasBg ?? DEFAULT_EDITOR_STAGE.canvasBg);
-    setStageSize(initialStageSize ?? DEFAULT_EDITOR_STAGE.stageSize);
+    setStageSize(
+      initialStageSize ? { ...initialStageSize } : { ...DEFAULT_EDITOR_STAGE.stageSize },
+    );
+
     setSelectedId(null);
     handleResetView();
     showToast({ message: "Đã hoàn tác thay đổi" });
+  };
+
+  const handleMoveToFront = () => {
+    if (!selectedId) return;
+    const index = elements.findIndex((el) => el.id === selectedId);
+    if (index === -1) return;
+    const newElements = [...elements];
+    const [element] = newElements.splice(index, 1);
+    newElements.push(element);
+    setElements(newElements);
+  };
+
+  const handleMoveToBack = () => {
+    if (!selectedId) return;
+    const index = elements.findIndex((el) => el.id === selectedId);
+    if (index === -1) return;
+    const newElements = [...elements];
+    const [element] = newElements.splice(index, 1);
+    newElements.unshift(element);
+    setElements(newElements);
   };
 
   useEffect(() => {
@@ -239,6 +264,8 @@ export const useEditor = () => {
     handleWheel,
     handleSave,
     handleDiscard,
+    handleMoveToFront,
+    handleMoveToBack,
 
     stageRef,
     mainGroupRef,

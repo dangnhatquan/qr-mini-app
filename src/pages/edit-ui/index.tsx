@@ -15,7 +15,7 @@ import { StickerTab } from "./components/StickerTab";
 import { Header, Page, Spinner, useNavigate, useParams } from "zmp-ui";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { EditorOutputs, EQRCategory, EQRType, useQRStore } from "@/store";
-import { showToast } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 import { QREditor } from "./components/QREditor";
 import { TemplateTab } from "./components/TemplateTab";
 import { SizeTab } from "./components/SizeTab";
@@ -135,7 +135,7 @@ const EditUIPage: FC = () => {
     };
     await updateQRRecord(id, data, blob, editorStage, sessionId);
 
-    showToast({ message: "Đã lưu thay đổi!" });
+    openSnackbar({ text: "Đã lưu thay đổi!", type: "success" });
     navigate(-1);
   };
 

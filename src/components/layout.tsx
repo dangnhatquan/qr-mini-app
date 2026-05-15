@@ -1,6 +1,8 @@
 import { getSystemInfo } from "zmp-sdk";
-import { AnimationRoutes, App, Route, SnackbarProvider, ZMPRouter } from "zmp-ui";
+import { AnimationRoutes, App, Route, SnackbarProvider, ZMPRouter, useSnackbar } from "zmp-ui";
 import { AppProps } from "zmp-ui/app";
+import React, { useEffect } from "react";
+import { setSnackbarFunction } from "@/utils/snackbar";
 
 import HomePage from "@/pages/index";
 import CreatePage from "@/pages/create";
@@ -24,10 +26,19 @@ import {
 } from "@/utils/routes";
 import ReviewGreetingDetailPage from "@/pages/review-greeting-card";
 
+const SnackbarRegister = () => {
+  const { openSnackbar } = useSnackbar();
+  useEffect(() => {
+    setSnackbarFunction(openSnackbar);
+  }, [openSnackbar]);
+  return null;
+};
+
 const Layout = () => {
   return (
     <App theme={getSystemInfo().zaloTheme as AppProps["theme"]}>
       <SnackbarProvider>
+        <SnackbarRegister />
         <ZMPRouter>
           <AuthProvider>
             <AnimationRoutes>

@@ -2,9 +2,10 @@ import { Box, Button } from "zmp-ui";
 import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
-import { chooseImage, showToast } from "zmp-sdk/apis";
+import { chooseImage } from "zmp-sdk/apis";
 import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
-import { getFullUrl } from "@/utils/axios";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
+import { openSnackbar } from "@/utils/snackbar";
 import { STICKERS } from "../utils/constants";
 
 export const StickerTab = () => {
@@ -47,10 +48,10 @@ export const StickerTab = () => {
             const url = getFullUrl(file.path);
             const { width, height } = await getImageDimensions(blob);
             handleAddSticker(url, file.id, width, height);
-            showToast({ message: "Đã thêm Sticker" });
+            openSnackbar({ text: "Đã thêm Sticker", type: "success" });
           } catch (err) {
             console.error("Upload sticker error:", err);
-            showToast({ message: "Lỗi tải Sticker" });
+            openSnackbar({ text: getErrorMessage(err, "Lỗi tải Sticker"), type: "error" });
           } finally {
             setUploading(false);
           }

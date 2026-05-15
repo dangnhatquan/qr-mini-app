@@ -1,7 +1,8 @@
 import React from "react";
 import { QrCode } from "@/store";
 import { useRef, useState } from "react";
-import { showToast } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
+import { getErrorMessage } from "@/utils/axios";
 
 export interface PullToRefreshOptions {
   onRefresh: () => Promise<void>;
@@ -168,9 +169,10 @@ export const usePullToRefresh = ({ onRefresh, isFetching }: PullToRefreshOptions
 
       try {
         await onRefresh();
-        showToast({ message: "Đã làm mới danh sách" });
+        openSnackbar({ text: "Đã làm mới danh sách", type: "success" });
       } catch (err) {
         console.error(err);
+        openSnackbar({ text: getErrorMessage(err, "Lỗi khi làm mới danh sách"), type: "error" });
       }
     }
 

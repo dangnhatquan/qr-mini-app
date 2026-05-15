@@ -39,3 +39,8 @@
 .zaui-list-item {
   cursor: pointer;
 }
+
+.zaui-snackbar-container,
+.zaui-snackbar {
+  z-index: 10000 !important;
+}

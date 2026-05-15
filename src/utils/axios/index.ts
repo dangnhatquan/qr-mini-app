@@ -7,6 +7,8 @@ import axios, {
 } from "axios";
 import { storage } from "../storage";
 import { ApiErrorResponse, ApiResponse } from "@/types/api";
+import { openSnackbar } from "@/utils/snackbar";
+import { t } from "@/utils/i18n";
 
 const PUBLIC_API_URL = import.meta.env.VITE_PUBLIC_API_URL;
 
@@ -37,14 +39,28 @@ axiosInstance.interceptors.response.use(
   },
   (error: AxiosError<ApiErrorResponse>) => {
     if (error.response) {
-      const { code, message, details } = error.response.data.error;
-
-      if (code === "VALIDATION_ERROR") {
-        console.error("Validation Error:", details);
-      }
+      const { code, details } = error.response.data.error;
 
       if (code === "UNAUTHORIZED" || code === "TOKEN_EXPIRED") {
         storage.removeItem("access_token");
+      }
+
+      if (error.response.status === 413 || code === "FILE_TOO_LARGE") {
+        openSnackbar({
+          type: "countdown",
+          duration: 5000,
+          text: t("errors.FILE_TOO_LARGE"),
+        });
+      } else if (code === "VALIDATION_ERROR" && details) {
+        details.forEach((detail: any) => {
+          const translatedMsg = t(`errors.${detail.message}`);
+          console.error(`${detail.field}: ${translatedMsg}`);
+        });
+      } else if (code) {
+        openSnackbar({
+          type: "error",
+          text: t(`errors.${code}`),
+        });
       }
     }
     return Promise.reject(error);
@@ -96,6 +112,18 @@ export const getFullUrl = (path: string) => {
   if (!path) return path;
   if (path.startsWith("http")) return path;
   return `${PUBLIC_API_URL}${path}`;
+};
+
+export const getErrorMessage = (error: unknown, defaultMessage = "Đã có lỗi xảy ra") => {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const code = axiosError.response?.data?.error?.code;
+    if (code) {
+      return t(`errors.${code}`);
+    }
+    return axiosError.response?.data?.error?.message || axiosError.message || defaultMessage;
+  }
+  return defaultMessage;
 };
 
 export default request;

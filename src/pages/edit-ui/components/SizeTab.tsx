@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Text, Input, Button } from "zmp-ui";
 import { useEditor } from "@/components/za-editor/hooks/useEditor";
 import { FRAME_RATIOS } from "../utils/constants";
-import { showToast } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 import { IconCheck } from "@tabler/icons-react";
 
 export const SizeTab = () => {
@@ -26,12 +26,12 @@ export const SizeTab = () => {
     const h = parseFloat(customHeight);
 
     if (isNaN(w) || isNaN(h) || w < 50 || h < 50 || w > 3000 || h > 3000) {
-      showToast({ message: "Kích thước không hợp lệ (50 - 3000px)" });
+      openSnackbar({ text: "Kích thước không hợp lệ (50 - 3000px)", type: "error" });
       return;
     }
 
     setStageSize({ width: w, height: h });
-    showToast({ message: "Đã áp dụng kích thước" });
+    openSnackbar({ text: "Đã áp dụng kích thước", type: "success" });
   };
 
   const isActive = (width: number, height: number) => {

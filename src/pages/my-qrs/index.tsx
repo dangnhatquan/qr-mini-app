@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Page, Box, Text, Spinner, Modal, Button } from "zmp-ui";
 import { IconGridDots, IconPlus } from "@tabler/icons-react";
-import { showToast } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
+import { getErrorMessage } from "@/utils/axios";
 import { useNavigate } from "react-router-dom";
 import { createRoute } from "@/utils/routes";
 import { QrCode } from "@/store";
@@ -51,17 +52,17 @@ const MyQRsPage: React.FC = () => {
         cardElement.classList.add("card-delete");
         setTimeout(async () => {
           await removeQRRecord(qrId);
-          showToast({ message: "Xoá mã QR thành công" });
+          openSnackbar({ text: "Xoá mã QR thành công", type: "success" });
           if (expandedId === qrId) setExpandedId(null);
         }, 500);
       } else {
         await removeQRRecord(qrId);
-        showToast({ message: "Xoá mã QR thành công" });
+        openSnackbar({ text: "Xoá mã QR thành công", type: "success" });
         if (expandedId === qrId) setExpandedId(null);
       }
     } catch (error) {
       console.error(error);
-      showToast({ message: "Lỗi khi xoá mã QR" });
+      openSnackbar({ text: getErrorMessage(error, "Lỗi khi xoá mã QR"), type: "error" });
     }
   };
 

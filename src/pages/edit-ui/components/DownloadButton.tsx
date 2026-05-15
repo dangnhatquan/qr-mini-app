@@ -2,7 +2,8 @@ import { Button } from "zmp-ui";
 import { useParams } from "react-router-dom";
 import { IconDownload } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
-import { saveImageToGallery, showToast } from "zmp-sdk/apis";
+import { saveImageToGallery } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 
 export const DownloadButton = () => {
   const { id } = useParams();
@@ -42,7 +43,7 @@ export const DownloadButton = () => {
 
           if (isZalo) {
             await saveImageToGallery({ imageBase64Data: uri });
-            showToast({ message: "Lưu ảnh thành công!" });
+            openSnackbar({ text: "Lưu ảnh thành công!", type: "success" });
           } else {
             const link = document.createElement("a");
             link.download = `qr-code-${id || "design"}.png`;
@@ -50,14 +51,14 @@ export const DownloadButton = () => {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast({ message: "Đã tải ảnh về máy!" });
+            openSnackbar({ text: "Đã tải ảnh về máy!", type: "success" });
           }
         } catch {
           const link = document.createElement("a");
           link.download = `qr-code-${id || "design"}.png`;
           link.href = uri;
           link.click();
-          showToast({ message: "Đã tải ảnh về máy!" });
+          openSnackbar({ text: "Đã tải ảnh về máy!", type: "success" });
         }
       }
     }, 100);

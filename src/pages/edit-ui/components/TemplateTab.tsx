@@ -2,9 +2,10 @@ import { Box } from "zmp-ui";
 import { IconPlus } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
-import { chooseImage, showToast } from "zmp-sdk/apis";
+import { chooseImage } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 import { uploadFile } from "@/utils/helpers/image";
-import { getFullUrl } from "@/utils/axios";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
 import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH, TEMPLATE_IMAGES } from "../utils/constants";
 
 export const TemplateTab = () => {
@@ -46,10 +47,10 @@ export const TemplateTab = () => {
             const file = await uploadFile(blob, sessionId);
             const url = getFullUrl(file.path);
             handleAddTemplate(url, file.id);
-            showToast({ message: "Đã thêm Template" });
+            openSnackbar({ text: "Đã thêm Template", type: "success" });
           } catch (err) {
             console.error("Upload template error:", err);
-            showToast({ message: "Lỗi tải Template" });
+            openSnackbar({ text: getErrorMessage(err, "Lỗi tải Template"), type: "error" });
           } finally {
             setUploading(false);
           }
@@ -87,7 +88,7 @@ export const TemplateTab = () => {
             onClick={async () => {
               setElements(elements.filter((el) => !el.id.startsWith("template-")));
               setSelectedId(null);
-              showToast({ message: "Đã xoá Template" });
+              openSnackbar({ text: "Đã xoá Template", type: "success" });
             }}
           >
             <div className="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 group-hover:bg-red-200 mb-2 transition-colors">

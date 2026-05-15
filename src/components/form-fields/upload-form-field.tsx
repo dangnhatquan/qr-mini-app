@@ -1,4 +1,4 @@
-import { getFullUrl } from "@/utils/axios";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
 import { uploadFile, deleteFile } from "@/utils/helpers/image";
 import { IQRFormValues } from "@/utils/schemas/qr";
 import { get } from "radash";
@@ -11,7 +11,8 @@ import {
   Path,
   UseFormSetValue,
 } from "react-hook-form";
-import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
+import { chooseImage, getUserInfo } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 import { Avatar, Button, Spinner } from "zmp-ui";
 import { IconUserCircle } from "@tabler/icons-react";
 
@@ -49,11 +50,11 @@ export const UploadFormField = ({
 
         setValue(name, file.path as any);
         setValue(`${name}FileId` as any, file.id as any);
-        showToast({ message: "Đã thêm Avatar" });
+        openSnackbar({ text: "Đã thêm Avatar", type: "success" });
       }
     } catch (_err) {
       console.error("Upload avatar error:", _err);
-      showToast({ message: "Lỗi tải ảnh" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi tải ảnh"), type: "error" });
     } finally {
       setUploading(false);
     }
@@ -80,11 +81,11 @@ export const UploadFormField = ({
 
         setValue(name, file.path as any);
         setValue(`${name}FileId` as any, file.id as any);
-        showToast({ message: "Đã thêm Avatar" });
+        openSnackbar({ text: "Đã thêm Avatar", type: "success" });
       }
     } catch (_err) {
       console.error("Use avatar error:", _err);
-      showToast({ message: "Lỗi lấy thông tin" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi lấy thông tin"), type: "error" });
     } finally {
       setUploading(false);
     }

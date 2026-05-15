@@ -1,6 +1,6 @@
 import { Accordion } from "@/components/accordion";
 import { Box, Button, Input } from "zmp-ui";
-import { IconUser, IconPlus } from "@tabler/icons-react";
+import { IconUser, IconPlus, IconLoader } from "@tabler/icons-react";
 import { useKonvaEditor } from "../context/KonvaEditorContext";
 import {
   BACKGROUND_COLORS,
@@ -10,11 +10,12 @@ import {
   DOT_TYPES,
   ERROR_CORRECTION_LEVELS,
 } from "../utils/constants";
-import { chooseImage, getUserInfo, showToast } from "zmp-sdk/apis";
+import { chooseImage, getUserInfo } from "zmp-sdk/apis";
+import { openSnackbar } from "@/utils/snackbar";
 import { ErrorCorrectionLevel, Options } from "qr-code-styling";
 import { uploadFile } from "@/utils/helpers/image";
 import { useState } from "react";
-import { getFullUrl } from "@/utils/axios";
+import { getFullUrl, getErrorMessage } from "@/utils/axios";
 
 export const StylingTab = () => {
   const { qrOptions, setQrOptions, logoFileId, setLogoFileId, sessionId } = useKonvaEditor();
@@ -50,11 +51,11 @@ export const StylingTab = () => {
           image: getFullUrl(file.path),
         }));
         setLogoFileId(file.id);
-        showToast({ message: "Đã thêm Avatar" });
+        openSnackbar({ text: "Đã thêm Avatar", type: "success" });
       }
     } catch (_err) {
       console.error("Use avatar error:", _err);
-      showToast({ message: "Lỗi lấy thông tin" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi lấy thông tin"), type: "error" });
     } finally {
       setUploading(false);
     }
@@ -75,11 +76,11 @@ export const StylingTab = () => {
           image: getFullUrl(file.path),
         }));
         setLogoFileId(file.id);
-        showToast({ message: "Đã thêm Logo" });
+        openSnackbar({ text: "Đã thêm Logo", type: "success" });
       }
     } catch (_err) {
       console.error("Upload logo error:", _err);
-      showToast({ message: "Lỗi tải ảnh" });
+      openSnackbar({ text: getErrorMessage(_err, "Lỗi tải ảnh"), type: "error" });
     } finally {
       setUploading(false);
     }
@@ -219,20 +220,25 @@ export const StylingTab = () => {
         onClick={() => setOpenSection(openSection === "image" ? null : "image")}
       >
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" onClick={handleUseAvatar} prefixIcon={<IconUser />}>
-              Dùng Avatar
-            </Button>
-            <Button
-              variant="secondary"
-              fullWidth
-              prefixIcon={<IconPlus />}
-              onClick={handleUploadLogo}
-              loading={uploading}
-            >
-              Tải Logo lên
-            </Button>
-          </div>
+          {uploading ? (
+            <div className="w-full flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="secondary" onClick={handleUseAvatar} prefixIcon={<IconUser />}>
+                Dùng Avatar
+              </Button>
+              <Button
+                variant="secondary"
+                fullWidth
+                prefixIcon={<IconPlus />}
+                onClick={handleUploadLogo}
+              >
+                Tải Logo lên
+              </Button>
+            </div>
+          )}
           {qrOptions.image && (
             <Button
               size="small"

@@ -75,12 +75,15 @@ export const uploadFile = async (
   blob: Blob | File,
   sessionId?: string,
 ): Promise<{ id: string; path: string }> => {
-  const url = sessionId ? `${getPresignedUrl}?sessionId=${sessionId}` : getPresignedUrl;
-
   const response = await request.get<{
     file: { id: string; path: string };
     uploadSignedUrl: string;
-  }>(url);
+  }>(getPresignedUrl, {
+    params: {
+      sessionId,
+      fileSize: blob.size,
+    },
+  });
 
   const { uploadSignedUrl, file } = response.data;
 

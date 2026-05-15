@@ -6,7 +6,7 @@ export const LayoutTab = () => {
   const { canvasBg, setCanvasBg } = useKonvaEditor();
 
   return (
-    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+    <Box p={4} className="overflow-y-auto pb-20">
       <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Màu nền khung hình</div>
       <div className="flex gap-3 flex-wrap w-full">
         {BACKGROUND_COLORS.map((t) => (

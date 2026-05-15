@@ -5,7 +5,7 @@ import { useState } from "react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
 import { uploadFile } from "@/utils/helpers/image";
 import { getFullUrl } from "@/utils/axios";
-import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH } from "../utils/constants";
+import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH, TEMPLATE_IMAGES } from "../utils/constants";
 
 export const TemplateTab = () => {
   const { elements, setElements, setSelectedId, stageSize, sessionId } = useKonvaEditor();
@@ -60,11 +60,11 @@ export const TemplateTab = () => {
   };
 
   return (
-    <Box p={4} className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+    <Box p={4} className="overflow-y-auto pb-20">
       <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
         Kho giao diện
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-6 2xl:grid-cols-8 gap-4 pb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-4">
         <Box
           className="w-full aspect-[35/45] flex flex-col justify-center items-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
           onClick={handleUploadTemplate}
@@ -98,6 +98,16 @@ export const TemplateTab = () => {
             </span>
           </Box>
         )}
+
+        {TEMPLATE_IMAGES.map((imgUrl) => (
+          <Box
+            key={imgUrl}
+            className="w-full aspect-[35/45] rounded-xl bg-gray-200 overflow-hidden transition-transform hover:scale-105 cursor-pointer"
+            onClick={() => handleAddTemplate(imgUrl)}
+          >
+            <img src={imgUrl} alt="Template" className="w-full h-full object-cover" />
+          </Box>
+        ))}
       </div>
     </Box>
   );

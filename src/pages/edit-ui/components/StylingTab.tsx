@@ -86,7 +86,7 @@ export const StylingTab = () => {
   };
 
   return (
-    <Box className="overflow-y-auto h-[calc(50vh-140px)] pb-20">
+    <Box className="overflow-y-auto pb-20">
       <Accordion
         title="Tùy chỉnh điểm ảnh"
         isOpen={openSection === "dots"}

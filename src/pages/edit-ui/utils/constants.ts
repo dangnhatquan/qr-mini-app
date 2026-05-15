@@ -194,3 +194,12 @@ export const ERROR_CORRECTION_LEVELS = [
 
 export const DEFAULT_FRAME_WIDTH = 350;
 export const DEFAULT_FRAME_HEIGHT = 450;
+
+export const TEMPLATE_IMAGES = [
+  `${PUBLIC_API_URL}/api/v1/files/serve/25ebb1d6-294c-4638-aca2-b962418a23a4`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/5106c07b-d9a0-4842-a416-53010aa1c8a9`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/5cae09ec-0582-41a4-96ce-16d9b454840f`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/98fa18b2-ac8d-4e93-aa99-b4435bbcdc90`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b4d35912-79d4-4d3d-ac2f-dfbdaad3b072`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/cfa24d40-b52a-45e9-90c1-103a44965719`,
+];

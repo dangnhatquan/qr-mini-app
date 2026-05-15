@@ -8,11 +8,12 @@ export const cardService = {
     previewImageId?: string,
     sessionId?: string,
   ): Promise<Card> {
-    return await request.post<Card>(cardsResource, {
+    const response = await request.post<Card>(cardsResource, {
       editorStage: editorStage ?? null,
       previewImageId: previewImageId ?? null,
       sessionId,
     });
+    return response.data;
   },
 
   async updateCard(
@@ -21,20 +22,23 @@ export const cardService = {
     previewImageId?: string,
     sessionId?: string,
   ): Promise<Card> {
-    return await request.patch<Card>(`${cardsResource}/${id}`, {
+    const response = await request.patch<Card>(`${cardsResource}/${id}`, {
       editorStage: editorStage ?? null,
       previewImageId: previewImageId ?? null,
       sessionId,
     });
+    return response.data;
   },
 
   async deleteCard(id: string): Promise<void> {
-    return await request.delete(`${cardsResource}/${id}`);
+    const response = await request.delete(`${cardsResource}/${id}`);
+    return response.data;
   },
 
   async getCard(id: string, password?: string): Promise<Card> {
-    return await request.post<Card>(`${cardsResource}/${id}`, {
+    const response = await request.post<Card>(`${cardsResource}/${id}`, {
       password,
     });
+    return response.data;
   },
 };

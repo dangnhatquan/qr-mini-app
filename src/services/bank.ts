@@ -4,6 +4,7 @@ import { Bank } from "@/types/bank";
 
 export const bankService = {
   getBanks: async () => {
-    return await request.get<Bank[]>(banksResource);
+    const response = await request.get<Bank[]>(banksResource);
+    return response.data;
   },
 };

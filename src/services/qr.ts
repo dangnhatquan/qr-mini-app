@@ -17,7 +17,8 @@ import { EQRCategory, EQRType, QrCode, EditorStage } from "@/store";
 
 export const qrService = {
   async getMyQRs() {
-    return await request.get<QrCode[]>(qrRecordResource);
+    const response = await request.get<QrCode[]>(qrRecordResource);
+    return response.data;
   },
 
   async createQR(data: IQRFormValues, sessionId?: string) {
@@ -45,7 +46,7 @@ export const qrService = {
         shortUrl: string;
       }>(qrRecordResource, { ...createPayload, sessionId });
 
-      const { id, shortUrl } = qrResponse;
+      const { id, shortUrl } = qrResponse.data;
 
       const finalVersion = ZALO_APP_DEV_VERSION;
 
@@ -60,7 +61,11 @@ export const qrService = {
         previewImageId: file.id,
       };
 
-      return await request.patch(`${qrRecordResource}/${id}`, { ...updatePayload, sessionId });
+      const response = await request.patch(`${qrRecordResource}/${id}`, {
+        ...updatePayload,
+        sessionId,
+      });
+      return response.data;
     }
 
     const payloadString = getQRPayload(data);
@@ -72,11 +77,12 @@ export const qrService = {
 
     const response = await request.post(qrRecordResource, { ...payload, sessionId });
 
-    return response;
+    return response.data;
   },
 
   async getQRDetail(id: string) {
-    return await request.get<QrCode>(`${qrRecordResource}/${id}`);
+    const response = await request.get<QrCode>(`${qrRecordResource}/${id}`);
+    return response.data;
   },
 
   async updateQR(
@@ -118,13 +124,15 @@ export const qrService = {
       payload.editorStage = cleanUpBase64(editorStage);
     }
 
-    return await request.patch(`${qrRecordResource}/${id}`, {
+    const response = await request.patch(`${qrRecordResource}/${id}`, {
       ...payload,
       sessionId,
     });
+    return response.data;
   },
 
   async deleteQR(id: string) {
-    return await request.delete(`${qrRecordResource}/${id}`);
+    const response = await request.delete(`${qrRecordResource}/${id}`);
+    return response.data;
   },
 };

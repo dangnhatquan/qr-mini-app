@@ -1,5 +1,12 @@
-import axios, { AxiosHeaders, AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import { storage } from "../storage";
+import { ApiErrorResponse, ApiResponse } from "@/types/api";
 
 const PUBLIC_API_URL = import.meta.env.VITE_PUBLIC_API_URL;
 
@@ -24,44 +31,64 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse<any>>) => {
+    return response;
+  },
+  (error: AxiosError<ApiErrorResponse>) => {
+    if (error.response) {
+      const { code, message, details } = error.response.data.error;
+
+      if (code === "VALIDATION_ERROR") {
+        console.error("Validation Error:", details);
+      }
+
+      if (code === "UNAUTHORIZED" || code === "TOKEN_EXPIRED") {
+        storage.removeItem("access_token");
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
 const isAbsoluteURL = (url: string) => /^(?:[a-z+]+:)?\/\//i.test(url);
 
 const request = {
-  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
-    return instance.get<T>(url, config).then((response) => response.data);
+    return instance.get<ApiResponse<T>>(url, config).then((response) => response.data);
   },
 
   async post<T = unknown, D = unknown>(
     url: string,
     data?: D,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
-    return instance.post<T>(url, data, config).then((response) => response.data);
+    return instance.post<ApiResponse<T>>(url, data, config).then((response) => response.data);
   },
 
   async put<T = unknown, D = unknown>(
     url: string,
     data?: D,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
-    return instance.put<T>(url, data, config).then((response) => response.data);
+    return instance.put<ApiResponse<T>>(url, data, config).then((response) => response.data);
   },
 
-  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
-    return instance.delete<T>(url, config).then((response) => response.data);
+    return instance.delete<ApiResponse<T>>(url, config).then((response) => response.data);
   },
 
   async patch<T = unknown, D = unknown>(
     url: string,
     data?: D,
     config?: AxiosRequestConfig,
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const instance = isAbsoluteURL(url) ? axios : axiosInstance;
-    return instance.patch<T>(url, data, config).then((response) => response.data);
+    return instance.patch<ApiResponse<T>>(url, data, config).then((response) => response.data);
   },
 };
 

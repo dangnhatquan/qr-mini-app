@@ -77,12 +77,12 @@ export const uploadFile = async (
 ): Promise<{ id: string; path: string }> => {
   const url = sessionId ? `${getPresignedUrl}?sessionId=${sessionId}` : getPresignedUrl;
 
-  const uploadInfo = await request.get<{
+  const response = await request.get<{
     file: { id: string; path: string };
     uploadSignedUrl: string;
   }>(url);
 
-  const { uploadSignedUrl, file } = uploadInfo;
+  const { uploadSignedUrl, file } = response.data;
 
   await request.put(uploadSignedUrl, blob, {
     headers: { "Content-Type": blob.type || "image/png" },
@@ -109,7 +109,7 @@ export const deleteFile = async (fileId?: string | null): Promise<void> => {
   console.info("🚀 Attempting to delete file from S3. ID:", fileId);
   try {
     const response = await request.delete(`${filesResource}/${fileId}`);
-    console.info("✅ File deleted successfully:", fileId, response);
+    console.info("✅ File deleted successfully:", fileId, response.data);
   } catch (error) {
     console.error("❌ deleteFile error for ID:", fileId, error);
   }

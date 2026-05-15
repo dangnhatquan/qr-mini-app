@@ -8,11 +8,14 @@ import { getAccessToken } from "zmp-sdk";
 
 async function loginWithZaloToken(zaloAccessToken: string): Promise<LoginResponse> {
   try {
-    const data = await request.post<LoginResponse, { accessToken: string }>(authZaloLoginResource, {
-      accessToken: isEmpty(zaloAccessToken) ? BYPASS_ZALO_ACCESS_TOKEN : zaloAccessToken,
-    });
+    const response = await request.post<LoginResponse, { accessToken: string }>(
+      authZaloLoginResource,
+      {
+        accessToken: isEmpty(zaloAccessToken) ? BYPASS_ZALO_ACCESS_TOKEN : zaloAccessToken,
+      },
+    );
 
-    return data;
+    return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     const message = error?.response?.data?.message || error?.message || "Login failed";

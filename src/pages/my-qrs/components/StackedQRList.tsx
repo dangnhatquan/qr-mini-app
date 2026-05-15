@@ -56,7 +56,7 @@ export const StackedQRList: React.FC<StackedQRListProps> = ({
         >
           {/* Swipe Action Background */}
           <div
-            className="absolute inset-0 bg-red-500 rounded-3xl flex items-center justify-end pr-8 text-white shadow-inner z-0"
+            className="absolute inset-0 bg-red-500 w-[calc(100%-1px)] h-[calc(100%-4px)] rounded-3xl flex items-center justify-end pr-8 text-white shadow-inner z-0"
             onClick={() => onDeleteConfirm(qr)}
           >
             <div className="flex flex-col items-center gap-1">

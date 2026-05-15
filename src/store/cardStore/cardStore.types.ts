@@ -13,6 +13,7 @@ export interface CardStore {
   card: Card | null;
   isFetching: boolean;
   error: string | null;
+  clearCard: () => void;
   fetchCard: (id: string, password?: string) => Promise<void>;
   createCard: (editorStage: StageProps, previewImageId: string) => Promise<void>;
   updateCard: (id: string, editorStage: StageProps, previewImageId: string) => Promise<void>;

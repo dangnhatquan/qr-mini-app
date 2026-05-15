@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Page, Box, Text, Button, Spinner, Header, Input, useSnackbar, useNavigate } from "zmp-ui";
-import { GreetingQRData, useCardStore, useQRStore } from "@/store";
-import { myQrsRoute } from "@/utils/routes";
+import { EQRCategory, EQRType, GreetingQRData, useCardStore, useQRStore } from "@/store";
+import { createRoute } from "@/utils/routes";
 import { IconDownload, IconLock } from "@tabler/icons-react";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { getFullUrl } from "@/utils/axios";
@@ -160,10 +160,12 @@ const ReviewGreetingDetailPage: React.FC = () => {
           </Box>
         )}
 
-        <div className="fixed bottom-4 right-4 flex gap-4">
+        <div className="fixed bottom-6 right-4 flex gap-4">
           <Button
             variant="primary"
-            onClick={() => navigate(myQrsRoute, { direction: "backward" })}
+            onClick={() =>
+              navigate(`${createRoute}?type=${EQRType.DYNAMIC}&category=${EQRCategory.GREETING}`)
+            }
             size="large"
             className="px-6"
           >

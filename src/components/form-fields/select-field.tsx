@@ -9,7 +9,7 @@ interface SelectFormFieldProps<T extends FieldValues> {
   control: Control<T>;
   label: string;
   placeholder?: string;
-  options: { value: string | number; label: string; description: string; image?: string }[];
+  options: { value: string | number; label: string; description?: string; image?: string }[];
   required?: boolean;
   helperText?: string;
   defaultValue?: string | number;

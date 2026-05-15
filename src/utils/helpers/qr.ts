@@ -40,8 +40,7 @@ export const generateQRPayload = (qr: QrCode) => {
     }
     case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
-      const { version } = getSystemInfo();
-      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      const finalVersion = ZALO_APP_DEV_VERSION;
       return generateDynamicLink(finalVersion, qr.id, qr.category, undefined);
     }
     default:
@@ -98,8 +97,7 @@ export const getQRPayload = (data: IQRFormValues, id?: string): string => {
 
     case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
-      const { version } = getSystemInfo();
-      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      const finalVersion = ZALO_APP_DEV_VERSION;
       return generateDynamicLink(finalVersion, id!, data.category, undefined);
     }
 

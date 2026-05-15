@@ -52,6 +52,9 @@ const CreatePage: React.FC = () => {
     }
   }, [savedFormState]);
 
+  const qrTypeFromUrl = searchParams.get("type") as EQRType;
+  const categoryFromUrl = searchParams.get("category") as EQRCategory;
+
   const {
     control,
     setValue,
@@ -63,8 +66,8 @@ const CreatePage: React.FC = () => {
     resolver: zodResolver(qrFormSchema),
     defaultValues: savedFormState ?? {
       name: "",
-      qrType: EQRType.STATIC,
-      category: EQRCategory.WIFI,
+      qrType: qrTypeFromUrl || EQRType.STATIC,
+      category: categoryFromUrl || EQRCategory.WIFI,
       wifiData: { ssid: "", password: "", security: DEFAULT_WIFI_SECURITY },
       bankingData: { bankId: DEFAULT_BANK_ID, accountNo: "", accountName: "" },
       vcardData: { fullName: "", phone: "" },
@@ -251,7 +254,6 @@ const CreatePage: React.FC = () => {
                 options={QR_TYPES}
                 required
               />
-
               <SelectFormField
                 name="category"
                 control={control}

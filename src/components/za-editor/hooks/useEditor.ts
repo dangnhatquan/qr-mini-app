@@ -232,7 +232,7 @@ export const useEditor = () => {
       await new Promise((r) => setTimeout(r, 150));
 
       try {
-        const blob = await qrCode.getRawData("png");
+        const blob = await qrCode.getRawData("webp");
         if (blob && isMounted) {
           const reader = new FileReader();
           reader.onloadend = () => {

@@ -47,8 +47,7 @@ export const qrService = {
 
       const { id, shortUrl } = qrResponse;
 
-      const { version } = getSystemInfo();
-      const finalVersion = version || ZALO_APP_DEV_VERSION;
+      const finalVersion = ZALO_APP_DEV_VERSION;
 
       const finalUrl = generateDynamicLink(finalVersion, id, data.category, shortUrl);
 

@@ -3,7 +3,7 @@ import { loginWithZalo } from "@/services/auth";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useNavigate } from "zmp-ui";
-import { myQrsRoute, uiKitRoute } from "@/utils/routes";
+import { greetingDetailRoute, myQrsRoute, uiKitRoute } from "@/utils/routes";
 import { storage } from "@/utils/storage";
 
 export const AuthContext = createContext<{ user: User | null }>({
@@ -22,9 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         storage.setItem("access_token", res.token);
         storage.setItem("refresh_token", res.refreshToken);
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get("page");
+
         const path = window.location.pathname;
 
-        if (path && path.includes(uiKitRoute)) {
+        console.log(page, path);
+
+        if (page) {
+          navigate(page, { replace: true });
+        } else if (path && path.includes(uiKitRoute)) {
           navigate(path, { replace: true });
         } else {
           navigate(myQrsRoute, { replace: true });

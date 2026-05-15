@@ -7,6 +7,7 @@ export const useCardStore = create<CardStore>((set) => ({
   card: null,
   isFetching: false,
   error: null,
+  clearCard: () => set({ card: null, isFetching: false, error: null }),
   fetchCard: async (id: string, password?: string) => {
     set({ isFetching: true, error: null });
     try {

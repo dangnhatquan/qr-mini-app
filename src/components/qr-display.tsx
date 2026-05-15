@@ -9,53 +9,42 @@ interface QRDisplayProps {
 }
 
 export const QRDisplay: React.FC<QRDisplayProps> = ({ data, size = 80, className }) => {
-  const [qrImageUrl, setQrImageUrl] = useState<string>("");
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const qrCodeRef = React.useRef<QRCodeStyling | null>(null);
 
   useEffect(() => {
-    const generateQR = async () => {
-      try {
-        const qrCode = new QRCodeStyling({
-          ...DEFAULT_EDITOR_STAGE.qrOptions,
-          width: size * 4,
-          height: size * 4,
-          data: data,
-          margin: 0,
-        });
+    if (!containerRef.current || !data) return;
 
-        const raw = await qrCode.getRawData("webp");
-        if (!raw) throw new Error("Failed to generate QR blob");
-
-        const rawBlob =
-          raw instanceof Blob ? raw : new Blob([raw as BlobPart], { type: "image/webp" });
-
-        const imgUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(rawBlob);
-        });
-
-        setQrImageUrl(imgUrl);
-      } catch (error) {
-        console.error("QRDisplay Error:", error);
-      }
-    };
-
-    if (data) {
-      generateQR();
+    if (!qrCodeRef.current) {
+      qrCodeRef.current = new QRCodeStyling({
+        ...DEFAULT_EDITOR_STAGE.qrOptions,
+        type: "svg",
+        width: size,
+        height: size,
+        data: data,
+        margin: 0,
+      });
+      qrCodeRef.current.append(containerRef.current);
+    } else {
+      qrCodeRef.current.update({
+        data: data,
+        width: size,
+        height: size,
+      });
     }
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+      qrCodeRef.current = null;
+    };
   }, [data, size]);
 
   return (
     <div
-      className={`flex items-center justify-center overflow-hidden bg-white ${className}`}
+      ref={containerRef}
+      className={`flex items-center justify-center overflow-hidden bg-white qr-container ${className}`}
       style={{ width: size, height: size }}
-    >
-      {qrImageUrl ? (
-        <img src={qrImageUrl} alt="QR Code" className="w-full h-full object-contain" />
-      ) : (
-        <div className="w-full h-full animate-pulse bg-gray-50" />
-      )}
-    </div>
+    />
   );
 };

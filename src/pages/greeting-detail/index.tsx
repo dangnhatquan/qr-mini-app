@@ -171,7 +171,7 @@ const GreetingDetailPage: React.FC = () => {
             <Text className="text-gray-400">Thiệp chưa được tạo</Text>
           </Box>
         )}
-        <div className="fixed bottom-4 right-4 flex gap-4">
+        <div className="fixed bottom-6 right-4 flex gap-4">
           <Button icon={<IconDownload />} onClick={handleDownload} size="large" />
         </div>
       </Box>

@@ -105,7 +105,7 @@ export const QRCardUI: React.FC<QRCardUIProps> = ({ qr, showMore = true, onMoreC
               .replace(",", "")}
           </Text>
         </div>
-        <div className="w-28 h-28 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden flex-shrink-0 border border-white/50 flex items-center justify-center p-2">
+        <div className="w-28 h-28 bg-white rounded-2xl shadow-2xl overflow-hidden flex-shrink-0 border border-white/50 flex items-center justify-center p-2">
           <QRDisplay data={qrText} size={112} />
         </div>
       </div>

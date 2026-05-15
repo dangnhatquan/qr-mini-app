@@ -121,11 +121,19 @@ const CardEditorPage: React.FC = () => {
     }
   };
 
-  const { card, fetchCard, isFetching } = useCardStore();
+  const { card, fetchCard, isFetching, clearCard } = useCardStore();
+
+  useEffect(() => {
+    return () => {
+      clearCard();
+    };
+  }, [clearCard]);
 
   useEffect(() => {
     if (initialCardId) {
       fetchCard(initialCardId!);
+    } else {
+      if (card) clearCard();
     }
   }, [initialCardId, fetchCard]);
 

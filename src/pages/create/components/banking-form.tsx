@@ -35,7 +35,7 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
         label="Ngân hàng"
         placeholder="Chọn ngân hàng"
         options={banks.map((bank) => ({
-          value: bank.bin || bank.code || bank.id.toString(), // prefer BIN for VietQR
+          value: bank.bin || bank.code || bank.id.toString(),
           label: bank.shortName || bank.name,
           description: bank.name,
           image: bank.logo,

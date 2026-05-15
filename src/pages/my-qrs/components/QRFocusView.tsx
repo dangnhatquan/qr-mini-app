@@ -3,7 +3,7 @@ import { QRCardUI } from "./QRCardUI";
 import { QrCode } from "@/store";
 import { QR_CARD_ANIMATION_CLOSE_DELAY } from "@/utils/constants/qr";
 import { IconDownload, IconDotsVertical, IconTrash } from "@tabler/icons-react";
-import { toPng } from "html-to-image";
+import { toCanvas, toPng } from "html-to-image";
 import { saveImageToGallery, showToast } from "zmp-sdk/apis";
 import { Button } from "zmp-ui";
 
@@ -31,17 +31,24 @@ export const QRFocusView: React.FC<QRFocusViewProps> = ({
     try {
       setIsDownloading(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      const dataUrl = await toPng(cardRef.current, {
+      if (!cardRef.current) return;
+
+      const canvas = await toCanvas(cardRef.current, {
         cacheBust: true,
-        pixelRatio: 3,
+        pixelRatio: 2,
         backgroundColor: "transparent",
+        skipFonts: false,
         style: {
           borderRadius: "0px",
           transform: "none",
+          margin: "0",
+          padding: "0",
         },
       });
+
+      const dataUrl = canvas.toDataURL("image/png");
 
       if (!dataUrl || dataUrl === "data:,") {
         throw new Error("Generated image is empty");
@@ -84,8 +91,10 @@ export const QRFocusView: React.FC<QRFocusViewProps> = ({
           transition: `transform ${QR_CARD_ANIMATION_CLOSE_DELAY}ms cubic-bezier(0.16, 1, 0.3, 1)`,
         }}
       >
-        <div ref={cardRef} className="w-[calc(100vw-48px)] max-w-[400px]  flex flex-col gap-2">
-          <div className="aspect-[1.586/1]">{qr && <QRCardUI qr={qr} showMore={false} />}</div>
+        <div className="w-[calc(100vw-48px)] max-w-[400px]  flex flex-col gap-2">
+          <div ref={cardRef} className="aspect-[1.586/1]">
+            {qr && <QRCardUI qr={qr} showMore={false} />}
+          </div>
           <div className="w-full flex justify-between gap-2">
             <Button
               onClick={() => {

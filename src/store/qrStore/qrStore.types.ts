@@ -56,6 +56,7 @@ export interface GreetingQRData {
   password?: string;
   maxAttempts?: number;
   cardId?: string;
+  hasPassword: boolean;
 }
 
 export interface QrCode {

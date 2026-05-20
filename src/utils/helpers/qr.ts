@@ -60,10 +60,6 @@ export const generateDynamicLink = (
     page = "greetings";
   }
 
-  console.log(
-    `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`,
-  );
-
   return `https://zalo.me/s/${ZALO_APP_ID}/?env=TESTING&version=${version}&page=${page}/${id}`;
 };
 
@@ -219,7 +215,7 @@ export const generateQRBlob = async (text: string, editorStage?: EditorStage): P
   layer.add(group);
   stage.add(layer);
 
-  const dataURL = stage.toDataURL({ pixelRatio: 3, mimeType: "image/webp" });
+  const dataURL = stage.toDataURL({ pixelRatio: 3, mimeType: "image/webp", quality: 1.0 });
 
   stage.destroy();
 

@@ -48,7 +48,7 @@ export const QRFocusView: React.FC<QRFocusViewProps> = ({
         },
       });
 
-      const dataUrl = canvas.toDataURL("image/png");
+      const dataUrl = canvas.toDataURL("image/jpeg", 1.0);
 
       if (!dataUrl || dataUrl === "data:,") {
         throw new Error("Generated image is empty");

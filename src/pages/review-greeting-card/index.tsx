@@ -16,9 +16,10 @@ const ReviewGreetingDetailPage: React.FC = () => {
   const [attempts, setAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const { selectedQR, isFetchingSelectedQR, fetchQRDetail } = useQRStore();
-  const { card, isFetching, fetchCard } = useCardStore();
+  const { card, isFetching, fetchCard, error: cardError } = useCardStore();
 
   const isAuthorized = !!(card && card.editorStage);
+  const hasPassword = !!selectedQR?.payload?.greetingData?.hasPassword;
   const isLoading = isFetching || isFetchingSelectedQR;
 
   useEffect(() => {
@@ -68,6 +69,15 @@ const ReviewGreetingDetailPage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const greetingData = selectedQR?.payload?.greetingData as GreetingQRData;
+    if (greetingData?.cardId && !card && !cardError && !isFetching) {
+      fetchCard(greetingData.cardId).catch(() => {
+        // Expected if password protected
+      });
+    }
+  }, [selectedQR, card, cardError, isFetching, fetchCard]);
+
   if (isLoading) {
     return (
       <Page className="flex items-center justify-center bg-gray-50">
@@ -111,7 +121,7 @@ const ReviewGreetingDetailPage: React.FC = () => {
     );
   }
 
-  if (!isAuthorized) {
+  if (hasPassword && !isAuthorized) {
     return (
       <Page className="bg-white">
         <Box p={6} className="h-full flex flex-col justify-center items-center pt-10">

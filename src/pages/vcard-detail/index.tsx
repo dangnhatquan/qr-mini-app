@@ -209,7 +209,7 @@ const VCardDetailPage: React.FC = () => {
               Website
             </Text>
             <Text className="text-white text-xs font-medium truncate">
-              {vcardData.website || "N/A"}
+              {vcardData.website || "Chưa cập nhât"}
             </Text>
           </Box>
 
@@ -228,7 +228,7 @@ const VCardDetailPage: React.FC = () => {
               Mạng xã hội
             </Text>
             <Text className="text-white text-xs font-medium truncate">
-              {vcardData.socialLinks || "Global"}
+              {vcardData.socialLinks || "Chưa cập nhât"}
             </Text>
           </Box>
         </div>

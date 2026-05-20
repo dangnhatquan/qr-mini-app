@@ -83,12 +83,12 @@ export const StickerTab = () => {
             <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">
               {set.name}
             </div>
-            <div className="grid grid-cols-4 xl:grid-cols-6 2xl:grid-cols-10 gap-4 pb-4">
+            <div className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-4 pb-4">
               {set.stickers.map((s) => (
                 <img
                   key={s}
                   src={getFullUrl(s)}
-                  className="w-full aspect-square object-contain rounded-lg p-1 active:bg-gray-100 cursor-pointer bg-white"
+                  className="w-full aspect-square object-contain rounded-lg p-3 active:bg-gray-100 cursor-pointer bg-white"
                   onClick={() => handleAddSticker(s)}
                 />
               ))}

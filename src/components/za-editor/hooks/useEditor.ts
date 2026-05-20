@@ -149,6 +149,8 @@ export const useEditor = () => {
             width: CAPTURE_WIDTH,
             height: CAPTURE_HEIGHT,
             pixelRatio: 1,
+            quality: 1.0,
+            mimeType: "image/png",
           });
 
           stage.scale({ x: oldScale, y: oldScale });

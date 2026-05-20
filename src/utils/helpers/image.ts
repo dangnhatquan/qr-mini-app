@@ -31,7 +31,7 @@ export const resizeImage = (
       canvas.height = height;
       const ctx = canvas.getContext("2d");
       ctx?.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL("image/png"));
+      resolve(canvas.toDataURL("image/png", 0.9));
     };
     img.onerror = () => resolve(base64);
   });

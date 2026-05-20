@@ -30,6 +30,8 @@ export const DownloadButton = () => {
           width: box.width,
           height: box.height,
           pixelRatio: 3,
+          quality: 1.0,
+          mimeType: "image/png",
         });
 
         stage.scale({ x: oldScale, y: oldScale });

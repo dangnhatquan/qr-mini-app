@@ -1,6 +1,7 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import zaloMiniApp from "zmp-vite-plugin";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default () => {
@@ -13,8 +14,14 @@ export default () => {
     },
     resolve: {
       alias: {
-        "@": "/src",
+        "@": path.resolve(__dirname, "./src"),
       },
+    },
+    test: {
+      globals: true,
+      environment: "jsdom",
+      include: ["**/*.test.{ts,tsx}"],
     },
   });
 };
+

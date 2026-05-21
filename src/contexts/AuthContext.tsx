@@ -27,8 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const path = window.location.pathname;
 
-        console.log(page, path);
-
         if (page) {
           navigate(page, { replace: true });
         } else if (path && path.includes(uiKitRoute)) {

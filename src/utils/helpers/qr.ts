@@ -1,11 +1,18 @@
-import { BankingQRData, EQRCategory, QrCode, WifiQRData, EditorStage } from "@/store";
+import {
+  BankingQRData,
+  EQRCategory,
+  QrCode,
+  WifiQRData,
+  EditorStage,
+  CanvasElement,
+  CanvasElementType,
+} from "@/store";
 import { IQRFormValues } from "../schemas/qr";
 import { ZALO_APP_LINK } from "../constants/common";
 import { DEFAULT_EDITOR_STAGE } from "../constants/qr";
 import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 
 import Konva from "konva";
-import { CanvasElement, CanvasElementType } from "@/store";
 import QRCodeStyling from "qr-code-styling";
 import { generateVietQRPayload } from "./viet-qr";
 

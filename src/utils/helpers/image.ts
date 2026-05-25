@@ -88,7 +88,7 @@ export const uploadFile = async (
   const { uploadSignedUrl, file } = response.data;
 
   await request.put(uploadSignedUrl, blob, {
-    headers: { "Content-Type": blob.type || "image/png" },
+    headers: { "Content-Type": blob.type || "image/webp" },
   });
 
   return file;

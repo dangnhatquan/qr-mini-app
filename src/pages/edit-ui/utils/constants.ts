@@ -136,42 +136,51 @@ export const BACKGROUND_COLORS = [
   COLOR.BLACK,
 ];
 
+export const TEMPLATE_IMAGES = [
+  `${PUBLIC_API_URL}/api/v1/files/serve/8f45fd08-af0e-428d-9a1c-3f6fd79ead48`, // trung-thu.webp
+  `${PUBLIC_API_URL}/api/v1/files/serve/9adbb99e-9827-4a07-ac7f-afe9e9577c29`, // summer-time.webp
+  `${PUBLIC_API_URL}/api/v1/files/serve/409a5759-a2f9-4d02-918d-84159eb26c70`, // quoc-khanh.webp
+  `${PUBLIC_API_URL}/api/v1/files/serve/221f338d-14db-4823-852f-902aee6cd260`, // ngay-van-hoa.webp
+  `${PUBLIC_API_URL}/api/v1/files/serve/ddcd3819-8151-4349-9bdf-422d5696530f`, // halloween.webp
+  `${PUBLIC_API_URL}/api/v1/files/serve/feee7306-8d5a-4dc9-8a11-35031121680f`, // giang-sinh.webp
+];
+
 export const ZAPY_STICKERS = [
-  `${PUBLIC_API_URL}/api/v1/files/serve/961361ea-890a-4bdd-ae75-b7dc47fcd054`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/9b56f4db-1c3d-48ab-aaf1-831ba760ce2c`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/9e28893d-e2d6-4774-8604-499fb45bfc83`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/357becdf-7642-4dae-97f8-0b52e0dd0df4`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/5d4468f9-2725-4b9e-99b7-857b73a2c8c1`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/455621e6-1a99-4bb4-b5fa-4bd5c4df58fd`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/d26ec264-4a3c-4ef9-9884-a15a1ac57b45`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/af31bf3c-ae0f-43c6-91ac-038ebed12c64`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/bf8064ed-242c-4e92-a7dc-721dd53c32c2`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/3e9f4bba-b17d-4049-b437-395c5f82bfcb`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/d62f4173-ef6c-46bb-94b3-fa73f0bf1655`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/4f952945-d9e8-4180-8582-ffb5a7730f0c`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/7dc65d82-9eb5-4180-929a-940c48f8105b`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/10909dd9-6d2f-4134-8f24-602aa84e190e`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/df92e9b9-ef3c-4fd8-8851-048d2aaab6c7`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/e0abefdb-8f82-46ee-9721-e1c824665a2c`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/f7f98f5f-1d1d-4959-8057-48db1c283883`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/338b3efe-c6cb-4324-84e3-9c5614c947e3`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/ae968d43-7219-4cae-aa06-8f7a39ed23b7`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b1ad63e3-2bb0-4f0f-a40d-f52afcf11287`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/6a8bdbd1-4112-4a50-8a3e-3b9731007837`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b80e75cd-d5bd-423f-b388-ef438e49d8cf`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/42e2edf7-bf8b-45b3-8aa4-2e7e675a297`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/0ad63eeb-4db6-4a8c-982b-f6985ca072a3`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/974e0371-3229-4eab-9a83-c3792f2f84e1`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/0fd5e752-66a7-4a75-afe3-70414afe1d88`,
 ];
 
 export const BU_MAT_NGAO = [
-  `${PUBLIC_API_URL}/api/v1/files/serve/99d08c8a-489f-4fc7-82e7-b482cf9e11be`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/10805214-d5fa-4f17-beaa-4b9a7756177e`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/8a829015-4fb4-40d9-85c0-f4e440fe9c84`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/afe722c5-2e2a-46da-848d-243a12b48df9`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/2af5b132-9082-4d2b-a0a5-0aa004dbc257`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/2e51103b-400f-465b-b769-e1c3ec2ef363`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/f06a79a7-c072-401e-9ed4-f6a36af4d799`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/229794b6-c345-469f-b4f2-31b218272b46`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/a83f676d-019b-4f59-90fc-805e07cae70b`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/f5053a00-abbc-44f7-9c7f-89770be5f877`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/e5b217cd-d2a7-4db0-ae0a-fd0f8086eba1`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/d13c9e07-50d4-4881-920c-56fd575700f0`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/e7720ccc-f9d8-4aa9-ac6d-fae8bc24612b`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/b308e74d-3c4b-4bb7-b44a-bd1a51d409e8`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/be8a8b8e-dd95-44d5-b2be-64592b2148ab`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/199e229a-b377-419e-843d-826151fa181a`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/82340215-0c43-4eb8-9803-aea88e3f2a71`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/7c1e78d9-7439-4754-8de9-5b69e2e3c385`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/334c7218-fef8-4547-b788-2a4512d56d80`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/18bc546a-0278-4d07-9b05-4abb62aa76c2`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b07d13a0-c620-4ad0-b0a0-51eaa54c601c`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/942b6f64-8ebe-450f-812b-8dcd31b4131e`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b42ce205-b8e4-4fdc-a44d-512423120bcb`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/ae5e6b6a-85eb-4d4d-a8c1-e8130ddf060`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/c4825162-a1c2-4e21-854a-89fbcda7c49b`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/b8431ef0-1bb7-4a24-bcbb-6799908b4a11`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/565c1fe2-4e42-4442-b1f3-0acfd134a5d6`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/442e9ed5-c449-44ee-a845-fad55b72efdc`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/070ae42c-c2f7-435e-a40f-84ba3ea43fe6`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/ecced96f-cf44-4d89-b55a-a1447cd48bf9`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/d807bbe5-26d5-4598-a90e-bf8803d4c20e`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/93d44c70-0fec-483c-b6c4-c850aaffecf3`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/2d8eee31-4aa1-4d94-9246-f1d48053a1b4`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/99f77cca-e1a2-4393-9325-15444a0d2a77`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/2f220f54-a138-43b7-b664-e666fbb5ec0d`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/6d303f92-0afb-4a3d-92c9-131205a4a70b`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/c0384d7a-c065-4741-8245-3a2c4a590ffd`,
+  `${PUBLIC_API_URL}/api/v1/files/serve/bba4e1eb-604b-4ad3-bcaf-7651805e0364`,
 ];
 
 export const STICKERS = [
@@ -194,12 +203,3 @@ export const ERROR_CORRECTION_LEVELS = [
 
 export const DEFAULT_FRAME_WIDTH = 350;
 export const DEFAULT_FRAME_HEIGHT = 450;
-
-export const TEMPLATE_IMAGES = [
-  `${PUBLIC_API_URL}/api/v1/files/serve/25ebb1d6-294c-4638-aca2-b962418a23a4`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/5106c07b-d9a0-4842-a416-53010aa1c8a9`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/5cae09ec-0582-41a4-96ce-16d9b454840f`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/98fa18b2-ac8d-4e93-aa99-b4435bbcdc90`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/b4d35912-79d4-4d3d-ac2f-dfbdaad3b072`,
-  `${PUBLIC_API_URL}/api/v1/files/serve/cfa24d40-b52a-45e9-90c1-103a44965719`,
-];

@@ -150,7 +150,7 @@ export const useEditor = () => {
             height: CAPTURE_HEIGHT,
             pixelRatio: 1,
             quality: 1.0,
-            mimeType: "image/png",
+            mimeType: "image/webp",
           });
 
           stage.scale({ x: oldScale, y: oldScale });

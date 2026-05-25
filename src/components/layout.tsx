@@ -25,6 +25,7 @@ import {
   reviewGreetingDetailRoute,
 } from "@/utils/routes";
 import ReviewGreetingDetailPage from "@/pages/review-greeting-card";
+import PerformanceOverlay from "./performance-overlay";
 
 const SnackbarRegister = () => {
   const { openSnackbar } = useSnackbar();
@@ -54,6 +55,7 @@ const Layout = () => {
             </AnimationRoutes>
           </AuthProvider>
         </ZMPRouter>
+        <PerformanceOverlay />
       </SnackbarProvider>
     </App>
   );

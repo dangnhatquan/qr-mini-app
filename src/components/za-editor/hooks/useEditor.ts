@@ -149,7 +149,7 @@ export const useEditor = () => {
             width: CAPTURE_WIDTH,
             height: CAPTURE_HEIGHT,
             pixelRatio: 1,
-            quality: 1.0,
+            quality: 0.85,
             mimeType: "image/webp",
           });
 

@@ -222,7 +222,7 @@ export const generateQRBlob = async (text: string, editorStage?: EditorStage): P
   layer.add(group);
   stage.add(layer);
 
-  const dataURL = stage.toDataURL({ pixelRatio: 3, mimeType: "image/webp", quality: 1.0 });
+  const dataURL = stage.toDataURL({ pixelRatio: 2, mimeType: "image/webp", quality: 0.85 });
 
   stage.destroy();
 

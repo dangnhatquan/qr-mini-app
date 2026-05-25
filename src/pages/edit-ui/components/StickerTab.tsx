@@ -7,6 +7,7 @@ import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
 import { getFullUrl, getErrorMessage } from "@/utils/axios";
 import { openSnackbar } from "@/utils/snackbar";
 import { STICKERS } from "../utils/constants";
+import { LazyImage } from "@/components/lazy-image";
 
 export const StickerTab = () => {
   const { elements, setElements, setSelectedId, sessionId } = useKonvaEditor();
@@ -85,7 +86,7 @@ export const StickerTab = () => {
             </div>
             <div className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-4 pb-4">
               {set.stickers.map((s) => (
-                <img
+                <LazyImage
                   key={s}
                   src={getFullUrl(s)}
                   className="w-full aspect-square object-contain rounded-lg p-3 active:bg-gray-100 cursor-pointer bg-white"

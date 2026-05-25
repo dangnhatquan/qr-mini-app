@@ -7,6 +7,7 @@ import { openSnackbar } from "@/utils/snackbar";
 import { uploadFile } from "@/utils/helpers/image";
 import { getFullUrl, getErrorMessage } from "@/utils/axios";
 import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH, TEMPLATE_IMAGES } from "../utils/constants";
+import { LazyImage } from "@/components/lazy-image";
 
 export const TemplateTab = () => {
   const { elements, setElements, setSelectedId, stageSize, sessionId } = useKonvaEditor();
@@ -106,7 +107,7 @@ export const TemplateTab = () => {
             className="w-full aspect-[35/45] rounded-xl bg-gray-200 overflow-hidden transition-transform hover:scale-105 cursor-pointer"
             onClick={() => handleAddTemplate(imgUrl)}
           >
-            <img src={imgUrl} alt="Template" className="w-full h-full object-cover" />
+            <LazyImage src={imgUrl} alt="Template" className="w-full h-full object-cover" />
           </Box>
         ))}
       </div>

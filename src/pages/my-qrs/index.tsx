@@ -14,6 +14,7 @@ import { useQRFocus } from "./hooks/useQRFocus";
 import { QRModal } from "./components/QRModal";
 import { StackedQRList } from "./components/StackedQRList";
 import { QRFocusView } from "./components/QRFocusView";
+import { SkeletonList } from "./components/SkeletonList";
 
 const MyQRsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const MyQRsPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QrCode | null>(null);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
   const { isFetching, removeQRRecord, qrCodeRecords: qrs, fetchQRRecords } = useQRStore();
   const { fetchBanks } = useBankStore();
@@ -29,8 +31,12 @@ const MyQRsPage: React.FC = () => {
   const { focusedQR, isFocusOpen, openFocus, closeFocus } = useQRFocus();
 
   useEffect(() => {
-    fetchQRRecords();
-    fetchBanks();
+    const timer = setTimeout(() => {
+      fetchQRRecords();
+      fetchBanks();
+      setIsTransitioning(false);
+    }, 200);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -108,15 +114,8 @@ const MyQRsPage: React.FC = () => {
           </Text>
         </Box>
 
-        {isFetching ? (
-          <Box flex justifyContent="center" alignItems="center" className="flex-1">
-            <div className="flex flex-col items-center gap-4">
-              <Spinner />
-              <Text className="text-gray-400 font-medium animate-pulse uppercase tracking-widest text-[10px]">
-                Đang tải dữ liệu...
-              </Text>
-            </div>
-          </Box>
+        {isFetching || isTransitioning ? (
+          <SkeletonList />
         ) : qrs.length > 0 ? (
           <StackedQRList
             qrs={qrs}

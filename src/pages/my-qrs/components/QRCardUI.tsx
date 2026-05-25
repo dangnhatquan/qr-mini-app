@@ -8,9 +8,15 @@ interface QRCardUIProps {
   qr: QrCode;
   showMore?: boolean;
   onMoreClick?: (e: React.MouseEvent) => void;
+  delayRender?: boolean;
 }
 
-export const QRCardUI: React.FC<QRCardUIProps> = ({ qr, showMore = true, onMoreClick }) => {
+export const QRCardUI: React.FC<QRCardUIProps> = ({
+  qr,
+  showMore = true,
+  onMoreClick,
+  delayRender,
+}) => {
   const { category, type, createdAt, payload } = qr;
   const { banks } = useBankStore();
 
@@ -106,7 +112,7 @@ export const QRCardUI: React.FC<QRCardUIProps> = ({ qr, showMore = true, onMoreC
           </Text>
         </div>
         <div className="w-28 h-28 bg-white rounded-2xl shadow-2xl overflow-hidden flex-shrink-0 border border-white/50 flex items-center justify-center p-2">
-          <QRDisplay data={qrText} size={112} />
+          <QRDisplay data={qrText} size={112} delayRender={delayRender} />
         </div>
       </div>
     </Box>

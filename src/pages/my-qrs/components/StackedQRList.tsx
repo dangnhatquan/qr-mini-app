@@ -80,6 +80,7 @@ export const StackedQRList: React.FC<StackedQRListProps> = ({
           >
             <QRCard
               qr={qr}
+              delayRender={isInitialRender}
               onClick={() => {
                 if (swipeState[qr.id] === -90) {
                   onCloseSwipe(qr.id);

@@ -6,9 +6,10 @@ interface QRCardProps {
   qr: QrCode;
   onClick: () => void;
   onMoreClick: () => void;
+  delayRender?: boolean;
 }
 
-export const QRCard: React.FC<QRCardProps> = ({ qr, onClick, onMoreClick }) => {
+export const QRCard: React.FC<QRCardProps> = ({ qr, onClick, onMoreClick, delayRender }) => {
   const handleMoreClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onMoreClick?.();
@@ -16,7 +17,7 @@ export const QRCard: React.FC<QRCardProps> = ({ qr, onClick, onMoreClick }) => {
 
   return (
     <div onClick={onClick} className="w-full h-full">
-      <QRCardUI qr={qr} onMoreClick={handleMoreClick} />
+      <QRCardUI qr={qr} onMoreClick={handleMoreClick} delayRender={delayRender} />
     </div>
   );
 };

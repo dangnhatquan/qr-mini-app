@@ -7,14 +7,12 @@ import {
   getCategoryLabel,
 } from "../qr";
 import { EQRCategory } from "@/store";
-import { PUBLIC_API_URL, ZALO_APP_DEV_VERSION, ZALO_APP_ID, ZALO_APP_SECRET } from "@/api";
-
 // Mock external dependencies to prevent side effects in Node environment
 vi.mock("@/api", () => ({
-  PUBLIC_API_URL: PUBLIC_API_URL,
-  ZALO_APP_ID: ZALO_APP_ID,
-  ZALO_APP_SECRET: ZALO_APP_SECRET,
-  ZALO_APP_DEV_VERSION: ZALO_APP_DEV_VERSION,
+  PUBLIC_API_URL: "https://mock-api.url",
+  ZALO_APP_ID: "397281302351627748",
+  ZALO_APP_SECRET: "mock-secret",
+  ZALO_APP_DEV_VERSION: "28",
 }));
 
 vi.mock("konva", () => {

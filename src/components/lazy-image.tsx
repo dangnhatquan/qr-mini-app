@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { openSnackbar } from "@/utils/snackbar";
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -52,12 +53,26 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     }
   };
 
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    setIsLoaded(true);
+    if (src && (src.includes("s3") || src.includes("amazonaws"))) {
+      openSnackbar({
+        text: "Ảnh có thể đã hết hạn, vui lòng tải lại trang để làm mới",
+        type: "warning",
+      });
+    }
+    if (props.onError) {
+      props.onError(e);
+    }
+  };
+
   return (
     <img
       ref={imgRef}
       src={isIntersected ? src : placeholder}
       alt={alt}
       onLoad={handleLoad}
+      onError={handleError}
       className={`transition-all duration-300 ${
         isLoaded ? "opacity-100" : "opacity-70 bg-gray-200 animate-pulse"
       } ${className || ""}`}

@@ -9,7 +9,7 @@ import {
   Spinner,
 } from "zmp-ui";
 import { AppProps } from "zmp-ui/app";
-import React, { useEffect, Suspense, lazy } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { setSnackbarFunction } from "@/utils/snackbar";
 
 import { AuthProvider } from "@/contexts";
@@ -24,7 +24,7 @@ import {
   uiKitRoute,
   reviewGreetingDetailRoute,
 } from "@/utils/routes";
-import PerformanceOverlay from "./performance-overlay";
+// import PerformanceOverlay from "./performance-overlay";
 
 // Lazy load page components to optimize first page load size
 const HomePage = lazy(() => import("@/pages/index"));
@@ -73,7 +73,7 @@ const Layout = () => {
             </Suspense>
           </AuthProvider>
         </ZMPRouter>
-        <PerformanceOverlay />
+        {/* <PerformanceOverlay /> */}
       </SnackbarProvider>
     </App>
   );

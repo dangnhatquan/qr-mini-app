@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IconGridDots } from "@tabler/icons-react";
+import { openSnackbar } from "@/utils/snackbar";
 
 export const PreviewImage = ({ src }: { src: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +46,15 @@ export const PreviewImage = ({ src }: { src: string }) => {
         alt="QR Code"
         className={`w-full h-full object-contain transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
         onLoad={() => setIsLoading(false)}
-        onError={() => setIsLoading(false)}
+        onError={() => {
+          setIsLoading(false);
+          if (src && (src.includes("s3") || src.includes("amazonaws"))) {
+            openSnackbar({
+              text: "Ảnh có thể đã hết hạn, vui lòng tải lại trang để làm mới",
+              type: "warning",
+            });
+          }
+        }}
         crossOrigin="anonymous"
       />
     </>

@@ -22,6 +22,35 @@ const axiosInstance: AxiosInstance = axios.create({
   withCredentials: false,
 });
 
+export const sanitizePayloadUrls = (payload: any): any => {
+  if (!payload) return payload;
+  if (payload instanceof Blob || payload instanceof File) return payload;
+  if (typeof FormData !== "undefined" && payload instanceof FormData) return payload;
+
+  try {
+    const isString = typeof payload === "string";
+    const payloadStr = isString ? payload : JSON.stringify(payload);
+    const uuidRegex = /([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/gi;
+
+    const sanitizedStr = payloadStr.replace(
+      /https:\/\/[^\s"']*(?:s3|amazonaws)[^\s"']+/gi,
+      (match) => {
+        const ids = match.match(uuidRegex);
+        if (ids && ids.length > 0) {
+          const fileId = ids[ids.length - 1];
+          return `/api/v1/files/serve/${fileId}`;
+        }
+        return match;
+      },
+    );
+
+    return isString ? sanitizedStr : JSON.parse(sanitizedStr);
+  } catch (error) {
+    console.error("Error sanitizing payload URLs:", error);
+    return payload;
+  }
+};
+
 axiosInstance.interceptors.request.use((config) => {
   const token = storage.getItem("access_token");
   if (token) {
@@ -30,6 +59,11 @@ axiosInstance.interceptors.request.use((config) => {
     }
     config.headers.set("Authorization", `Bearer ${token}`);
   }
+
+  if (config.data && ["post", "put", "patch"].includes(config.method?.toLowerCase() || "")) {
+    config.data = sanitizePayloadUrls(config.data);
+  }
+
   return config;
 });
 

@@ -15,6 +15,7 @@ import { ZALO_APP_DEV_VERSION, ZALO_APP_ID } from "@/api";
 import Konva from "konva";
 import QRCodeStyling from "qr-code-styling";
 import { generateVietQRPayload } from "./viet-qr";
+import { getFullUrl } from "../axios";
 
 export const generateWifiPayload = (ssid: string, password: string, security: string) => {
   return `WIFI:S:${ssid};T:${security};P:${password};;`;
@@ -71,7 +72,10 @@ export const generateDynamicLink = (
 };
 
 export const isRemoteImage = (imageSrc?: string) =>
-  imageSrc && (/^(https?:)?\/\//.test(imageSrc) || imageSrc.startsWith("/minio-proxy/"));
+  imageSrc &&
+  (/^(https?:)?\/\//.test(imageSrc) ||
+    imageSrc.startsWith("/minio-proxy/") ||
+    imageSrc.startsWith("/api/"));
 
 export const cleanUpBase64 = (editorStage: EditorStage) => {
   return {
@@ -116,8 +120,37 @@ export const getQRPayload = (data: IQRFormValues, id?: string): string => {
 export const generateQRBlob = async (text: string, editorStage?: EditorStage): Promise<Blob> => {
   const stageData = editorStage || DEFAULT_EDITOR_STAGE;
 
+  const qrOptions = stageData.qrOptions || DEFAULT_EDITOR_STAGE.qrOptions;
+
+  let safeLogoUrl: string | undefined = undefined;
+  if (qrOptions?.image) {
+    safeLogoUrl = await new Promise<string | undefined>((resolve) => {
+      const img = new Image();
+      const timeout = setTimeout(() => {
+        console.warn("Timeout loading QR logo in generateQRBlob:", qrOptions.image);
+        resolve(undefined);
+      }, 3000);
+
+      img.onload = () => {
+        clearTimeout(timeout);
+        resolve(getFullUrl(qrOptions.image!));
+      };
+      img.onerror = () => {
+        clearTimeout(timeout);
+        console.error("Failed to load QR logo in generateQRBlob:", qrOptions.image);
+        resolve(undefined);
+      };
+      const fullUrl = getFullUrl(qrOptions.image!);
+      if (fullUrl.startsWith("http")) {
+        img.crossOrigin = "Anonymous";
+      }
+      img.src = fullUrl;
+    });
+  }
+
   const qrCode = new QRCodeStyling({
-    ...(stageData.qrOptions || DEFAULT_EDITOR_STAGE.qrOptions),
+    ...qrOptions,
+    image: safeLogoUrl,
     data: text,
   });
 
@@ -135,9 +168,15 @@ export const generateQRBlob = async (text: string, editorStage?: EditorStage): P
 
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.crossOrigin = "Anonymous";
+    const timeout = setTimeout(() => reject(new Error("Timeout loading QR code base image")), 5000);
+    img.onload = () => {
+      clearTimeout(timeout);
+      resolve(img);
+    };
+    img.onerror = (e) => {
+      clearTimeout(timeout);
+      reject(e);
+    };
     img.src = imgUrl;
   });
 
@@ -174,24 +213,38 @@ export const generateQRBlob = async (text: string, editorStage?: EditorStage): P
   const otherElements = (stageData.elements || []).filter((e: CanvasElement) => e.id !== "qr-main");
   for (const el of otherElements) {
     if (el.type === CanvasElementType.IMAGE && el.src) {
-      const imageElement = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const imageElement = await new Promise<HTMLImageElement | null>((resolve) => {
         const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
+        const timeout = setTimeout(() => {
+          console.warn("Timeout loading image in generateQRBlob:", el.src);
+          resolve(null);
+        }, 5000);
+
+        img.onload = () => {
+          clearTimeout(timeout);
+          resolve(img);
+        };
+        img.onerror = () => {
+          clearTimeout(timeout);
+          console.error("Failed to load image in generateQRBlob:", el.src);
+          resolve(null);
+        };
         img.crossOrigin = "Anonymous";
-        img.src = el.src ?? "";
+        img.src = getFullUrl(el.src ?? "");
       });
 
-      const newKonvaImage = new Konva.Image({
-        image: imageElement,
-        x: el.x,
-        y: el.y,
-        width: imageElement.width,
-        height: imageElement.height,
-        rotation: el.rotation,
-      });
+      if (imageElement) {
+        const newKonvaImage = new Konva.Image({
+          image: imageElement,
+          x: el.x,
+          y: el.y,
+          width: imageElement.width,
+          height: imageElement.height,
+          rotation: el.rotation,
+        });
 
-      group.add(newKonvaImage);
+        group.add(newKonvaImage);
+      }
     } else if (el.type === CanvasElementType.TEXT) {
       const konvaText = new Konva.Text({
         text: el.text,

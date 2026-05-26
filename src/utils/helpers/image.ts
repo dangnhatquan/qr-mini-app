@@ -1,5 +1,6 @@
 import request, { getFullUrl } from "../axios";
 import { filesResource, getPresignedUrl } from "@/resources";
+import { openSnackbar } from "@/utils/snackbar";
 
 export const resizeImage = (
   base64: string,
@@ -8,7 +9,6 @@ export const resizeImage = (
 ): Promise<string> => {
   return new Promise((resolve) => {
     const img = new Image();
-    img.crossOrigin = "Anonymous";
     img.src = base64;
     img.onload = () => {
       const canvas = document.createElement("canvas");
@@ -61,12 +61,24 @@ export const preloadImage = async (
     };
 
     reader.onerror = (e) => {
+      if (url && (url.includes("s3") || url.includes("amazonaws"))) {
+        openSnackbar({
+          text: "Ảnh có thể đã hết hạn, vui lòng tải lại trang để làm mới",
+          type: "warning",
+        });
+      }
       if (onFail) onFail(e);
     };
 
     reader.readAsDataURL(blob);
   } catch (error) {
     console.error("preloadImage error:", error);
+    if (url && (url.includes("s3") || url.includes("amazonaws"))) {
+      openSnackbar({
+        text: "Ảnh có thể đã hết hạn, vui lòng tải lại trang để làm mới",
+        type: "warning",
+      });
+    }
     if (onFail) onFail(error);
   }
 };
@@ -97,7 +109,6 @@ export const uploadFile = async (
 export const getImageDimensions = (blob: Blob) => {
   return new Promise<{ width: number; height: number }>((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "Anonymous";
     img.src = URL.createObjectURL(blob);
     img.onload = () => resolve({ width: img.width, height: img.height });
     img.onerror = reject;

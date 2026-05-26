@@ -1,17 +1,17 @@
 import { getSystemInfo } from "zmp-sdk";
-import { AnimationRoutes, App, Route, SnackbarProvider, ZMPRouter, useSnackbar } from "zmp-ui";
+import {
+  AnimationRoutes,
+  App,
+  Route,
+  SnackbarProvider,
+  ZMPRouter,
+  useSnackbar,
+  Spinner,
+} from "zmp-ui";
 import { AppProps } from "zmp-ui/app";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense, lazy } from "react";
 import { setSnackbarFunction } from "@/utils/snackbar";
 
-import HomePage from "@/pages/index";
-import CreatePage from "@/pages/create";
-import MyQRsPage from "@/pages/my-qrs";
-import EditUIPage from "@/pages/edit-ui";
-import VCardDetailPage from "@/pages/vcard-detail";
-import CardEditorPage from "@/pages/card-editor";
-import GreetingDetailPage from "@/pages/greeting-detail";
-import UIKitPage from "@/pages/ui-kit";
 import { AuthProvider } from "@/contexts";
 import {
   createRoute,
@@ -24,8 +24,18 @@ import {
   uiKitRoute,
   reviewGreetingDetailRoute,
 } from "@/utils/routes";
-import ReviewGreetingDetailPage from "@/pages/review-greeting-card";
 import PerformanceOverlay from "./performance-overlay";
+
+// Lazy load page components to optimize first page load size
+const HomePage = lazy(() => import("@/pages/index"));
+const CreatePage = lazy(() => import("@/pages/create"));
+const MyQRsPage = lazy(() => import("@/pages/my-qrs"));
+const EditUIPage = lazy(() => import("@/pages/edit-ui"));
+const VCardDetailPage = lazy(() => import("@/pages/vcard-detail"));
+const CardEditorPage = lazy(() => import("@/pages/card-editor"));
+const GreetingDetailPage = lazy(() => import("@/pages/greeting-detail"));
+const ReviewGreetingDetailPage = lazy(() => import("@/pages/review-greeting-card"));
+const UIKitPage = lazy(() => import("@/pages/ui-kit"));
 
 const SnackbarRegister = () => {
   const { openSnackbar } = useSnackbar();
@@ -42,17 +52,25 @@ const Layout = () => {
         <SnackbarRegister />
         <ZMPRouter>
           <AuthProvider>
-            <AnimationRoutes>
-              <Route path={defaultRoute} element={<HomePage />} />
-              <Route path={createRoute} element={<CreatePage />} />
-              <Route path={myQrsRoute} element={<MyQRsPage />} />
-              <Route path={editRoute} element={<EditUIPage />} />
-              <Route path={vcardDetailRoute} element={<VCardDetailPage />} />
-              <Route path={reviewGreetingDetailRoute} element={<GreetingDetailPage />} />
-              <Route path={greetingDetailRoute} element={<ReviewGreetingDetailPage />} />
-              <Route path={cardEditorRoute} element={<CardEditorPage />} />
-              <Route path={uiKitRoute} element={<UIKitPage />} />
-            </AnimationRoutes>
+            <Suspense
+              fallback={
+                <div className="h-screen w-screen flex items-center justify-center bg-slate-50">
+                  <Spinner />
+                </div>
+              }
+            >
+              <AnimationRoutes>
+                <Route path={defaultRoute} element={<HomePage />} />
+                <Route path={createRoute} element={<CreatePage />} />
+                <Route path={myQrsRoute} element={<MyQRsPage />} />
+                <Route path={editRoute} element={<EditUIPage />} />
+                <Route path={vcardDetailRoute} element={<VCardDetailPage />} />
+                <Route path={reviewGreetingDetailRoute} element={<GreetingDetailPage />} />
+                <Route path={greetingDetailRoute} element={<ReviewGreetingDetailPage />} />
+                <Route path={cardEditorRoute} element={<CardEditorPage />} />
+                <Route path={uiKitRoute} element={<UIKitPage />} />
+              </AnimationRoutes>
+            </Suspense>
           </AuthProvider>
         </ZMPRouter>
         <PerformanceOverlay />

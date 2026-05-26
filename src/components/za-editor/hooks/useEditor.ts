@@ -160,7 +160,7 @@ export const useEditor = () => {
           const response = await fetch(uri);
           const blob = await response.blob();
 
-          onSave?.({
+          await onSave?.({
             qrOptions,
             elements,
             canvasBg,

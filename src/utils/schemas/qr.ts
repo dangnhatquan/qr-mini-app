@@ -11,7 +11,19 @@ export const bankingSchema = z.object({
   bankId: z.string().min(1, "Vui lòng chọn ngân hàng"),
   accountNo: z.string().min(1, "Vui lòng nhập số tài khoản"),
   accountName: z.string().optional(),
-  amount: z.string().optional(),
+  amount: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const num = Number(val);
+        return !isNaN(num) && num >= 1000;
+      },
+      {
+        message: "Số tiền tối thiểu là 1.000 VNĐ",
+      },
+    ),
   description: z.string().optional(),
 });
 

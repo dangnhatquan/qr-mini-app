@@ -11,6 +11,9 @@ interface InputFormFieldProps<T extends FieldValues> {
   type?: "text" | "password" | "number";
   required?: boolean;
   helperText?: string;
+  inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal";
+  formatter?: (value: any) => string;
+  parser?: (value: string) => any;
 }
 
 export const InputFormField = <T extends FieldValues>({
@@ -21,16 +24,29 @@ export const InputFormField = <T extends FieldValues>({
   type = "text",
   required,
   helperText,
+  inputMode,
+  formatter,
+  parser,
 }: InputFormFieldProps<T>) => {
   return (
     <Controller
       name={name}
       control={control}
-      render={({ field, formState: { errors } }) => {
+      render={({ field: { value, onChange, ...fieldProps }, formState: { errors } }) => {
         const fieldError = get(errors, name) as FieldError | undefined;
 
+        const displayValue = formatter ? formatter(value) : value;
+
+        const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const rawVal = e.target.value;
+          const parsedVal = parser ? parser(rawVal, displayValue) : rawVal;
+          onChange(parsedVal);
+        };
+
         const inputProps = {
-          ...field,
+          ...fieldProps,
+          value: displayValue ?? "",
+          onChange: handleValueChange,
           label: (
             <span className="text-sm font-medium">
               {label} {required && <span className="text-red-500">*</span>}
@@ -40,6 +56,7 @@ export const InputFormField = <T extends FieldValues>({
           helperText: helperText,
           errorText: fieldError?.message,
           status: (fieldError ? "error" : undefined) as any,
+          inputMode: inputMode,
         };
 
         return (

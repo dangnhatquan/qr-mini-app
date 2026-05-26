@@ -12,7 +12,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { Group, Layer, Rect, Stage } from "react-konva";
-import { Box } from "zmp-ui";
+import { Box, Spinner } from "zmp-ui";
 import { useEditor } from "./hooks/useEditor";
 import { FC } from "react";
 
@@ -168,8 +168,8 @@ export const ZaStage: FC<IZaStageProps> = ({ toolbarHeight, onSave }) => {
       </Stage>
 
       {isRendering && (
-        <Box className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-[2px] z-10">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <Box className="fixed inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px] z-[9999]">
+          <Spinner />
         </Box>
       )}
 

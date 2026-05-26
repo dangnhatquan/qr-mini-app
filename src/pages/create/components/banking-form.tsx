@@ -61,7 +61,23 @@ export const BankingForm: React.FC<BankingFormProps> = ({ control }) => {
         control={control}
         label="Số tiền (Tùy chọn)"
         placeholder="Nhập số tiền"
-        type="number"
+        inputMode="numeric"
+        formatter={(val) => {
+          if (!val) return "";
+          const numStr = String(val).replace(/\D/g, "");
+          if (!numStr) return "";
+          const formatted = new Intl.NumberFormat("vi-VN").format(Number(numStr));
+          return `${formatted} VNĐ`;
+        }}
+        parser={(val, oldVal) => {
+          const rawNew = val.replace(/\D/g, "");
+          const rawOld = String(oldVal || "").replace(/\D/g, "");
+
+          if (rawNew === rawOld && val.length < (oldVal ? String(oldVal).length : 0)) {
+            return rawNew.slice(0, -1);
+          }
+          return rawNew;
+        }}
       />
       <InputFormField
         name="bankingData.description"

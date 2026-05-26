@@ -12,7 +12,7 @@ import { WifiForm } from "./components/wifi-form";
 import { BankingForm } from "./components/banking-form";
 import { VCardForm } from "./components/vcard-form";
 import { GreetingForm } from "./components/greeting-form";
-import { EQRType, EQRCategory } from "@/store";
+import { EQRType, EQRCategory, QrCode } from "@/store";
 import { qrService } from "@/services/qr";
 import { cardService } from "@/services/card";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -31,6 +31,7 @@ const CreatePage: React.FC = () => {
   const [initialLoading, setInitialLoading] = useState(isEdit);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const pendingNavRef = useRef<() => void>(() => navigate(myQrsRoute));
+  const [qrDetail, setQrDetail] = useState<QrCode | null>(null);
 
   const sessionId = crypto.randomUUID();
 
@@ -90,6 +91,7 @@ const CreatePage: React.FC = () => {
         const qr = await qrService.getQRDetail(id);
         if (qr) {
           hasFetchedRef.current = id;
+          setQrDetail(qr);
           if (!savedFormState) {
             reset({
               name: qr.name || "",
@@ -176,7 +178,7 @@ const CreatePage: React.FC = () => {
     try {
       setLoading(true);
       if (isEdit && id) {
-        await qrService.updateQR(id, data, undefined, undefined, sessionId);
+        await qrService.updateQR(id, data, undefined, qrDetail?.editorStage, sessionId);
         openSnackbar({
           type: "success",
           text: "Cập nhật mã QR thành công!",

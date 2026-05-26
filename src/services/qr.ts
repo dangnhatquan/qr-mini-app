@@ -91,20 +91,27 @@ export const qrService = {
     editorStage?: EditorStage,
     sessionId?: string,
   ) {
-    const existing = await this.getQRDetail(id);
+    let fileId: string | undefined = undefined;
 
-    let finalEditorStage = editorStage || existing.editorStage;
+    // Only generate and upload QR preview image if it is static OR if customBlob is provided (styling changes in Editor)
+    if (data.qrType === EQRType.STATIC || customBlob) {
+      let finalEditorStage = editorStage;
+      if (!finalEditorStage) {
+        const existing = await this.getQRDetail(id);
+        finalEditorStage = existing.editorStage;
+      }
 
-    const payloadString = getQRPayload(data, id);
-    const blob = customBlob || (await generateQRBlob(payloadString, finalEditorStage));
+      const payloadString = getQRPayload(data, id);
+      const blob = customBlob || (await generateQRBlob(payloadString, finalEditorStage));
 
-    const file = await uploadFile(blob, sessionId);
+      const file = await uploadFile(blob, sessionId);
+      fileId = file.id;
+    }
 
     const payload: Record<string, unknown> = {
       name: data.name,
       qrType: data.qrType,
       category: data.category,
-      previewImageId: file.id,
       wifiData: data.category === EQRCategory.WIFI ? data.wifiData : undefined,
       bankingData: data.category === EQRCategory.BANKING ? data.bankingData : undefined,
       vcardData: data.category === EQRCategory.VCARD ? data.vcardData : undefined,
@@ -117,6 +124,10 @@ export const qrService = {
             }
           : undefined,
     };
+
+    if (fileId) {
+      payload.previewImageId = fileId;
+    }
 
     if (editorStage) {
       payload.editorStage = cleanUpBase64(editorStage);

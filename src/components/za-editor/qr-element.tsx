@@ -3,6 +3,7 @@ import Konva from "konva";
 import { Image, Transformer } from "react-konva";
 import useImage from "use-image";
 import { CanvasElement } from "@/store";
+import { getFullUrl } from "@/utils/axios";
 
 export const ImageElement = ({
   imageProps,
@@ -26,7 +27,7 @@ export const ImageElement = ({
   onChange?: (newProps: CanvasElement) => void;
   enabledAnchors?: string[];
 }) => {
-  const displaySrc = imageProps.src;
+  const displaySrc = getFullUrl(imageProps.src);
   const [img] = useImage(displaySrc || "", "anonymous");
   const shapeRef = useRef<Konva.Image | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);

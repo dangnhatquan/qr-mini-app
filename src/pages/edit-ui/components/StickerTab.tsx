@@ -4,7 +4,7 @@ import { useKonvaEditor } from "../context/KonvaEditorContext";
 import { useState } from "react";
 import { chooseImage } from "zmp-sdk/apis";
 import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
-import { getFullUrl, getErrorMessage } from "@/utils/axios";
+import { getFullUrl, getErrorMessage, cleanFileUrl } from "@/utils/axios";
 import { openSnackbar } from "@/utils/snackbar";
 import { STICKERS } from "../utils/constants";
 import { LazyImage } from "@/components/lazy-image";
@@ -23,7 +23,7 @@ export const StickerTab = () => {
       {
         id,
         type: "image",
-        src: url,
+        src: cleanFileUrl(url),
         fileId,
         x: 0,
         y: 0,
@@ -46,7 +46,7 @@ export const StickerTab = () => {
             const response = await fetch(path);
             const blob = await response.blob();
             const file = await uploadFile(blob, sessionId);
-            const url = getFullUrl(file.path);
+            const url = `/api/v1/files/serve/${file.id}`;
             const { width, height } = await getImageDimensions(blob);
             handleAddSticker(url, file.id, width, height);
             openSnackbar({ text: "Đã thêm Sticker", type: "success" });

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { chooseImage } from "zmp-sdk/apis";
 import { openSnackbar } from "@/utils/snackbar";
 import { uploadFile } from "@/utils/helpers/image";
-import { getFullUrl, getErrorMessage } from "@/utils/axios";
+import { getErrorMessage, cleanFileUrl } from "@/utils/axios";
 import { DEFAULT_FRAME_HEIGHT, DEFAULT_FRAME_WIDTH, TEMPLATE_IMAGES } from "../utils/constants";
 import { LazyImage } from "@/components/lazy-image";
 
@@ -22,7 +22,7 @@ export const TemplateTab = () => {
       {
         id,
         type: "image",
-        src: url,
+        src: cleanFileUrl(url),
         fileId,
         x: 0,
         y: 0,
@@ -46,7 +46,7 @@ export const TemplateTab = () => {
             const response = await fetch(path);
             const blob = await response.blob();
             const file = await uploadFile(blob, sessionId);
-            const url = getFullUrl(file.path);
+            const url = `/api/v1/files/serve/${file.id}`;
             handleAddTemplate(url, file.id);
             openSnackbar({ text: "Đã thêm Template", type: "success" });
           } catch (err) {

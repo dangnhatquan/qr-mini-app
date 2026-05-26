@@ -33,7 +33,7 @@ export const sanitizePayloadUrls = (payload: any): any => {
     const uuidRegex = /([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/gi;
 
     const sanitizedStr = payloadStr.replace(
-      /https:\/\/[^\s"']*(?:s3|amazonaws)[^\s"']+/gi,
+      /https?:\/\/[^\s"']*(?:s3|amazonaws|127\.0\.0\.1:9000|localhost:9000|minio)[^\s"']+/gi,
       (match) => {
         const ids = match.match(uuidRegex);
         if (ids && ids.length > 0) {
@@ -144,8 +144,27 @@ const request = {
 
 export const getFullUrl = (path: string) => {
   if (!path) return path;
-  if (path.startsWith("http")) return path;
+  if (path.startsWith("http") || path.startsWith("data:") || path.startsWith("blob:")) return path;
   return `${PUBLIC_API_URL}${path}`;
+};
+
+export const cleanFileUrl = (url: string): string => {
+  if (!url) return url;
+  const uuidRegex = /([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i;
+  if (
+    url.includes("/api/v1/files/serve/") ||
+    url.includes("s3") ||
+    url.includes("amazonaws") ||
+    url.includes("127.0.0.1:9000") ||
+    url.includes("localhost:9000") ||
+    url.includes("minio")
+  ) {
+    const match = url.match(uuidRegex);
+    if (match) {
+      return `/api/v1/files/serve/${match[1]}`;
+    }
+  }
+  return url;
 };
 
 export const getErrorMessage = (error: unknown, defaultMessage = "Đã có lỗi xảy ra") => {

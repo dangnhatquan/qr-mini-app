@@ -5,6 +5,7 @@ import { KonvaEventObject } from "konva/lib/Node";
 import QRCodeStyling from "qr-code-styling";
 import { useEffect, useMemo } from "react";
 import { showToast } from "zmp-sdk/apis";
+import { getFullUrl } from "@/utils/axios";
 
 export const useEditor = () => {
   const {
@@ -228,6 +229,7 @@ export const useEditor = () => {
     const updateQRPreview = async () => {
       const displayOptions = {
         ...qrOptions,
+        image: qrOptions.image ? getFullUrl(qrOptions.image) : undefined,
       };
       qrCode.update(displayOptions);
 

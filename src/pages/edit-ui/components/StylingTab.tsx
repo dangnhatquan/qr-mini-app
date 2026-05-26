@@ -15,7 +15,7 @@ import { openSnackbar } from "@/utils/snackbar";
 import { ErrorCorrectionLevel, Options } from "qr-code-styling";
 import { uploadFile } from "@/utils/helpers/image";
 import { useState } from "react";
-import { getFullUrl, getErrorMessage } from "@/utils/axios";
+import { getErrorMessage } from "@/utils/axios";
 
 export const StylingTab = () => {
   const { qrOptions, setQrOptions, logoFileId, setLogoFileId, sessionId } = useKonvaEditor();
@@ -48,7 +48,7 @@ export const StylingTab = () => {
 
         setQrOptions((prev) => ({
           ...prev,
-          image: getFullUrl(file.path),
+          image: `/api/v1/files/serve/${file.id}`,
         }));
         setLogoFileId(file.id);
         openSnackbar({ text: "Đã thêm Avatar", type: "success" });
@@ -73,7 +73,7 @@ export const StylingTab = () => {
 
         setQrOptions((prev) => ({
           ...prev,
-          image: getFullUrl(file.path),
+          image: `/api/v1/files/serve/${file.id}`,
         }));
         setLogoFileId(file.id);
         openSnackbar({ text: "Đã thêm Logo", type: "success" });

@@ -3,9 +3,9 @@ import { Box, Button } from "zmp-ui";
 import { IconUpload } from "@tabler/icons-react";
 import { chooseImage, showToast } from "zmp-sdk/apis";
 import { getImageDimensions, uploadFile } from "@/utils/helpers/image";
-import { getFullUrl } from "@/utils/axios";
 import { useKonvaEditor } from "@/pages/edit-ui/context/KonvaEditorContext";
 import { CanvasElement, CanvasElementType } from "@/store";
+import { cleanFileUrl } from "@/utils/axios";
 
 export const ImageTab = () => {
   const { elements, setElements, setSelectedId, sessionId } = useKonvaEditor();
@@ -18,7 +18,7 @@ export const ImageTab = () => {
     const newElement: CanvasElement = {
       id,
       type: CanvasElementType.IMAGE,
-      src: url,
+      src: cleanFileUrl(url),
       fileId,
       x: 0,
       y: 0,
@@ -42,7 +42,7 @@ export const ImageTab = () => {
             const response = await fetch(path);
             const blob = await response.blob();
             const file = await uploadFile(blob, sessionId);
-            const url = getFullUrl(file.path);
+            const url = `/api/v1/files/serve/${file.id}`;
             const { width, height } = await getImageDimensions(blob);
             handleAddImage(url, file.id, width, height);
             showToast({ message: "Đã thêm hình ảnh" });

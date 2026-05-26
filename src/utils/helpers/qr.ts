@@ -108,7 +108,8 @@ export const getQRPayload = (data: IQRFormValues, id?: string): string => {
     case EQRCategory.VCARD:
     case EQRCategory.GREETING: {
       const finalVersion = ZALO_APP_DEV_VERSION;
-      return generateDynamicLink(finalVersion, id!, data.category, undefined);
+      const finalUrl = generateDynamicLink(finalVersion, id!, data.category, undefined);
+      return finalUrl;
     }
 
     default: {

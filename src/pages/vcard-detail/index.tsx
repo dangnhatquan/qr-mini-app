@@ -147,7 +147,7 @@ const VCardDetailPage: React.FC = () => {
           <Box flex alignItems="center" justifyContent="space-between">
             <Box>
               <Text size="xLarge" className="font-bold text-blue-primary text-2xl mb-1">
-                {vcardData.fullName || "N/A"}
+                {vcardData.fullName || "Chưa cập nhật"}
               </Text>
               <Text className="text-gray-500 font-medium text-base">
                 {vcardData.position || "Professional"}
@@ -173,7 +173,7 @@ const VCardDetailPage: React.FC = () => {
               E-mail
             </Text>
             <Text className="text-white text-xs font-medium truncate">
-              {vcardData.email || "N/A"}
+              {vcardData.email || "Chưa cập nhật"}
             </Text>
           </Box>
 
@@ -191,7 +191,9 @@ const VCardDetailPage: React.FC = () => {
             <Text className="text-white/60 text-[10px] uppercase font-bold tracking-wider mb-1">
               Số điện thoại
             </Text>
-            <Text className="text-white text-xs font-medium">{vcardData.phone || "N/A"}</Text>
+            <Text className="text-white text-xs font-medium">
+              {vcardData.phone || "Chưa cập nhật"}
+            </Text>
           </Box>
 
           <Box
@@ -209,7 +211,7 @@ const VCardDetailPage: React.FC = () => {
               Website
             </Text>
             <Text className="text-white text-xs font-medium truncate">
-              {vcardData.website || "Chưa cập nhât"}
+              {vcardData.website || "Chưa cập nhật"}
             </Text>
           </Box>
 

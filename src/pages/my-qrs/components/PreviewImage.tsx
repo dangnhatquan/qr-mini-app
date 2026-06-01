@@ -36,7 +36,7 @@ export const PreviewImage = ({ src }: { src: string }) => {
   return (
     <>
       {isLoading && (
-        <div className="absolute inset-0 z-10 w-full h-full animate-pulse flex flex-col items-center justify-center gap-4 bg-gray-50">
+        <div className="absolute inset-0 z-10 w-full aspect-[350/450] animate-pulse flex flex-col items-center justify-center gap-4 bg-gray-50">
           <IconGridDots size={48} className="text-gray-200" />
           <div className="w-1/3 h-2 bg-gray-200 rounded-full opacity-50" />
         </div>

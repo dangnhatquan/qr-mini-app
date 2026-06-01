@@ -1,7 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = path.join(__dirname, 'profiling-data.05-25-2026.00-07-36.json');
+const filePathArg = process.argv[2];
+const outputNameArg = process.argv[3];
+
+const filePath = filePathArg ? path.resolve(filePathArg) : path.join(__dirname, 'profiling-data.05-25-2026.00-07-36.json');
+const outputReportPath = outputNameArg ? path.resolve(outputNameArg) : path.join(__dirname, 'profiler_analysis_report.md');
+
 const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 const root = data.dataForRoots[0];
 
@@ -198,5 +203,5 @@ groups.forEach(g => {
   report += `\n`;
 });
 
-fs.writeFileSync(path.join(__dirname, 'profiler_analysis_report.md'), report, 'utf8');
-console.log('Report generated at docs/profiler_analysis_report.md successfully.');
+fs.writeFileSync(outputReportPath, report, 'utf8');
+console.log(`Report generated at ${outputReportPath} successfully.`);

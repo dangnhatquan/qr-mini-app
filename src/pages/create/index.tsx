@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Page, Button, Box, useSnackbar, Spinner } from "zmp-ui";
+import { Page, Button, Box, useSnackbar, Spinner, useNavigate } from "zmp-ui";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { FieldErrors, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +15,7 @@ import { GreetingForm } from "./components/greeting-form";
 import { EQRType, EQRCategory, QrCode } from "@/store";
 import { qrService } from "@/services/qr";
 import { cardService } from "@/services/card";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { myQrsRoute } from "@/utils/routes";
 import { DEFAULT_BANK_ID, DEFAULT_MAX_ATTEMPTS, DEFAULT_WIFI_SECURITY } from "@/utils/constants/qr";
 import { storage } from "@/utils/storage";
@@ -231,7 +231,9 @@ const CreatePage: React.FC = () => {
           <Button
             variant="tertiary"
             icon={<IconChevronLeft size={24} className="text-black" />}
-            onClick={() => handleNavigateAway(() => navigate(-1))}
+            onClick={() =>
+              handleNavigateAway(() => navigate(myQrsRoute, { direction: "backward" }))
+            }
           />
           <div className="zaui-header-title">
             {isEdit ? "Sửa thông tin mã QR" : "Tạo mã QR mới"}

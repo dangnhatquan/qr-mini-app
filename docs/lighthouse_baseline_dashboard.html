@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lighthouse Performance — Baseline (Before)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #faf9f6;
+      --card-bg: #f6f5ef;
+      --text-main: #1c1a17;
+      --text-muted: #6b665f;
+      --text-label: #8a8378;
+      
+      --color-poor: #eb5757;
+      --color-poor-bg: #fde8e8;
+      --color-warning: #f2994a;
+      --color-warning-bg: #fef0e0;
+      --color-good: #27ae60;
+      --color-good-bg: #e3f7eb;
+      
+      --border-light: rgba(0, 0, 0, 0.06);
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 2.5rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 3.5rem;
+      border-radius: 24px;
+      box-shadow: 0 10px 45px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.01);
+    }
+
+    /* Header Section */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .score-badge {
+      display: flex;
+      align-items: baseline;
+      font-weight: 800;
+      font-size: 5rem;
+      color: var(--color-poor);
+      line-height: 1;
+    }
+
+    .score-total {
+      font-size: 1.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 0.25rem;
+    }
+
+    .header-info h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+    }
+
+    .header-info p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: rgba(0, 0, 0, 0.08);
+      margin: 3rem 0;
+      border: none;
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--text-label);
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+      border-left: 3px solid var(--text-label);
+      padding-left: 0.75rem;
+    }
+
+    /* Row Layout for Metric Items */
+    .metrics-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .metric-row {
+      background-color: var(--card-bg);
+      border-radius: 18px;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .metric-row:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Left side: Metric overview */
+    .metric-summary {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+      padding-right: 1.5rem;
+    }
+
+    .metric-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    .metric-value-wrapper {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    /* Colors per state */
+    .metric-row.poor .metric-value {
+      color: var(--color-poor);
+    }
+    .metric-row.warning .metric-value {
+      color: var(--color-warning);
+    }
+    .metric-row.good .metric-value {
+      color: var(--color-good);
+    }
+
+    .progress-bar {
+      height: 4px;
+      width: 100%;
+      border-radius: 2px;
+      background-color: rgba(0, 0, 0, 0.06);
+      margin: 0.5rem 0 1rem 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+    }
+
+    .poor .progress-fill {
+      background-color: var(--color-poor);
+      width: 100%;
+    }
+    .warning .progress-fill {
+      background-color: var(--color-warning);
+      width: 100%;
+    }
+    .good .progress-fill {
+      background-color: var(--color-good);
+      width: 100%;
+    }
+
+    .metric-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .target {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Badge styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .poor .badge {
+      background-color: var(--color-poor-bg);
+      color: var(--color-poor);
+    }
+    .warning .badge {
+      background-color: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+    .good .badge {
+      background-color: var(--color-good-bg);
+      color: var(--color-good);
+    }
+
+    /* Right side: Detailed Analysis */
+    .metric-analysis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .analysis-col h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-label);
+      margin-bottom: 0.75rem;
+    }
+
+    .analysis-col ul {
+      padding-left: 1.25rem;
+      font-size: 0.9rem;
+      color: #383530;
+    }
+
+    .analysis-col li {
+      margin-bottom: 0.5rem;
+      line-height: 1.45;
+    }
+
+    .analysis-col li b {
+      color: var(--text-main);
+    }
+
+    .analysis-col code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      background-color: rgba(0, 0, 0, 0.05);
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .metric-row {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .metric-summary {
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        padding-right: 0;
+        padding-bottom: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .metric-analysis {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .container {
+        padding: 2rem;
+      }
+      body {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Section -->
+    <div class="header">
+      <div class="score-badge">
+        54<span class="score-total">/ 100</span>
+      </div>
+      <div class="header-info">
+        <h1>Lighthouse Performance — Baseline (Before)</h1>
+        <p>Môi trường dev · No cache · Fast 4G · React dev-mode · ~2.8 MB JS chưa nén</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Section 1: Core Web Vitals & Lighthouse Metrics -->
+    <div class="section-title">Core Web Vitals & Lighthouse Metrics</div>
+    <div class="metrics-list">
+      
+      <!-- LCP Row -->
+      <div class="metric-row poor">
+        <div class="metric-summary">
+          <div class="metric-title">LCP — Largest Contentful Paint</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">5.1 s</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 2.5 s</span>
+            <span class="badge">Poor</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>SVG QR Code render đồng bộ:</b> Mỗi QR Code Display render đồng thời dùng thư viện nặng block main thread khi vẽ.</li>
+              <li><b>Tải JS thô dung lượng lớn:</b> Các file thư viện lớn chưa nén (~2.8MB) được load trong môi trường Dev blocking render.</li>
+              <li><b>Render-blocking CSS từ CDN ngoài:</b> CDN Font Awesome chặn quá trình render ban đầu làm lãng phí ước tính 1.46s (wastedMs) và trễ FCP/LCP khoảng 750ms.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Áp dụng <b>Lazy Rendering (IntersectionObserver)</b> cho component <code>&lt;QRDisplay /&gt;</code>, chỉ vẽ QR khi cuộn vào viewport.</li>
+              <li>Sử dụng <b>Lazy Loading (React.lazy)</b> cho Editor, Canvas QR để trì hoãn load bundle nặng.</li>
+              <li>Thay CDN Font Awesome bằng inline SVG icons (<code>@tabler/icons-react</code>) hoặc dùng link preload.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- FCP Row -->
+      <div class="metric-row warning">
+        <div class="metric-summary">
+          <div class="metric-title">FCP — First Contentful Paint</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">3.9 s</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 1.8 s</span>
+            <span class="badge">Needs improvement</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>Render-blocking CSS:</b> CDN Font Awesome link ngoài chặn vẽ khung đầu tiên.</li>
+              <li><b>JS Bundle kích thước lớn:</b> Quá nhiều script load đồng thời ngay từ lần đầu truy cập trong dev mode.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Loại bỏ CSS Font Awesome bên ngoài, chuyển sang dùng SVG inline có sẵn.</li>
+              <li>Chia tách code (Code Splitting) thông qua dynamic import để giảm dung lượng file bundle ban đầu.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- TBT Row -->
+      <div class="metric-row warning">
+        <div class="metric-summary">
+          <div class="metric-title">TBT — Total Blocking Time</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">340 ms</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 200 ms</span>
+            <span class="badge">Needs improvement</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>Khởi chạy script nặng:</b> JS chính chạy nặng, block Main Thread của trình duyệt lúc khởi tạo do load đồng thời <code>react-konva</code>, <code>lottie-react</code> dù người dùng chưa dùng đến các tính năng đó.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Áp dụng <b>Lazy Load</b> cho trang QR Editor và VCard/Greeting details để trì hoãn nạp code đồ hoạ Konva cho tới khi người dùng thực sự click điều hướng qua.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Speed Index Row -->
+      <div class="metric-row poor">
+        <div class="metric-summary">
+          <div class="metric-title">Speed Index</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">13.3 s</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 4.0 s</span>
+            <span class="badge">Poor</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>Tải JS chưa nén trong dev-mode:</b> Tốc độ kết nối Fast 4G giả lập tốn nhiều thời gian tải hết ~2.8MB code thô khiến trang hiển thị nội dung hoàn chỉnh rất chậm (lên tới 13s).</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Đo lường lại trên bản <b>Production Build</b> (Vite sẽ minify code, tree-shake thư viện thừa, gộp file giúp tối ưu đáng kể Speed Index).</li>
+              <li>Tối ưu dung lượng hình ảnh Sticker/Template tải ban đầu.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLS Lab Row -->
+      <div class="metric-row good">
+        <div class="metric-summary">
+          <div class="metric-title">CLS — Cumulative Layout Shift</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">0.09</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 0.05</span>
+            <span class="badge">Good (lab)</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li>Các icon hoặc font chữ load chậm từ CDN ngoài gây hiện tượng giật font (FOUT/FOIT) làm lệch nhẹ layout.</li>
+              <li>Thiếu kích thước placeholder (width/height) cố định cho phần khung QR.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Đặt <code>aspect-ratio</code> hoặc chiều rộng/cao cụ thể làm placeholder cho khung QR và các ảnh template.</li>
+              <li>Loại bỏ font từ CDN, tự lưu trữ (self-host) font local nếu cần.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Score Row -->
+      <div class="metric-row warning">
+        <div class="metric-summary">
+          <div class="metric-title">Performance Score</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">54</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &gt; 80</span>
+            <span class="badge">Needs improvement</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li>Điểm số tổng quan bị kéo xuống do FCP, LCP và Speed Index ở mức báo động đỏ dưới môi trường Fast 4G + Dev bundle chưa tối ưu.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Triển khai đồng bộ 4 giải pháp: Lazy render QR, Lazy load Editor, thay thế CDN CSS Font Awesome và tối ưu hoá xuất ảnh từ canvas.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="divider">
+
+    <!-- Section 2: Field Data / RUM -->
+    <div class="section-title">Field Data / RUM — Zalo Simulator · Slow 4G</div>
+    <div class="metrics-list">
+
+      <!-- INP Editor Row -->
+      <div class="metric-row warning">
+        <div class="metric-summary">
+          <div class="metric-title">INP — Chuyển trang/Lưu Editor</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">232 ms</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 100 ms</span>
+            <span class="badge">Needs improvement</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>Unmount Editor nặng nề:</b> Konva Stage dọn dẹp các canvas layer, groups đồng bộ khi thoát trang.</li>
+              <li><b>Mount MyQRsPage + Gọi API lập tức:</b> Gọi đồng thời <code>fetchQRRecords</code> và <code>fetchBanks</code> đúng lúc router đang chạy hiệu ứng slide transition làm nghẽn Main Thread.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li><b>Trì hoãn gọi API:</b> Đặt trong <code>setTimeout 200ms</code> để trang danh sách render mượt mà, hoàn thành hiệu ứng trượt transition trước khi tải dữ liệu.</li>
+              <li>Dùng state cục bộ (local state) hoặc cache nếu dữ liệu không đổi để hạn chế fetch API thừa.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLS Modal Row -->
+      <div class="metric-row poor">
+        <div class="metric-summary">
+          <div class="metric-title">CLS — Modal &amp; Spinner -> List</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">0.316</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 0.1</span>
+            <span class="badge">Poor</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>Thay thế giao diện đột ngột:</b> Khi chuyển đổi từ màn hình Loading (Spinner nhỏ) sang danh sách QR chiếm diện tích lớn làm nhảy giật toàn bộ layout phía dưới.</li>
+              <li>Modal <code>QRFocusView</code> xuất hiện đè lên mà không có transition mượt.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Xây dựng <b>Skeleton Screen</b> mô phỏng thẻ QR thay thế Spinner lúc loading để giữ chỗ layout cố định.</li>
+              <li>Set kích thước khung preview QR cụ thể để tránh giật CLS khi SVG vẽ xong.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- LCP Real Row -->
+      <div class="metric-row poor">
+        <div class="metric-summary">
+          <div class="metric-title">LCP — Thực tế (QRFocusView)</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">10.6 s</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 2.0 s</span>
+            <span class="badge">Poor</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li><b>Đặc thù Single Page Application (SPA):</b> Phần tử lớn nhất vẽ lên màn hình (tấm thiệp QR phóng to trong QRFocusView) chỉ xuất hiện sau khi người dùng click chọn card từ danh sách. Thời gian từ lúc load trang đến lúc click chọn được trình duyệt tính gộp vào LCP thực tế.</li>
+              <li><b>Tải bundle ban đầu chậm:</b> Mạng Slow 4G tốn 10.6s để load hết đống JS ban đầu trước khi trang render được.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Áp dụng Code Splitting (Lazy Load) cho trang Editor, Trang VCard Detail và Greeting Detail để giảm kích thước bundle trang đầu, giúp FCP/LCP tải trang ban đầu nhanh hơn.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- INP Input Row -->
+      <div class="metric-row good">
+        <div class="metric-summary">
+          <div class="metric-title">INP — Nhập form input</div>
+          <div>
+            <div class="metric-value-wrapper">
+              <span class="metric-value">56–112 ms</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="metric-meta">
+            <span class="target">Target &lt; 50 ms</span>
+            <span class="badge">Good</span>
+          </div>
+        </div>
+        <div class="metric-analysis">
+          <div class="analysis-col">
+            <h4>Nguyên nhân chính</h4>
+            <ul>
+              <li>Trình duyệt phải xử lý re-render form mỗi khi gõ phím. Nếu form chứa logic tính toán phức tạp hoặc vẽ canvas liên tục khi gõ sẽ gây trễ phản hồi.</li>
+            </ul>
+          </div>
+          <div class="analysis-col">
+            <h4>Kế hoạch tối ưu hóa</h4>
+            <ul>
+              <li>Áp dụng <b>Debounce / Throttle</b> khi cập nhật thông tin lên canvas QR Code. Chỉ render canvas sau khi dừng gõ 300ms thay vì render đồng bộ từng ký tự.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

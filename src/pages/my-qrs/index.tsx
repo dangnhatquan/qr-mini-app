@@ -42,7 +42,7 @@ const MyQRsPage: React.FC = () => {
 
   useEffect(() => {
     if (qrs.length > 0 && isInitialRender) {
-      const timer = setTimeout(() => setIsInitialRender(false), 1000);
+      const timer = setTimeout(() => setIsInitialRender(false), 200);
       return () => clearTimeout(timer);
     }
   }, [qrs, isInitialRender]);
